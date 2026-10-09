@@ -1,0 +1,16 @@
+{
+  "name": "rightsrail",
+  "private": true,
+  "version": "0.1.0",
+  "description": "RightsRail monorepo",
+  "workspaces": [
+    "apps/web",
+    "apps/api"
+  ],
+  "scripts": {
+    "test:python": "python -m unittest discover -s tests -t . -p test_*.py",
+    "check:compile": "python -m compileall -q contracts packages tests",
+    "lint": "ruff check .",
+    "typecheck": "mypy"
+  }
+}

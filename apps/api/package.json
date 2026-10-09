@@ -1,0 +1,8 @@
+{
+  "name": "@rightsrail/api",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "echo API foundation only; implementation is planned for phase 2"
+  }
+}

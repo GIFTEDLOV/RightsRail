@@ -1,0 +1,50 @@
+[project]
+name = "rightsrail"
+version = "0.1.0"
+description = "Semantic usage-rights enforcement on GenLayer"
+requires-python = ">=3.12"
+readme = "README.md"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.6",
+  "mypy>=1.11",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [
+  ".",
+  "packages/domain",
+  "packages/shared",
+  "packages/evidence",
+  "packages/media-analysis",
+  "packages/policy-engine",
+  "packages/genlayer-client",
+  "packages/indexer",
+  "packages/workflow",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["apps/web/node_modules"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_configs = true
+files = [
+  "contracts",
+  "packages/domain",
+  "packages/shared",
+  "packages/evidence",
+  "packages/media-analysis",
+  "packages/policy-engine",
+  "packages/genlayer-client",
+]
