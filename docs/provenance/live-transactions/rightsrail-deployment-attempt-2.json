@@ -1,0 +1,151 @@
+{
+  "attempt": "DEPLOYMENT_ATTEMPT_2",
+  "historical_attempt_1_tx": "0x6d1f81af7fe4872be8eeceb29a2331a082e6a822a6b912a99d2155b9a76d664e",
+  "network": "studio-dev",
+  "chain_id": 61997,
+  "rpc": "https://studio-dev.genlayer.com/api",
+  "account_name": "firewall-only",
+  "deployer": "0x33653e6e86807e41682d3346cdf648d6653384b1",
+  "source_sha256": "C312E73FA9A01DB54A81FB19CBE82DBD0B73C6F9308D71A181E3E07BD13D548B",
+  "abi_sha256": "E1314699D11B66D903E049F3D4DF558486E93225DFFD861A7A2E7210697969DB",
+  "source_bytes": 58413,
+  "runner": "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng",
+  "constructor_args": [],
+  "constructor_kwargs": {},
+  "user_value": "0",
+  "fee_value": "100000000000010352",
+  "fee_distribution": {
+    "leaderTimeunitsAllocation": "100",
+    "validatorTimeunitsAllocation": "200",
+    "appealRounds": "0",
+    "executionBudgetPerRound": "25000000000000000",
+    "executionConsumed": "0",
+    "totalMessageFees": "0",
+    "rotations": [
+      "3"
+    ],
+    "maxPriceGenPerTimeUnit": "2",
+    "storageFeeMaxGasPrice": "300000000",
+    "receiptFeeMaxGasPrice": "300000000"
+  },
+  "fee_policy": {
+    "enabled": true,
+    "genPerTimeUnit": "1",
+    "storageUnitPrice": "250000000",
+    "receiptGasPrice": "250000000",
+    "executionBudgetFloor": "76548000000000",
+    "timeUnitOverlayBps": "1500"
+  },
+  "raw_fee_estimate": {
+    "distribution": {
+      "leaderTimeunitsAllocation": "100",
+      "validatorTimeunitsAllocation": "200",
+      "appealRounds": "0",
+      "executionBudgetPerRound": "25000000000000000",
+      "executionConsumed": "0",
+      "totalMessageFees": "0",
+      "rotations": [
+        "3"
+      ],
+      "maxPriceGenPerTimeUnit": "2",
+      "storageFeeMaxGasPrice": "300000000",
+      "receiptFeeMaxGasPrice": "300000000"
+    },
+    "feeValue": "100000000000010352",
+    "policy": {
+      "enabled": true,
+      "genPerTimeUnit": "1",
+      "storageUnitPrice": "250000000",
+      "receiptGasPrice": "250000000",
+      "executionBudgetFloor": "76548000000000",
+      "timeUnitOverlayBps": "1500"
+    }
+  },
+  "balance_before": "1298823693749987307",
+  "latest_nonce_before": 14,
+  "pending_nonce_before": 14,
+  "deployment_request": {
+    "chainId": 61997,
+    "rpc": "https://studio-dev.genlayer.com/api",
+    "sender": "0x33653E6e86807e41682D3346CDf648D6653384B1",
+    "nonce": 14,
+    "latestNonce": 14,
+    "pendingNonce": 14,
+    "sourceSha256": "C312E73FA9A01DB54A81FB19CBE82DBD0B73C6F9308D71A181E3E07BD13D548B",
+    "abiSha256": "E1314699D11B66D903E049F3D4DF558486E93225DFFD861A7A2E7210697969DB",
+    "runner": "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng",
+    "userValue": "0",
+    "constructorArgs": [],
+    "constructorKwargs": {},
+    "observedReceiptCost": "78628000000000",
+    "fees": {
+      "feeValue": "100000000000010352",
+      "distribution": {
+        "leaderTimeunitsAllocation": "100",
+        "validatorTimeunitsAllocation": "200",
+        "appealRounds": "0",
+        "executionBudgetPerRound": "25000000000000000",
+        "executionConsumed": "0",
+        "totalMessageFees": "0",
+        "rotations": [
+          "3"
+        ],
+        "maxPriceGenPerTimeUnit": "2",
+        "storageFeeMaxGasPrice": "300000000",
+        "receiptFeeMaxGasPrice": "300000000"
+      },
+      "source": "genlayer-js:estimateTransactionFees -> proven Studio-dev profile",
+      "rawEstimate": {
+        "feeValue": "100000000000010352",
+        "executionBudgetPerRound": "25000000000000000"
+      },
+      "observedReceiptCost": "78628000000000"
+    },
+    "sdk_call": "client.deployContract({ account, code, args: [], kwargs: {}, fees })"
+  },
+  "phase": "DEPLOYMENT_VERIFIED_STOP",
+  "broadcast_count": 1,
+  "tx_hash": "0x7166a52cc76262d251ab1279cd476028d9eb5e230357047381df7f888ee2fa70",
+  "status": "FINALIZED",
+  "execution_status": "FINISHED_WITH_RETURN",
+  "contract_address": "0x984b996079d2591976FcfFb62d0506DF02E0396A",
+  "qualification_writes": 0,
+  "unexpected_writes": 0,
+  "created_at": "2026-10-09T23:40:35.526Z",
+  "broadcast_started_at": "2026-10-09T23:40:35.534Z",
+  "submitted_at": "2026-10-09T23:40:38.543Z",
+  "submitted_nonce": 14,
+  "result_name": "MAJORITY_AGREE",
+  "source_parity": true,
+  "abi_parity": true,
+  "runner_parity": true,
+  "public_method_count": 30,
+  "public_read_methods": 21,
+  "public_write_methods": 9,
+  "semantic_schema": "RIGHTSRAIL_USAGE_V1",
+  "semantic_keys": [
+    "asset_match",
+    "purpose_within_scope",
+    "prohibited_context_present",
+    "transformation_within_scope",
+    "attribution_satisfied",
+    "endorsement_implied",
+    "evidence_sufficient"
+  ],
+  "initial_state_verified": true,
+  "accounting_initial_state_verified": true,
+  "deployed_source_sha256": "C312E73FA9A01DB54A81FB19CBE82DBD0B73C6F9308D71A181E3E07BD13D548B",
+  "balance_after": "1298744605999986484",
+  "latest_nonce_after": 15,
+  "pending_nonce_after": 15,
+  "fee_accounting_summary": {
+    "paid_fee_value": "100000000000010352",
+    "primary_fee_spent": 79087750000823,
+    "total_refunded": "99920912250009529",
+    "execution_budget_per_round": "25000000000000000",
+    "execution_budget_overrun": 0,
+    "execution_budget_exceeded": false,
+    "nondeterministic_output_bytes": 64
+  },
+  "deployment_verdict": "SUCCESSFUL_DEPLOYMENT_ONLY_NO_QUALIFICATION"
+}
