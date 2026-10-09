@@ -1,0 +1,62 @@
+{
+  "schema": "RIGHTSRAIL_EVIDENCE_MANIFEST_V1",
+  "host": "https://rightsrail-evidence.vercel.app",
+  "source": "RightsRail project-created controlled fixtures",
+  "entries": [
+    {
+      "case": "REFERENCE",
+      "role": "protected source asset",
+      "purpose": "frozen policy reference asset",
+      "filename": "reference.svg",
+      "url": "https://rightsrail-evidence.vercel.app/reference.svg",
+      "mime": "image/svg+xml",
+      "exact_bytes": 1325,
+      "sha256": "0FAC13CBD9597297D4DE5F4B656A9DC97CF6B2D43A866347B5C14EF5DE57D3EF",
+      "expected_result": null
+    },
+    {
+      "case": "CASE_A",
+      "role": "proposed use artifact",
+      "purpose": "compliant editorial/newsletter usage with attribution",
+      "filename": "proposed-editorial.svg",
+      "url": "https://rightsrail-evidence.vercel.app/proposed-editorial.svg",
+      "mime": "image/svg+xml",
+      "exact_bytes": 1842,
+      "sha256": "4A6B49323FB5BC1E64A47129E73311EA3A6255300E77C76B94AF19968D2D1627",
+      "expected_result": "PERMITTED"
+    },
+    {
+      "case": "CASE_B",
+      "role": "proposed use artifact",
+      "purpose": "betting advertisement with implied endorsement",
+      "filename": "proposed-betting.svg",
+      "url": "https://rightsrail-evidence.vercel.app/proposed-betting.svg",
+      "mime": "image/svg+xml",
+      "exact_bytes": 1389,
+      "sha256": "788338F4D84AC1A020B1774B6E06EEA1BB259F5E119E1D9235159654A5C98517",
+      "expected_result": "DENIED"
+    },
+    {
+      "case": "CASE_C",
+      "role": "proposed use artifact",
+      "purpose": "insufficient context evidence fixture",
+      "filename": "proposed-missing-context.svg",
+      "url": "https://rightsrail-evidence.vercel.app/proposed-missing-context.svg",
+      "mime": "image/svg+xml",
+      "exact_bytes": 1180,
+      "sha256": "F70930915E70D3B23BE250E38F6D16FB68B006639E2967B2C3A0E701C38ACE69",
+      "expected_result": "INCONCLUSIVE"
+    },
+    {
+      "case": "CASE_D",
+      "role": "proposed use artifact",
+      "purpose": "unrelated asset with sufficient evidence",
+      "filename": "unrelated.svg",
+      "url": "https://rightsrail-evidence.vercel.app/unrelated.svg",
+      "mime": "image/svg+xml",
+      "exact_bytes": 888,
+      "sha256": "2CCF22846EE7DF949ED64A61F7775ECBAA0A8A2EE93DD4C5099E9A9117312D89",
+      "expected_result": "NOT_APPLICABLE"
+    }
+  ]
+}

@@ -111,29 +111,30 @@ the known-good JS RC client. It recognized the frozen source as a contract with
 
 ## Deployer and funding status
 
-No account was selected for RightsRail deployment. The local keystore contains
-accounts named for other projects or shared tooling, so using one would mix
-nonce and provenance history. No private key, mnemonic, password, or keystore
-secret was read or recorded.
+Under the revised Phase 4B authorization, the already configured and
+Studio-dev-tested account was selected for preparation only. No private key,
+mnemonic, password, or keystore secret was read or recorded.
 
 ```text
-ACCOUNT_NAME: NONE_SELECTED
-ADDRESS: N/A
-LATEST_NONCE: N/A
-PENDING_NONCE: N/A
-BALANCE: N/A
+ACCOUNT_NAME: firewall-only
+ADDRESS: 0x33653e6e86807e41682d3346cdf648d6653384b1
+ACCOUNT_STATUS: active, unlocked, Studio-dev chain 61997
+LATEST_NONCE: 11
+PENDING_NONCE: 11
+BALANCE_WEI: 1299053337749989776
+BALANCE_GEN: 1.299053337749989776
 ```
 
-A fresh, dedicated RightsRail-only signer is required before deployment
-authorization. Its latest and pending nonce must be read immediately before
-preparing the request and must agree unless a known transaction explains the
-difference.
+The latest and pending nonce agree. This snapshot is not deployment nonce
+authorization. Both values must be read again immediately before any future
+authorized broadcast.
 
 ## Future deployment request
 
 The future request must be prepared through the proven JS SDK explicit-fee
 path, not a CLI default path. This is a normalized template only; it has no
-real sender or nonce and was not signed.
+The sender is the selected existing account, but the nonce remains a runtime
+placeholder and the request was not signed.
 
 ```json
 {
@@ -141,7 +142,7 @@ real sender or nonce and was not signed.
   "rpc": "https://studio-dev.genlayer.com/api",
   "sourceSha256": "C312E73FA9A01DB54A81FB19CBE82DBD0B73C6F9308D71A181E3E07BD13D548B",
   "runner": "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng",
-  "sender": "<FRESH_RIGHTSRAIL_ADDRESS>",
+  "sender": "0x33653e6e86807e41682d3346cdf648d6653384b1",
   "nonce": "<READ_IMMEDIATELY_BEFORE_SIGNING>",
   "userValue": "0",
   "fees": {
@@ -198,6 +199,16 @@ The controlled policy uses a deliberately small nonzero fee of `10` wei. Four
 requests therefore require `40` wei of total escrow. The contract requires
 exact escrow equality with the frozen policy fee. No live escrow was sent.
 
+With the current read-only balance, the planning requirement is already
+covered:
+
+```text
+BALANCE_AVAILABLE: 1299053337749989776 wei
+TOTAL_REQUIRED: 2200755000074405 wei
+FUNDING_REQUIRED: NO
+FUNDING_DEFICIT: 0 wei
+```
+
 ## Controlled live qualification plan
 
 The four cases use the original RightsRail fictional asset and one frozen
@@ -216,18 +227,26 @@ requester has externally received GEN.
 
 ## Evidence hosting plan
 
-The project-created SVG fixtures are local and content-stable. They have not
-been published to a public host. A future immutable or content-addressed host
-must serve the exact bytes below; the served response must be re-hashed and
-byte-counted immediately before evidence commit.
+The five project-created SVG fixtures were published to the evidence-only
+static host `https://rightsrail-evidence.vercel.app`. The RightsRail
+application was not deployed. Each public response returned HTTP 200 and
+`image/svg+xml`; the downloaded bytes exactly matched the local fixture bytes
+and SHA-256.
 
 | Fixture | Local source | Public URL | Bytes | SHA-256 | MIME |
 | --- | --- | --- | ---: | --- | --- |
-| Reference | `apps/web/public/demo/reference.svg` | Not published | `1325` | `0FAC13CBD9597297D4DE5F4B656A9DC97CF6B2D43A866347B5C14EF5DE57D3EF` | `image/svg+xml` |
-| Case A | `apps/web/public/demo/proposed-editorial.svg` | Not published | `1842` | `4A6B49323FB5BC1E64A47129E73311EA3A6255300E77C76B94AF19968D2D1627` | `image/svg+xml` |
-| Case B | `apps/web/public/demo/proposed-betting.svg` | Not published | `1389` | `788338F4D84AC1A020B1774B6E06EEA1BB259F5E119E1D9235159654A5C98517` | `image/svg+xml` |
-| Case C | `apps/web/public/demo/proposed-missing-context.svg` | Not published | `1180` | `F70930915E70D3B23BE250E38F6D16FB68B006639E2967B2C3A0E701C38ACE69` | `image/svg+xml` |
-| Case D | `apps/web/public/demo/unrelated.svg` | Not published | `888` | `2CCF22846EE7DF949ED64A61F7775ECBAA0A8A2EE93DD4C5099E9A9117312D89` | `image/svg+xml` |
+| Reference | `apps/web/public/demo/reference.svg` | `https://rightsrail-evidence.vercel.app/reference.svg` | `1325` | `0FAC13CBD9597297D4DE5F4B656A9DC97CF6B2D43A866347B5C14EF5DE57D3EF` | `image/svg+xml` |
+| Case A | `apps/web/public/demo/proposed-editorial.svg` | `https://rightsrail-evidence.vercel.app/proposed-editorial.svg` | `1842` | `4A6B49323FB5BC1E64A47129E73311EA3A6255300E77C76B94AF19968D2D1627` | `image/svg+xml` |
+| Case B | `apps/web/public/demo/proposed-betting.svg` | `https://rightsrail-evidence.vercel.app/proposed-betting.svg` | `1389` | `788338F4D84AC1A020B1774B6E06EEA1BB259F5E119E1D9235159654A5C98517` | `image/svg+xml` |
+| Case C | `apps/web/public/demo/proposed-missing-context.svg` | `https://rightsrail-evidence.vercel.app/proposed-missing-context.svg` | `1180` | `F70930915E70D3B23BE250E38F6D16FB68B006639E2967B2C3A0E701C38ACE69` | `image/svg+xml` |
+| Case D | `apps/web/public/demo/unrelated.svg` | `https://rightsrail-evidence.vercel.app/unrelated.svg` | `888` | `2CCF22846EE7DF949ED64A61F7775ECBAA0A8A2EE93DD4C5099E9A9117312D89` | `image/svg+xml` |
+
+The published manifest is
+`https://rightsrail-evidence.vercel.app/manifest.json`, with `2351` bytes and
+SHA-256
+`7114DAD3B100993B17DEEA40EE3A7D048E75B27568EDAC8DA1C2DD53600205DA`.
+The complete table is recorded in
+[`docs/LIVE_QUALIFICATION_EVIDENCE.md`](LIVE_QUALIFICATION_EVIDENCE.md).
 
 ## Result-shopping and reconciliation rules
 
@@ -281,10 +300,10 @@ is:
 
 ## Known limitations and authorization boundary
 
-- No dedicated RightsRail signer exists yet; existing local accounts were not
-  selected because their names and nonce history belong to other projects or
-  shared tooling.
-- Evidence files are not yet hosted at stable public URLs.
+- The selected account is an existing account named `firewall-only`; it is used
+  only under the explicit revised Phase 4B preparation authorization.
+- The evidence host is a separate evidence-only static project and does not
+  represent a deployed RightsRail contract or canonical application.
 - RightsRail has no deployed contract address.
 - `genlayer-js 2.0.0-rc.1` is available in the known-good CharterLock client,
   not as a direct RightsRail dependency; the proven SDK path is documented and
@@ -295,5 +314,4 @@ is:
   fee estimation is required immediately before every future write.
 
 The deployment authorization boundary is intentionally still closed. No
-blockchain write occurred in Phase 4A.
-
+blockchain write occurred in Phase 4B.
