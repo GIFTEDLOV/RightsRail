@@ -11,7 +11,7 @@ RightsRail does not determine legal copyright ownership or legal infringement. I
 This repository contains the local runtime foundation only:
 
 - a real GenLayer contract at `contracts/rightsrail.py` using the known-good Studio-dev RC5 `py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng` dialect;
-- actual `gl.contract.Contract`, public view/write/payable methods, TreeMap/DynArray storage, `gl.vm.run_nondet_default`, `gl.vm.Return`, and deterministic native-value settlement calls;
+- actual `gl.contract.Contract`, public view/write/payable methods, TreeMap/DynArray storage, `gl.vm.run_nondet_default`, `gl.vm.Return`, and deterministic entitlement settlement accounting;
 - strict seven-boolean semantic parsing, independent validator evaluation, two-image evidence bounds, authenticated URL/media bindings, append-only records, and frozen-policy state transitions;
 - deterministic `INCONCLUSIVE`, `NOT_APPLICABLE`, `PERMITTED`, and `DENIED` precedence;
 - generated ABI/schema at `artifacts/rightsrail.abi.json`;

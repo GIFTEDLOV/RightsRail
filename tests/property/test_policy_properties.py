@@ -45,10 +45,28 @@ def test_no_non_permitted_result_can_create_a_permit(vector: SemanticVector) -> 
         generation=1,
     )
     state.settle(request_id="request-001")
+    request = state.requests["request-001"]
+    assert request.escrow_consumed == request.escrow_received
+    assert request.escrowed_value == 0
+    assert request.entitlement_amount == request.escrow_received
+    assert request.settlement_id is not None
     if adjudication.result != PolicyResult.PERMITTED.value:
         assert state.permits == {}
+        assert request.entitlement_type == "REFUND_ALLOCATED"
+        assert request.entitlement_recipient == request.requester
+        assert state.refundable_by_address[request.requester] == request.escrow_received
     else:
         assert len(state.permits) == 1
+        policy = state.policies[request.policy_id]
+        assert request.entitlement_type == "PAYOUT_ALLOCATED"
+        assert request.entitlement_recipient == policy.settlement_recipient
+        assert state.claimable_by_address[policy.settlement_recipient] == policy.required_fee_wei
+    assert state.total_escrow_received == (
+        state.total_escrowed
+        + state.total_payout_allocated
+        + state.total_refund_allocated
+        - state.total_withdrawal_emitted
+    )
 
 
 def test_settlement_and_permit_counts_are_bounded_by_one() -> None:
@@ -62,3 +80,4 @@ def test_settlement_and_permit_counts_are_bounded_by_one() -> None:
     state.settle(request_id="request-001")
     assert len(state.settlements) <= 1
     assert len(state.permits) <= 1
+    assert state.requests["request-001"].escrow_consumed in {0, 10}

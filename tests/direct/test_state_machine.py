@@ -82,9 +82,16 @@ class RightsRailStateMachineTests(unittest.TestCase):
         )
         settlement = state.settle(request_id="request-001")
         self.assertEqual(adjudication.result, PolicyResult.PERMITTED.value)
-        self.assertEqual(settlement.status, "TRANSFER_REQUIRED")
+        self.assertEqual(settlement.status, "PAYOUT_ALLOCATED")
         self.assertEqual(settlement.amount, 10)
         self.assertEqual(settlement.recipient, RECIPIENT)
+        self.assertEqual(state.requests["request-001"].escrow_consumed, 10)
+        self.assertEqual(state.requests["request-001"].entitlement_type, "PAYOUT_ALLOCATED")
+        self.assertEqual(state.claimable_by_address[RECIPIENT], 10)
+        self.assertEqual(state.total_escrow_received, 10)
+        self.assertEqual(state.total_escrowed, 0)
+        self.assertEqual(state.total_payout_allocated, 10)
+        self.assertEqual(state.total_refund_allocated, 0)
         self.assertEqual(len(state.permits), 1)
         permit = next(iter(state.permits.values()))
         self.assertEqual(permit.policy_id, "policy-fictional-001")
@@ -103,8 +110,11 @@ class RightsRailStateMachineTests(unittest.TestCase):
         )
         settlement = state.settle(request_id="request-001")
         self.assertEqual(adjudication.result, PolicyResult.DENIED.value)
-        self.assertEqual(settlement.status, "REFUND_REQUIRED")
+        self.assertEqual(settlement.status, "REFUND_ALLOCATED")
         self.assertEqual(settlement.recipient, "requester-001")
+        self.assertEqual(state.refundable_by_address["requester-001"], 10)
+        self.assertEqual(state.total_escrowed, 0)
+        self.assertEqual(state.total_refund_allocated, 10)
         self.assertEqual(state.permits, {})
 
     def test_inconclusive_takes_precedence_and_refunds(self) -> None:
@@ -119,7 +129,8 @@ class RightsRailStateMachineTests(unittest.TestCase):
         )
         settlement = state.settle(request_id="request-001")
         self.assertEqual(adjudication.result, PolicyResult.INCONCLUSIVE.value)
-        self.assertEqual(settlement.status, "REFUND_REQUIRED")
+        self.assertEqual(settlement.status, "REFUND_ALLOCATED")
+        self.assertEqual(state.refundable_by_address["requester-001"], 10)
         self.assertEqual(state.permits, {})
 
     def test_unrelated_asset_is_not_applicable(self) -> None:
@@ -135,6 +146,65 @@ class RightsRailStateMachineTests(unittest.TestCase):
         state.settle(request_id="request-001")
         self.assertEqual(adjudication.result, PolicyResult.NOT_APPLICABLE.value)
         self.assertEqual(state.permits, {})
+
+    def test_two_independent_requests_conserve_payout_and_refund_entitlements(self) -> None:
+        state = build_state()
+        state.submit_request(
+            request_id="request-002",
+            policy_id="policy-fictional-001",
+            policy_version=1,
+            requester="requester-002",
+            purpose_description="commercial editorial newsletter follow-up",
+            channel="newsletter",
+            context_description="independent editorial article with no endorsement",
+            proposed_asset_sha256=ASSET_SHA,
+            proposed_asset_exact_bytes=1500,
+            proposed_media_type="image/png",
+            public_evidence_url="https://example.test/article-2",
+            attribution_text="Image courtesy of the issuer",
+            escrowed_value=10,
+        )
+        state.commit_evidence(
+            evidence_id="evidence-002",
+            request_id="request-002",
+            reference_asset_sha256=ASSET_SHA,
+            proposed_asset_sha256=ASSET_SHA,
+            content_sha256="c" * 64,
+            exact_byte_length=512,
+            media_type="text/html",
+            source_digest="d" * 64,
+            authority_digest="e" * 64,
+            schema_version="RIGHTSRAIL_EVIDENCE_V1",
+            reference_source="fixture://protected/original.png",
+            proposed_source="fixture://proposed/use-2.png",
+            public_evidence_url="https://example.test/article-2",
+        )
+        state.record_adjudication(
+            request_id="request-001",
+            evidence_id="evidence-001",
+            semantic_output=compliant_vector(),
+            generation=1,
+        )
+        denied = compliant_vector()
+        denied["prohibited_context_present"] = True
+        state.record_adjudication(
+            request_id="request-002",
+            evidence_id="evidence-002",
+            semantic_output=denied,
+            generation=1,
+        )
+        state.settle(request_id="request-001")
+        state.settle(request_id="request-002")
+        self.assertEqual(state.total_escrow_received, 20)
+        self.assertEqual(state.total_escrowed, 0)
+        self.assertEqual(state.total_payout_allocated, 10)
+        self.assertEqual(state.total_refund_allocated, 10)
+        self.assertEqual(state.claimable_by_address[RECIPIENT], 10)
+        self.assertEqual(state.refundable_by_address["requester-002"], 10)
+        self.assertEqual(
+            state.total_escrow_received,
+            state.total_escrowed + state.total_payout_allocated + state.total_refund_allocated,
+        )
 
     def test_evidence_and_first_adjudication_are_append_only(self) -> None:
         state = build_state()

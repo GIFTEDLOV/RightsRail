@@ -12,7 +12,7 @@ This phase is local-only. Do not deploy, spend GEN, push to GitHub, create a rem
 6. Verify the exact semantic schema and deterministic precedence tests.
 7. Verify one-state-too-early, replay, evidence immutability, permit binding, and settlement tests.
 8. Run the RC5 direct execution tests with controlled two-image mocks and explicit validator replay. The test-only adapter must remain isolated from contract code.
-9. Native transfer/refund calls are qualified with deterministic mocks; direct gltest does not emulate transaction rollback for a failing emitted transfer, so end-to-end atomicity remains a release blocker.
+9. Verify settlement allocation and conservation invariants. `settle_request` must not emit an external transfer; withdrawal/delivery reconciliation is a later phase.
 10. Obtain explicit approval for any future deployment or GEN spend.
 
 ## Artifact recording
@@ -23,7 +23,7 @@ Record the contract SHA-256, ABI SHA-256, pinned dependency header, GenVM valida
 
 - external media/context capture service with durable receipts;
 - hosted write/transaction execution and receipt qualification;
-- crash-safe journal and idempotent transfer/refund worker;
+- crash-safe journal and idempotent entitlement/delivery reconciliation worker;
 - operational monitoring separating consensus rotation, evidence failure, business result, and transfer execution;
 - adversarial model/prompt regression corpus;
 - final deployment review and explicit economic sign-off.

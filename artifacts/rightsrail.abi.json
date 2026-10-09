@@ -210,6 +210,12 @@
       "ret": "null",
       "payable": false
     },
+    "get_accounting_status": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
     "get_adjudication": {
       "params": [
         [
@@ -239,6 +245,17 @@
           "$rep": "string"
         }
       ]
+    },
+    "get_claimable": {
+      "params": [
+        [
+          "account",
+          "address"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "int"
     },
     "get_evidence": {
       "params": [
@@ -346,6 +363,17 @@
         [
           "policy_id",
           "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "int"
+    },
+    "get_refundable": {
+      "params": [
+        [
+          "account",
+          "address"
         ]
       ],
       "kwparams": {},

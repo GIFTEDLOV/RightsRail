@@ -40,7 +40,10 @@ else all five permission predicates pass -> PERMITTED
 else -> DENIED
 ```
 
-Only `PERMITTED` issues a permit and transfers the frozen licensing fee. The other three outcomes create no permit and refund the exact escrow under the deterministic settlement rule.
+Only `PERMITTED` issues a permit and allocates the frozen licensing fee to the
+frozen recipient's claimable balance. The other three outcomes create no permit
+and allocate the exact escrow to the original requester's refundable balance.
+Settlement is canonical entitlement allocation, not external delivery.
 
 ## One-state-too-early audit
 

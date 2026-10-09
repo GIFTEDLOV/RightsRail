@@ -103,6 +103,14 @@ def test_mutant_generation_settlement_and_binding_guards_are_killed() -> None:
     settlement = state.settle(request_id="request-001")
     assert settlement.amount == state.policies["policy-fictional-001"].required_fee_wei
     assert settlement.recipient == state.policies["policy-fictional-001"].settlement_recipient
+    assert settlement.status == "PAYOUT_ALLOCATED"
+    assert state.requests["request-001"].escrow_consumed == 10
+    assert state.requests["request-001"].entitlement_type == "PAYOUT_ALLOCATED"
+    assert state.claimable_by_address[settlement.recipient] == 10
+    assert state.refundable_by_address == {}
+    assert state.total_escrowed == 0
+    assert state.total_payout_allocated == 10
+    assert state.total_refund_allocated == 0
     assert len(state.permits) == 1
     permit = next(iter(state.permits.values()))
     assert permit.request_digest == state.requests["request-001"].request_digest
@@ -118,7 +126,10 @@ def test_mutant_generation_settlement_and_binding_guards_are_killed() -> None:
 def test_mutation_matrix_has_all_requested_security_targets() -> None:
     source = (  # keep the mutation target names discoverable in review
         "evidence_sufficiency asset_match permit_condition frozen_policy evidence_overwrite "
-        "generation settlement permit_binding fee_binding recipient_binding request_binding"
+        "generation settlement permit_binding fee_binding recipient_binding request_binding "
+        "wrong_payout_recipient wrong_refund_recipient wrong_amount permit_on_denied "
+        "permit_on_inconclusive permit_on_not_applicable escrow_clear dual_entitlement "
+        "frozen_fee"
     )
     for target in (
         "evidence_sufficiency",
@@ -132,5 +143,14 @@ def test_mutation_matrix_has_all_requested_security_targets() -> None:
         "fee_binding",
         "recipient_binding",
         "request_binding",
+        "wrong_payout_recipient",
+        "wrong_refund_recipient",
+        "wrong_amount",
+        "permit_on_denied",
+        "permit_on_inconclusive",
+        "permit_on_not_applicable",
+        "escrow_clear",
+        "dual_entitlement",
+        "frozen_fee",
     ):
         assert target in source

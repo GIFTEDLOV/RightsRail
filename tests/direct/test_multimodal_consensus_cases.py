@@ -206,5 +206,7 @@ def test_controlled_multimodal_consensus_cases(
 
     direct_vm.sender = direct_charlie
     settlement = contract.settle_request("request-001")
-    assert settlement == ("TRANSFERRED" if expected == "PERMITTED" else "REFUNDED")
+    assert settlement == (
+        "PAYOUT_ALLOCATED" if expected == "PERMITTED" else "REFUND_ALLOCATED"
+    )
     assert len(contract.get_permit_ids(0, 64)) == (1 if expected == "PERMITTED" else 0)

@@ -10,11 +10,15 @@ RightsRail enforces a frozen issuer policy. It does not claim legal ownership, l
 2. Authenticated evidence: at most a protected/reference image, a proposed-use image or webpage screenshot, and optional public context text/screenshot with exact bindings.
 3. Bounded semantic consensus: exactly seven booleans, independently produced by leader and validator.
 4. Deterministic policy: fixed precedence maps the vector to one of four results.
-5. Deterministic settlement: fixed amount, recipient, request, policy version, generation, and one-shot settlement guard.
+5. Deterministic settlement: fixed amount, recipient, request, policy version, generation, one-shot guard, and internal entitlement allocation.
 
 ## Authority
 
 There is no global owner override. The issuer controls only its own draft, its freeze, and its close-for-future-requests operation. After request/evidence commitment, adjudication requires no issuer cooperation. The issuer cannot rewrite frozen policy, replace evidence, select booleans, select a verdict, suppress adjudication, or delete an adverse result.
+
+Settlement consumes escrow exactly once into either a payout entitlement for the
+frozen recipient or a refund entitlement for the requester. It does not claim
+that an asynchronous external value message has completed.
 
 ## Consensus safety
 

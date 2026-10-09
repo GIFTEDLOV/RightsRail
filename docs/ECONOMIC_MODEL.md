@@ -2,29 +2,54 @@
 
 ## Frozen fee binding
 
-`required_fee_wei` and `settlement_recipient` are frozen policy fields. A payable request must carry exactly the frozen fee. The model never selects an amount, recipient, or refund destination.
+`required_fee_wei` and `settlement_recipient` are frozen policy fields. A
+payable request must carry exactly the frozen fee. The semantic evaluator never
+selects an amount, recipient, or refund destination.
 
-## Terminal settlement
+## Terminal settlement and entitlement allocation
 
-Settlement is allowed only after a canonical adjudication and exact request/policy-version/generation checks.
+Settlement is allowed only after a canonical adjudication and exact
+request/policy-version/generation/evidence checks.
 
-| Result | Permit | Recipient | Amount |
+| Result | Permit | Entitlement recipient | Amount |
 | --- | --- | --- | --- |
 | `PERMITTED` | one bound permit | frozen settlement recipient | exact frozen fee |
-| `DENIED` | none | original requester | exact escrow refund |
-| `INCONCLUSIVE` | none | original requester | exact escrow refund |
-| `NOT_APPLICABLE` | none | original requester | exact escrow refund |
+| `DENIED` | none | original requester | exact escrow |
+| `INCONCLUSIVE` | none | original requester | exact escrow |
+| `NOT_APPLICABLE` | none | original requester | exact escrow |
 
-The contract records one settlement ID per request. A permitted settlement creates a permit whose binding includes request, request digest, evidence hash, adjudication ID, generation, policy version, fee, recipient, and expiry. Native transfer is attempted after all deterministic writes; a runtime revert must revert the transaction rather than leave a canonical permit with an unpaid settlement.
+`settle_request` performs no external value transfer. It consumes the request
+escrow and allocates exactly one internal entitlement in canonical GenVM state.
+The permitted recipient receives a claimable balance; every other result
+receives a refundable balance for the requester.
+
+The conservation equation is:
+
+```text
+total_escrow_received
+== total_escrowed
+ + total_payout_allocated
+ + total_refund_allocated
+ - total_withdrawal_emitted
+```
+
+`total_withdrawal_emitted` remains zero because RightsRail does not expose a
+withdrawal method in this phase. An external message is never treated as
+delivered merely because it was emitted.
 
 ## Invariants
 
 - escrow equals the frozen required fee;
 - a request settles at most once;
 - a request receives at most one permit;
+- a request cannot receive both payout and refund entitlements;
 - a payout can target only the frozen recipient;
 - a refund can target only the original requester;
 - settlement cannot precede terminal adjudication;
-- fee, recipient, request, policy version, evidence hash, and generation cannot be substituted at settlement.
+- fee, recipient, request, policy version, evidence hash, and generation cannot be substituted at settlement;
+- settled request escrow is zero;
+- `escrow_received` preserves the historical input while live `escrowed_value` is zero after settlement;
+- aggregate counters equal the sum of request-level allocations.
 
-The local deterministic reference model and mutation tests cover the state guards. Full native-value execution remains a runtime-harness integration gate.
+The local deterministic reference model, direct tests, property tests, and
+mutation tests cover these accounting and state guards.

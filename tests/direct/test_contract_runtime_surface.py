@@ -37,7 +37,17 @@ def test_contract_uses_real_storage_and_consensus_primitives() -> None:
         "evidence_records",
         "adjudication_records",
     } <= annotations
-    assert {"permit_records", "settlement_records", "audit_records", "sequence"} <= annotations
+    assert {
+        "permit_records",
+        "settlement_records",
+        "claimable_by_address",
+        "refundable_by_address",
+        "total_escrowed",
+        "total_payout_allocated",
+        "total_refund_allocated",
+        "audit_records",
+        "sequence",
+    } <= annotations
     assert "gl.vm.run_nondet_default" in source
     assert "isinstance(leaders_result, gl.vm.Return)" in source
     assert "_semantic_tuple(leader) == _semantic_tuple(own)" in source
@@ -63,4 +73,7 @@ def test_settlement_is_after_adjudication_and_permit_binding_is_explicit() -> No
     assert '"permit_binding_hash"' in source
     assert '"request_digest": request["request_digest"]' in source
     assert '"settlement_recipient": policy["settlement_recipient"]' in source
-    assert 'if amount > 0:' in source
+    assert '"settlement_type": settlement_type' in source
+    assert 'self._consume_total_escrowed(amount)' in source
+    assert "emit_transfer" not in source
+    assert "_Payable" not in source

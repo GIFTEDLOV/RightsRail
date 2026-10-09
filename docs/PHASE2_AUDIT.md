@@ -34,7 +34,7 @@ The pipeline is URL -> fetch/capture -> exact byte/content check -> digest compa
 
 ## Payment invariants
 
-The request escrow must equal the frozen fee. `PERMITTED` creates one bound permit and transfers the exact fee to the frozen recipient. Every other terminal result creates no permit and refunds the original requester. The contract rejects wrong recipient/request/version/evidence/generation, duplicate settlement, duplicate permit, and settlement before adjudication. RC5 direct tests qualify these calls with a native-transfer mock; direct gltest does not roll back storage after a deliberately failing mocked transfer, so transaction-level failure atomicity remains a release blocker.
+The request escrow must equal the frozen fee. `PERMITTED` creates one bound permit and allocates the exact fee to the frozen recipient's claimable balance. Every other terminal result creates no permit and allocates the exact escrow to the original requester. The contract rejects wrong recipient/request/version/evidence/generation, duplicate settlement, duplicate permit, and settlement before adjudication. Aggregate accounting exposes received, escrowed, payout-allocated, refund-allocated, and withdrawal-emitted counters with a documented conservation equation. `settle_request` performs no external transfer.
 
 ## Replay
 
@@ -52,9 +52,9 @@ Malformed model output, missing return wrapper, validator disagreement, fetch fa
 
 - Contract: `contracts/rightsrail.py`.
 - ABI: `artifacts/rightsrail.abi.json`.
-- Public methods: 27 total, 18 reads, 9 writes.
+- Public methods: 30 total, 21 reads, 9 writes.
 - Runtime header: `py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng`.
 - Validation bundle: `GENVM_VERSION=v0.6.0-rc5`, `py-genlayer 0.19.0rc2`, `genlayer-test 0.30.0rc2`, `genvm-linter 0.11.1rc2`, `genlayer CLI 0.40.0-rc.3`.
-- Hosted exact-source schema: pass, 27 methods (18 views, 9 writes).
+- Hosted exact-source schema must be rerun after the accounting surface change: expected 30 methods (21 views, 9 writes).
 - Local validation/typecheck/schema: pass. Static lint: pass with known RC5 E010 warnings for valid `gl.nondet` helper reachability.
 - Final command matrix and direct case counts: `docs/PHASE2_5_AUDIT.md`.

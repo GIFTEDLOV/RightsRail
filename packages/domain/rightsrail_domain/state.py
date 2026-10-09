@@ -97,6 +97,13 @@ class RightsRailState:
         self.adjudication_by_request: dict[str, str] = {}
         self.permits: dict[str, Permit] = {}
         self.settlements: dict[str, Settlement] = {}
+        self.claimable_by_address: dict[str, int] = {}
+        self.refundable_by_address: dict[str, int] = {}
+        self.total_escrow_received = 0
+        self.total_escrowed = 0
+        self.total_payout_allocated = 0
+        self.total_refund_allocated = 0
+        self.total_withdrawal_emitted = 0
         self.journal: list[JournalEntry] = []
 
     def _record(self, action: str, subject_id: str, details: Mapping[str, Any]) -> None:
@@ -299,9 +306,18 @@ class RightsRailState:
             created_at=created_at,
             state=RequestState.SUBMITTED,
             generation=0,
+            escrow_received=escrowed_value,
+            escrow_consumed=0,
+            entitlement_type=None,
+            entitlement_recipient=None,
+            entitlement_amount=0,
+            settlement_id=None,
+            settled_at=None,
         )
         self.requests[request_id] = request
         self.request_digests[request_digest] = request_id
+        self.total_escrow_received += escrowed_value
+        self.total_escrowed += escrowed_value
         self._record(
             "SUBMIT_REQUEST", request_id, {"policy_id": policy_id, "policy_version": policy_version}
         )
@@ -433,29 +449,90 @@ class RightsRailState:
             raise StateTransitionError("settlement is append-only and can occur once")
         adjudication = self.adjudications[self.adjudication_by_request[request_id]]
         policy = self._policy(request.policy_id)
+        if request.required_fee != policy.required_fee_wei:
+            raise InvariantViolation("settlement fee does not match the frozen policy")
+        if request.escrowed_value != request.required_fee:
+            raise InvariantViolation("settlement escrow is not exact")
+        if request.escrow_received != request.escrowed_value:
+            raise InvariantViolation("request escrow received value is inconsistent")
+        if request.escrow_consumed != 0 or request.entitlement_type is not None:
+            raise StateTransitionError("request escrow has already been consumed")
+        if request.entitlement_recipient is not None or request.entitlement_amount != 0:
+            raise StateTransitionError("request entitlement is already allocated")
+        if request.settlement_id is not None or request.settled_at is not None:
+            raise StateTransitionError("request settlement binding is already populated")
+        if adjudication.request_id != request_id or adjudication.policy_id != policy.policy_id:
+            raise InvariantViolation("settlement binding does not match request and policy")
+        if (
+            adjudication.policy_version != policy.version
+            or adjudication.generation != request.generation
+        ):
+            raise InvariantViolation(
+                "settlement binding does not match policy version and generation"
+            )
+        evidence = self._evidence_for(request_id, adjudication.evidence_id)
+        if evidence.policy_version != policy.version:
+            raise InvariantViolation("settlement evidence does not match policy version")
+        settlement_id = "settle-" + canonical_digest(
+            {
+                "request_id": request_id,
+                "adjudication_id": adjudication.adjudication_id,
+                "generation": adjudication.generation,
+            }
+        )[:48]
+        if settlement_id in self.settlements:
+            raise StateTransitionError("settlement identity already exists")
+        amount = request.escrowed_value
+        if self.total_escrowed < amount:
+            raise InvariantViolation("aggregate escrow is insufficient")
         now = self._clock()
         if adjudication.result == "PERMITTED":
-            settlement = Settlement(
-                request_id=request_id,
-                result=adjudication.result,
-                amount=policy.required_fee_wei,
-                recipient=policy.settlement_recipient,
-                settled_at=now,
-                status="TRANSFER_REQUIRED",
-            )
+            status = "PAYOUT_ALLOCATED"
+            entitlement_type = "PAYOUT_ALLOCATED"
+            recipient = policy.settlement_recipient
             permit = self._issue_permit(request, policy, adjudication, now)
-            self.permits[permit.permit_id] = permit
         else:
-            settlement = Settlement(
-                request_id=request_id,
-                result=adjudication.result,
-                amount=request.escrowed_value,
-                recipient=request.requester,
-                settled_at=now,
-                status="REFUND_REQUIRED",
+            status = "REFUND_ALLOCATED"
+            entitlement_type = "REFUND_ALLOCATED"
+            recipient = request.requester
+            permit = None
+        settlement = Settlement(
+            settlement_id=settlement_id,
+            request_id=request_id,
+            result=adjudication.result,
+            amount=amount,
+            recipient=recipient,
+            settled_at=now,
+            status=status,
+            entitlement_type=entitlement_type,
+            escrow_received=request.escrow_received,
+            escrow_consumed=amount,
+        )
+        if entitlement_type == "PAYOUT_ALLOCATED":
+            self.claimable_by_address[recipient] = (
+                self.claimable_by_address.get(recipient, 0) + amount
             )
+            self.total_payout_allocated += amount
+            if permit is not None:
+                self.permits[permit.permit_id] = permit
+        else:
+            self.refundable_by_address[recipient] = (
+                self.refundable_by_address.get(recipient, 0) + amount
+            )
+            self.total_refund_allocated += amount
         self.settlements[request_id] = settlement
-        self.requests[request_id] = replace(request, state=RequestState.SETTLED)
+        self.total_escrowed -= amount
+        self.requests[request_id] = replace(
+            request,
+            state=RequestState.SETTLED,
+            escrowed_value=0,
+            escrow_consumed=amount,
+            entitlement_type=entitlement_type,
+            entitlement_recipient=recipient,
+            entitlement_amount=amount,
+            settlement_id=settlement_id,
+            settled_at=now,
+        )
         self._record(
             "SETTLE_REQUEST",
             request_id,

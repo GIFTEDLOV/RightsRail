@@ -10,10 +10,10 @@ RightsRail answers one narrow question: does a proposed use satisfy the permissi
 
 - dependency header: `py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng`;
 - canonical state: `TreeMap` and `DynArray` storage, never process-local dictionaries;
-- reads: 18 `@gl.public.view` methods;
+- reads: 21 `@gl.public.view` methods;
 - writes: 9 methods, including one payable request method;
 - semantic execution: `gl.vm.run_nondet_default`, leader output through `gl.vm.Return`, independent validator evaluation;
-- settlement: deterministic post-consensus native-value transfer/refund path.
+- settlement: deterministic post-consensus internal entitlement allocation; no external transfer in `settle_request`.
 
 The pinned validation bundle is `GENVM_VERSION=v0.6.0-rc5`. The contract is validated with `genvm-lint`; project-level Python mypy intentionally covers the framework-neutral packages, while the GenLayer typechecker covers the contract dialect.
 
@@ -41,6 +41,6 @@ The pinned validation bundle is `GENVM_VERSION=v0.6.0-rc5`. The contract is vali
 7. Anyone triggers adjudication. The leader and validators independently produce exactly seven booleans.
 8. Consensus output is strictly parsed again, then deterministic precedence derives the result.
 9. Exactly one adjudication generation is persisted.
-10. Exactly one settlement is allowed. Only `PERMITTED` creates a request-bound permit and licensing-fee transfer; all other results refund the requester and create no permit.
+10. Exactly one settlement is allowed. Only `PERMITTED` creates a request-bound permit and payout entitlement; all other results create a requester refund entitlement and no permit.
 
 Canonical records and audit entries are append-only or transition-guarded. Read models are projections and never a second source of truth.

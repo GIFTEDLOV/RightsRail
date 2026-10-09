@@ -61,15 +61,23 @@ dict that production calldata serialization would isolate.
 
 ## Economic qualification
 
-The frozen fee is the only value source. The direct mock suite verified exact
-fee amount, frozen recipient on `PERMITTED`, requester on every refund result,
-permit creation only for `PERMITTED`, one transfer/refund call, and second
-settlement rejection. No model output controls value or recipient.
+Phase 2.5 qualified the frozen fee and recipient bindings. Phase 2.6 replaces
+external transfer attempts with canonical internal entitlement allocation. The
+new direct suite verifies exact payout/refund ledgers, zeroed request escrow,
+one permit only on `PERMITTED`, conservation counters, zero-fee safety, and
+second-settlement rejection. No model output controls value or recipient.
 
-Direct gltest does not provide transaction-level rollback for a mocked
-`emit_transfer` exception. Therefore transfer-failure atomicity, actual
-requester balance debit/refund, and hosted receipt execution remain blocked
-until a transaction-capable RC5 harness is available.
+Withdrawal/delivery execution is intentionally not implemented. There is no
+automatic retry because an unknown external delivery result could double-pay.
+
+## Phase 2.6 accounting delta
+
+The candidate now exposes 30 public methods: 21 reads and 9 writes. The three
+additional reads are `get_claimable`, `get_refundable`, and
+`get_accounting_status`. The RC5 runner/header and semantic consensus path are
+unchanged. `settle_request` has no `emit_transfer` path. Canonical settlement
+is `PAYOUT_ALLOCATED` or `REFUND_ALLOCATED`, with request-level escrow
+consumption and aggregate conservation counters.
 
 ## One-state-too-early and replay
 

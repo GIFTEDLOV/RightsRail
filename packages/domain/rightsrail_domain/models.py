@@ -77,6 +77,13 @@ class UsageRequest:
     created_at: datetime
     state: RequestState
     generation: int
+    escrow_received: int
+    escrow_consumed: int
+    entitlement_type: str | None
+    entitlement_recipient: str | None
+    entitlement_amount: int
+    settlement_id: str | None
+    settled_at: datetime | None
 
 
 @dataclass(frozen=True)
@@ -137,12 +144,16 @@ class Permit:
 
 @dataclass(frozen=True)
 class Settlement:
+    settlement_id: str
     request_id: str
     result: str
     amount: int
     recipient: str | None
     settled_at: datetime
     status: str
+    entitlement_type: str
+    escrow_received: int
+    escrow_consumed: int
 
 
 @dataclass(frozen=True)

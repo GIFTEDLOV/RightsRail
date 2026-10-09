@@ -22,7 +22,7 @@ import genlayer as gl
 
 
 CONTRACT_NAME = "RightsRail"
-CONTRACT_VERSION = "2.0.0"
+CONTRACT_VERSION = "2.1.0"
 SEMANTIC_SCHEMA = "RIGHTSRAIL_USAGE_V1"
 SEMANTIC_KEYS = (
     "asset_match",
@@ -60,8 +60,8 @@ RESULTS = (
     RESULT_NOT_APPLICABLE,
 )
 
-SETTLEMENT_TRANSFERRED = "TRANSFERRED"
-SETTLEMENT_REFUNDED = "REFUNDED"
+SETTLEMENT_PAYOUT_ALLOCATED = "PAYOUT_ALLOCATED"
+SETTLEMENT_REFUND_ALLOCATED = "REFUND_ALLOCATED"
 
 EVIDENCE_SCHEMA = "RIGHTSRAIL_EVIDENCE_V1"
 AUTH_SCHEMA = "RIGHTSRAIL_EVIDENCE_AUTH_V1"
@@ -533,15 +533,6 @@ def _evaluate_semantics(policy: dict, request: dict, evidence: dict, auth: dict)
     return _parse_semantic_json(raw)
 
 
-@gl.evm.contract_interface
-class _Payable:
-    class View:
-        pass
-
-    class Write:
-        pass
-
-
 class RightsRail(gl.contract.Contract):
     """Production-shaped RightsRail contract with actual GenLayer storage."""
 
@@ -567,10 +558,22 @@ class RightsRail(gl.contract.Contract):
     settlement_records: gl.storage.TreeMap[str, str]
     settlement_ids: gl.storage.DynArray[str]
     settlement_by_request: gl.storage.TreeMap[str, str]
+    claimable_by_address: gl.storage.TreeMap[str, gl.u256]
+    refundable_by_address: gl.storage.TreeMap[str, gl.u256]
+    total_escrow_received: gl.u256
+    total_escrowed: gl.u256
+    total_payout_allocated: gl.u256
+    total_refund_allocated: gl.u256
+    total_withdrawal_emitted: gl.u256
     audit_records: gl.storage.DynArray[str]
     sequence: gl.u256
 
     def __init__(self) -> None:
+        self.total_escrow_received = gl.u256(0)  # pyright: ignore[reportCallIssue]
+        self.total_escrowed = gl.u256(0)  # pyright: ignore[reportCallIssue]
+        self.total_payout_allocated = gl.u256(0)  # pyright: ignore[reportCallIssue]
+        self.total_refund_allocated = gl.u256(0)  # pyright: ignore[reportCallIssue]
+        self.total_withdrawal_emitted = gl.u256(0)  # pyright: ignore[reportCallIssue]
         self.sequence = gl.u256(0)  # pyright: ignore[reportCallIssue]
 
     def _record(self, store: typing.Any, key: str, name: str) -> dict:
@@ -649,6 +652,38 @@ class RightsRail(gl.contract.Contract):
         if request["escrowed_value"] != request["required_fee"]:
             _fail("request escrow is not exact")
 
+    def _add_total_escrow_received(self, amount: int) -> None:
+        updated = _require_u256(int(self.total_escrow_received) + amount, "total escrow received")
+        self.total_escrow_received = gl.u256(updated)  # pyright: ignore[reportCallIssue]
+
+    def _add_total_escrowed(self, amount: int) -> None:
+        updated = _require_u256(int(self.total_escrowed) + amount, "total escrowed")
+        self.total_escrowed = gl.u256(updated)  # pyright: ignore[reportCallIssue]
+
+    def _consume_total_escrowed(self, amount: int) -> None:
+        current = int(self.total_escrowed)
+        if current < amount:
+            _fail("total escrowed is insufficient for settlement")
+        self.total_escrowed = gl.u256(current - amount)  # pyright: ignore[reportCallIssue]
+
+    def _add_total_payout_allocated(self, amount: int) -> None:
+        updated = _require_u256(int(self.total_payout_allocated) + amount, "total payout allocated")
+        self.total_payout_allocated = gl.u256(updated)  # pyright: ignore[reportCallIssue]
+
+    def _add_total_refund_allocated(self, amount: int) -> None:
+        updated = _require_u256(int(self.total_refund_allocated) + amount, "total refund allocated")
+        self.total_refund_allocated = gl.u256(updated)  # pyright: ignore[reportCallIssue]
+
+    def _credit(self, ledger: typing.Any, address: str, amount: int) -> None:
+        current = int(ledger[address]) if address in ledger else 0
+        updated = _require_u256(current + amount, "entitlement balance")
+        if amount > 0 or address in ledger:
+            ledger[address] = gl.u256(updated)  # pyright: ignore[reportCallIssue]
+
+    def _balance(self, ledger: typing.Any, address: gl.Address) -> int:
+        key = _address(address, "account").as_hex
+        return int(ledger[key]) if key in ledger else 0
+
     @gl.public.view
     def contract_info(self) -> dict:
         return {
@@ -661,6 +696,8 @@ class RightsRail(gl.contract.Contract):
             "settlement_schema": SETTLEMENT_SCHEMA,
             "max_semantic_images": 2,
             "owner_override": False,
+            "settlement_model": "ENTITLEMENT_ALLOCATION",
+            "withdrawal_supported": False,
         }
 
     @gl.public.view
@@ -673,6 +710,11 @@ class RightsRail(gl.contract.Contract):
             "adjudication_count": len(self.adjudication_ids),
             "permit_count": len(self.permit_ids),
             "settlement_count": len(self.settlement_ids),
+            "total_escrow_received": int(self.total_escrow_received),
+            "total_escrowed": int(self.total_escrowed),
+            "total_payout_allocated": int(self.total_payout_allocated),
+            "total_refund_allocated": int(self.total_refund_allocated),
+            "total_withdrawal_emitted": int(self.total_withdrawal_emitted),
             "audit_count": len(self.audit_records),
             "sequence": int(self.sequence),
         }
@@ -739,6 +781,28 @@ class RightsRail(gl.contract.Contract):
     @gl.public.view
     def get_settlement_ids(self, start: gl.u256, limit: gl.u256) -> list[str]:
         return _page(self.settlement_ids, int(start), int(limit), "settlement")
+
+    @gl.public.view
+    def get_claimable(self, account: gl.Address) -> gl.u256:
+        return gl.u256(self._balance(self.claimable_by_address, account))  # pyright: ignore[reportCallIssue]
+
+    @gl.public.view
+    def get_refundable(self, account: gl.Address) -> gl.u256:
+        return gl.u256(self._balance(self.refundable_by_address, account))  # pyright: ignore[reportCallIssue]
+
+    @gl.public.view
+    def get_accounting_status(self) -> dict:
+        return {
+            "total_escrow_received": int(self.total_escrow_received),
+            "total_escrowed": int(self.total_escrowed),
+            "total_payout_allocated": int(self.total_payout_allocated),
+            "total_refund_allocated": int(self.total_refund_allocated),
+            "total_withdrawal_emitted": int(self.total_withdrawal_emitted),
+            "conservation_rhs": int(self.total_escrowed)
+            + int(self.total_payout_allocated)
+            + int(self.total_refund_allocated)
+            - int(self.total_withdrawal_emitted),
+        }
 
     @gl.public.view
     def get_semantic_schema(self) -> str:
@@ -858,8 +922,11 @@ class RightsRail(gl.contract.Contract):
             "proposed_media_type": _require_mime(proposed_media_type, "proposed_media_type"),
             "public_evidence_url": _optional_text(public_evidence_url, "public_evidence_url", MAX_URL_BYTES),
             "attribution_text": _optional_text(attribution_text, "attribution_text"),
-            "required_fee": policy["required_fee_wei"], "escrowed_value": escrowed, "created_at": now,
-            "state": REQUEST_SUBMITTED, "generation": 0,
+            "required_fee": policy["required_fee_wei"], "escrowed_value": escrowed,
+            "escrow_received": escrowed, "escrow_consumed": 0,
+            "entitlement_type": "", "entitlement_recipient": "", "entitlement_amount": 0,
+            "settlement_id": "", "settled_at": 0,
+            "created_at": now, "state": REQUEST_SUBMITTED, "generation": 0,
         }
         request["request_digest"] = _hash_json(
             {
@@ -881,6 +948,8 @@ class RightsRail(gl.contract.Contract):
         if request["request_digest"] in self.request_digests:
             _fail("duplicate request digest")
         self._validate_request_binding(request, policy)
+        self._add_total_escrow_received(escrowed)
+        self._add_total_escrowed(escrowed)
         self._save(self.request_records, request_id, request)
         self.request_ids.append(request_id)
         self.request_digests[request["request_digest"]] = request_id
@@ -1048,14 +1117,28 @@ class RightsRail(gl.contract.Contract):
         adjudication_id = self.adjudication_by_request[request_id]
         adjudication = self._adjudication(adjudication_id)
         policy = self._policy(request["policy_id"])
+        self._validate_request_binding(request, policy)
         if adjudication["generation"] != request["generation"]:
             _fail("settlement generation does not match adjudication")
+        if adjudication["request_id"] != request_id or adjudication["policy_id"] != policy["policy_id"]:
+            _fail("settlement request or policy binding does not match adjudication")
         if adjudication["policy_version"] != request["policy_version"]:
             _fail("settlement policy version does not match adjudication")
-        if request["escrowed_value"] != policy["required_fee_wei"]:
-            _fail("settlement escrow does not equal the frozen fee")
+        evidence_id = self.evidence_by_request[request_id] if request_id in self.evidence_by_request else ""
+        if evidence_id == "" or adjudication["evidence_id"] != evidence_id:
+            _fail("settlement evidence does not match the request")
+        if adjudication["evidence_hash"] != _sha256_text(self.evidence_records[evidence_id]):
+            _fail("settlement evidence hash does not match canonical evidence")
         if adjudication["result"] not in RESULTS:
             _fail("settlement result is not a canonical policy result")
+        if request["escrow_received"] != request["escrowed_value"]:
+            _fail("settlement escrow received value is inconsistent")
+        if request["escrow_consumed"] != 0 or request["entitlement_type"] != "":
+            _fail("request escrow has already been consumed")
+        if request["entitlement_recipient"] != "" or request["entitlement_amount"] != 0:
+            _fail("request entitlement is already allocated")
+        if request["settlement_id"] != "" or request["settled_at"] != 0:
+            _fail("request settlement binding is already populated")
         now = _now()
         permit_id = ""
         if adjudication["result"] == RESULT_PERMITTED:
@@ -1072,6 +1155,38 @@ class RightsRail(gl.contract.Contract):
             permit_id = "permit-" + permit_binding_hash[:48]
             if request_id in self.permit_by_request or permit_id in self.permit_records:
                 _fail("duplicate permit is forbidden")
+            settlement_status = SETTLEMENT_PAYOUT_ALLOCATED
+            recipient = policy["settlement_recipient"]
+            amount = policy["required_fee_wei"]
+            settlement_action = "ALLOCATE_LICENSING_FEE"
+            settlement_type = SETTLEMENT_PAYOUT_ALLOCATED
+        else:
+            settlement_status = SETTLEMENT_REFUND_ALLOCATED
+            recipient = request["requester"]
+            amount = request["escrowed_value"]
+            settlement_action = "ALLOCATE_REQUEST_REFUND"
+            settlement_type = SETTLEMENT_REFUND_ALLOCATED
+        settlement_id = "settle-" + _hash_json({"request_id": request_id, "adjudication_id": adjudication_id, "generation": adjudication["generation"]})[:48]
+        if settlement_id in self.settlement_records:
+            _fail("duplicate settlement identity")
+        settlement = {
+            "settlement_id": settlement_id, "request_id": request_id, "policy_id": policy["policy_id"],
+            "policy_version": policy["version"], "requester": request["requester"],
+            "adjudication_id": adjudication_id, "generation": adjudication["generation"],
+            "result": adjudication["result"], "action": settlement_action, "amount": amount,
+            "recipient": recipient, "permit_id": permit_id, "status": settlement_status,
+            "settlement_type": settlement_type, "escrow_received": request["escrow_received"],
+            "escrow_consumed": amount,
+            "settled_at": now, "schema_version": SETTLEMENT_SCHEMA,
+        }
+        self._consume_total_escrowed(amount)
+        if settlement_type == SETTLEMENT_PAYOUT_ALLOCATED:
+            self._credit(self.claimable_by_address, recipient, amount)
+            self._add_total_payout_allocated(amount)
+        else:
+            self._credit(self.refundable_by_address, recipient, amount)
+            self._add_total_refund_allocated(amount)
+        if adjudication["result"] == RESULT_PERMITTED:
             permit = dict(permit_binding)
             permit["permit_id"] = permit_id
             permit["permit_binding_hash"] = permit_binding_hash
@@ -1079,34 +1194,17 @@ class RightsRail(gl.contract.Contract):
             self._save(self.permit_records, permit_id, permit)
             self.permit_ids.append(permit_id)
             self.permit_by_request[request_id] = permit_id
-            settlement_status = SETTLEMENT_TRANSFERRED
-            recipient = policy["settlement_recipient"]
-            amount = policy["required_fee_wei"]
-            settlement_action = "TRANSFER_LICENSING_FEE"
-        else:
-            settlement_status = SETTLEMENT_REFUNDED
-            recipient = request["requester"]
-            amount = request["escrowed_value"]
-            settlement_action = "REFUND_REQUEST_ESCROW"
-        settlement_id = "settle-" + _hash_json({"request_id": request_id, "adjudication_id": adjudication_id, "generation": adjudication["generation"]})[:48]
-        settlement = {
-            "settlement_id": settlement_id, "request_id": request_id, "policy_id": policy["policy_id"],
-            "policy_version": policy["version"], "requester": request["requester"],
-            "adjudication_id": adjudication_id, "generation": adjudication["generation"],
-            "result": adjudication["result"], "action": settlement_action, "amount": amount,
-            "recipient": recipient, "permit_id": permit_id, "status": settlement_status,
-            "settled_at": now, "schema_version": SETTLEMENT_SCHEMA,
-        }
         self._save(self.settlement_records, settlement_id, settlement)
         self.settlement_ids.append(settlement_id)
         self.settlement_by_request[request_id] = settlement_id
+        request["escrow_consumed"] = amount
+        request["escrowed_value"] = 0
+        request["entitlement_type"] = settlement_type
+        request["entitlement_recipient"] = recipient
+        request["entitlement_amount"] = amount
+        request["settlement_id"] = settlement_id
+        request["settled_at"] = now
         request["state"] = REQUEST_SETTLED
         self._save(self.request_records, request_id, request)
         self._audit("SETTLE_REQUEST", settlement_id, settlement)
-        # This is deterministic post-consensus native value movement. If it reverts,
-        # the transaction reverts and the permit/settlement writes are not canonical.
-        if amount > 0:
-            _Payable(gl.Address(recipient)).emit_transfer(  # pyright: ignore[reportCallIssue]
-                value=gl.u256(amount)  # pyright: ignore[reportCallIssue]
-            )
         return settlement_status
