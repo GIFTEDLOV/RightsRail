@@ -1,33 +1,34 @@
 # Threat model
 
-## Assets to protect
+## Protected assets
 
-- frozen policy meaning and version;
-- request/evidence binding;
+- frozen policy meaning, version, and fee/recipient;
+- request/evidence identity and byte bindings;
 - semantic result integrity;
-- permit non-transferability across requests or versions;
-- exact fee/refund accounting;
+- permit non-transferability;
+- exact escrow/refund/transfer accounting;
 - immutable adverse history;
 - availability of adjudication after issuer abandonment.
 
-## Threats and controls
+## Controls
 
 | Threat | Control |
 | --- | --- |
-| Issuer rewrites a policy after a request | `DRAFT`-only edits; freeze is immutable |
-| Issuer deletes or replaces adverse evidence | evidence is committed once and journaled |
-| Requester supplies booleans | calldata schema contains no semantic fields |
-| Model returns prose/confidence/extra keys | exact parser rejects it |
-| Leader returns a favorable result and validator copies it | validator independently evaluates and compares the seven booleans |
-| Result shopping across generations | first canonical adjudication per request is authoritative |
-| Unrelated asset receives a permit | `asset_match` is policy-gated and permit is bound to asset/request/evidence |
-| Betting/endorsement context is hidden | bounded context/evidence evaluation exposes context and endorsement booleans to consensus |
-| URL or media changes after review | source identifiers, digests, byte lengths, media types, request ID, policy ID/version are committed |
-| Permit transfer to another use | permit binds request digest and policy version; no transfer method exists |
-| Settlement replay or double pay | one settlement per request, deterministic amount, phase-two journal/idempotency gate required |
-| Indexer invents state | canonical state/journal are authoritative; projections are rebuildable |
-| Infrastructure failure becomes denial | consensus rejection/rotation is distinct from all four business results |
+| issuer rewrites a frozen policy | edits require issuer sender and `DRAFT` |
+| issuer removes adverse evidence | evidence commit is one-shot and append-only |
+| requester supplies favorable booleans | no semantic fields exist in request calldata |
+| model emits prose/confidence/verdict | exact seven-key parser rejects it |
+| leader and validator copy the same error | validator independently evaluates the same bound context |
+| requester shops generations | one adjudication per request; generation increments exactly once |
+| unrelated image receives a permit | asset digest/bytes/MIME binding plus `asset_match` |
+| hidden betting or endorsement context | bounded context/image evidence and explicit semantic booleans |
+| URL changes after review | source identifiers, digests, lengths, MIME, and context bindings |
+| permit is reused for another request | permit binds request ID, request digest, evidence hash, policy version, and generation |
+| fee or recipient changes after request | frozen policy binding and settlement checks |
+| double settlement or payout | one settlement per request and one permit per request |
+| indexer fabricates state | canonical storage and audit records are authoritative |
+| fetch/runtime failure becomes denial | failure statuses remain outside the four business results |
 
 ## Residual risk
 
-Semantic evaluation can be wrong even when consensus agrees. The trust model therefore limits the claim to policy enforcement, keeps evidence provenance visible, and forbids legal conclusions. URL retrieval, vision provider availability, and payment execution need explicit production adapters and fault tests before deployment.
+Consensus agreement does not prove semantic truth. RightsRail narrows the claim to frozen-policy enforcement and preserves the evidence facts used. External fetch behavior, vision provider availability, native-value execution, and crash recovery require further integration tests before deployment.

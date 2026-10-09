@@ -27,7 +27,9 @@ class RightsRailStateMachineTests(unittest.TestCase):
         state = build_state()
         # The fixture is already frozen; an adversarial issuer cannot rewrite it.
         with self.assertRaises(StateTransitionError):
-            state.edit_policy(caller=ISSUER, policy_id="policy-fictional-001", license_text="rewritten")
+            state.edit_policy(
+                caller=ISSUER, policy_id="policy-fictional-001", license_text="rewritten"
+            )
         with self.assertRaises(AuthorizationError):
             state.close_policy(caller="attacker", policy_id="policy-fictional-001")
         state.close_policy(caller=ISSUER, policy_id="policy-fictional-001")
@@ -76,7 +78,7 @@ class RightsRailStateMachineTests(unittest.TestCase):
             request_id="request-001",
             evidence_id="evidence-001",
             semantic_output=compliant_vector(),
-            generation=0,
+            generation=1,
         )
         settlement = state.settle(request_id="request-001")
         self.assertEqual(adjudication.result, PolicyResult.PERMITTED.value)
@@ -97,7 +99,7 @@ class RightsRailStateMachineTests(unittest.TestCase):
             request_id="request-001",
             evidence_id="evidence-001",
             semantic_output=vector,
-            generation=0,
+            generation=1,
         )
         settlement = state.settle(request_id="request-001")
         self.assertEqual(adjudication.result, PolicyResult.DENIED.value)
@@ -113,7 +115,7 @@ class RightsRailStateMachineTests(unittest.TestCase):
             request_id="request-001",
             evidence_id="evidence-001",
             semantic_output=vector,
-            generation=0,
+            generation=1,
         )
         settlement = state.settle(request_id="request-001")
         self.assertEqual(adjudication.result, PolicyResult.INCONCLUSIVE.value)
@@ -128,7 +130,7 @@ class RightsRailStateMachineTests(unittest.TestCase):
             request_id="request-001",
             evidence_id="evidence-001",
             semantic_output=vector,
-            generation=0,
+            generation=1,
         )
         state.settle(request_id="request-001")
         self.assertEqual(adjudication.result, PolicyResult.NOT_APPLICABLE.value)
@@ -156,7 +158,7 @@ class RightsRailStateMachineTests(unittest.TestCase):
             request_id="request-001",
             evidence_id="evidence-001",
             semantic_output=compliant_vector(),
-            generation=0,
+            generation=1,
         )
         with self.assertRaises(StateTransitionError):
             state.record_adjudication(

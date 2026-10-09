@@ -1,7 +1,7 @@
 """Test bootstrap for the intentionally uninstalled monorepo packages."""
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
 for _package_root in (_ROOT / "packages").glob("*"):

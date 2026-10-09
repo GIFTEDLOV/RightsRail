@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from rightsrail_domain import RightsRailState
 from rightsrail_shared import sha256_text
@@ -13,7 +13,7 @@ LICENSE_SHA = sha256_text("RightsRail fictional editorial license v1")
 ISSUER = "issuer-001"
 REQUESTER = "requester-001"
 RECIPIENT = "settlement-001"
-NOW = datetime(2026, 1, 1, 12, 0, tzinfo=timezone.utc)
+NOW = datetime(2026, 1, 1, 12, 0, tzinfo=UTC)
 
 
 def compliant_vector() -> dict[str, bool]:

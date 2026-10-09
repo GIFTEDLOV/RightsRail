@@ -1,0 +1,518 @@
+{
+  "ctor": {
+    "params": [],
+    "kwparams": {}
+  },
+  "methods": {
+    "adjudicate_usage": {
+      "params": [
+        [
+          "request_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
+      "payable": false
+    },
+    "authenticate_evidence": {
+      "params": [
+        [
+          "evidence_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
+      "payable": false
+    },
+    "close_policy": {
+      "params": [
+        [
+          "policy_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "commit_evidence": {
+      "params": [
+        [
+          "evidence_id",
+          "string"
+        ],
+        [
+          "request_id",
+          "string"
+        ],
+        [
+          "reference_source",
+          "string"
+        ],
+        [
+          "reference_sha256",
+          "string"
+        ],
+        [
+          "reference_byte_length",
+          "int"
+        ],
+        [
+          "reference_mime",
+          "string"
+        ],
+        [
+          "proposed_source",
+          "string"
+        ],
+        [
+          "proposed_sha256",
+          "string"
+        ],
+        [
+          "proposed_byte_length",
+          "int"
+        ],
+        [
+          "proposed_mime",
+          "string"
+        ],
+        [
+          "public_context_url",
+          "string"
+        ],
+        [
+          "context_content_sha256",
+          "string"
+        ],
+        [
+          "context_screenshot_sha256",
+          "string"
+        ],
+        [
+          "authority_digest",
+          "string"
+        ],
+        [
+          "attribution_text",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "contract_info": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "create_policy": {
+      "params": [
+        [
+          "policy_id",
+          "string"
+        ],
+        [
+          "asset_sha256",
+          "string"
+        ],
+        [
+          "asset_exact_bytes",
+          "int"
+        ],
+        [
+          "asset_media_type",
+          "string"
+        ],
+        [
+          "asset_source",
+          "string"
+        ],
+        [
+          "license_text_sha256",
+          "string"
+        ],
+        [
+          "license_text_exact_bytes",
+          "int"
+        ],
+        [
+          "license_text",
+          "string"
+        ],
+        [
+          "allowed_purposes",
+          "array"
+        ],
+        [
+          "prohibited_purposes",
+          "array"
+        ],
+        [
+          "allowed_channels",
+          "array"
+        ],
+        [
+          "prohibited_contexts",
+          "array"
+        ],
+        [
+          "transformation_rules",
+          "array"
+        ],
+        [
+          "attribution_requirement",
+          "string"
+        ],
+        [
+          "endorsement_rule",
+          "string"
+        ],
+        [
+          "valid_from",
+          "int"
+        ],
+        [
+          "valid_until",
+          "int"
+        ],
+        [
+          "required_fee_wei",
+          "int"
+        ],
+        [
+          "settlement_recipient",
+          "address"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "freeze_policy": {
+      "params": [
+        [
+          "policy_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "get_adjudication": {
+      "params": [
+        [
+          "adjudication_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_adjudication_ids": {
+      "params": [
+        [
+          "start",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "string"
+        }
+      ]
+    },
+    "get_evidence": {
+      "params": [
+        [
+          "evidence_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_evidence_ids": {
+      "params": [
+        [
+          "start",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "string"
+        }
+      ]
+    },
+    "get_permit": {
+      "params": [
+        [
+          "permit_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_permit_ids": {
+      "params": [
+        [
+          "start",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "string"
+        }
+      ]
+    },
+    "get_permit_status": {
+      "params": [
+        [
+          "permit_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "string"
+    },
+    "get_policy": {
+      "params": [
+        [
+          "policy_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_policy_ids": {
+      "params": [
+        [
+          "start",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "string"
+        }
+      ]
+    },
+    "get_policy_version": {
+      "params": [
+        [
+          "policy_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "int"
+    },
+    "get_request": {
+      "params": [
+        [
+          "request_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_request_ids": {
+      "params": [
+        [
+          "start",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "string"
+        }
+      ]
+    },
+    "get_semantic_keys": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "string"
+        }
+      ]
+    },
+    "get_semantic_schema": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "string"
+    },
+    "get_settlement": {
+      "params": [
+        [
+          "settlement_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_settlement_ids": {
+      "params": [
+        [
+          "start",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "string"
+        }
+      ]
+    },
+    "get_status": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "settle_request": {
+      "params": [
+        [
+          "request_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
+      "payable": false
+    },
+    "submit_usage_request": {
+      "params": [
+        [
+          "request_id",
+          "string"
+        ],
+        [
+          "policy_id",
+          "string"
+        ],
+        [
+          "policy_version",
+          "int"
+        ],
+        [
+          "purpose_description",
+          "string"
+        ],
+        [
+          "channel",
+          "string"
+        ],
+        [
+          "context_description",
+          "string"
+        ],
+        [
+          "proposed_asset_sha256",
+          "string"
+        ],
+        [
+          "proposed_asset_exact_bytes",
+          "int"
+        ],
+        [
+          "proposed_media_type",
+          "string"
+        ],
+        [
+          "public_evidence_url",
+          "string"
+        ],
+        [
+          "attribution_text",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": true
+    },
+    "update_policy_draft": {
+      "params": [
+        [
+          "policy_id",
+          "string"
+        ],
+        [
+          "updates_json",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    }
+  }
+}

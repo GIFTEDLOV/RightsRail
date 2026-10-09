@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable, Mapping
 from dataclasses import replace
-from datetime import datetime, timezone
-from typing import Any, Callable, Mapping
+from datetime import UTC, datetime
+from typing import Any
 
 from rightsrail_evidence import validate_sha256
 from rightsrail_policy_engine import (
     SEMANTIC_SCHEMA,
-    SemanticVector,
     evaluate_policy,
     parse_semantic_vector,
 )
@@ -47,7 +47,7 @@ class InvariantViolation(RightsRailError):
 
 
 def _utc_now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _non_empty(value: str, name: str) -> str:
@@ -90,6 +90,7 @@ class RightsRailState:
         self._clock = clock or _utc_now
         self.policies: dict[str, Policy] = {}
         self.requests: dict[str, UsageRequest] = {}
+        self.request_digests: dict[str, str] = {}
         self.evidence: dict[str, Evidence] = {}
         self.evidence_by_request: dict[str, str] = {}
         self.adjudications: dict[str, Adjudication] = {}
@@ -196,7 +197,9 @@ class RightsRailState:
         if merged.valid_until is not None and merged.valid_until < merged.valid_from:
             raise ValueError("valid_until cannot precede valid_from")
         self.policies[policy_id] = merged
-        self._record("EDIT_POLICY", policy_id, {"version": merged.version, "fields": sorted(changes)})
+        self._record(
+            "EDIT_POLICY", policy_id, {"version": merged.version, "fields": sorted(changes)}
+        )
         return merged
 
     def freeze_policy(self, *, caller: str, policy_id: str) -> Policy:
@@ -260,7 +263,6 @@ class RightsRailState:
 
         created_at = self._clock()
         digest_input = {
-            "request_id": request_id,
             "policy_id": policy_id,
             "policy_version": policy_version,
             "requester": requester,
@@ -274,8 +276,10 @@ class RightsRailState:
             "attribution_text": attribution_text,
             "required_fee": policy.required_fee_wei,
             "escrowed_value": escrowed_value,
-            "created_at": created_at.isoformat(),
         }
+        request_digest = canonical_digest(digest_input)
+        if request_digest in self.request_digests:
+            raise StateTransitionError("duplicate request digest")
         request = UsageRequest(
             request_id=request_id,
             policy_id=policy_id,
@@ -289,7 +293,7 @@ class RightsRailState:
             proposed_media_type=_non_empty(proposed_media_type, "proposed_media_type"),
             public_evidence_url=public_evidence_url,
             attribution_text=attribution_text,
-            request_digest=canonical_digest(digest_input),
+            request_digest=request_digest,
             required_fee=policy.required_fee_wei,
             escrowed_value=escrowed_value,
             created_at=created_at,
@@ -297,7 +301,10 @@ class RightsRailState:
             generation=0,
         )
         self.requests[request_id] = request
-        self._record("SUBMIT_REQUEST", request_id, {"policy_id": policy_id, "policy_version": policy_version})
+        self.request_digests[request_digest] = request_id
+        self._record(
+            "SUBMIT_REQUEST", request_id, {"policy_id": policy_id, "policy_version": policy_version}
+        )
         return request
 
     def commit_evidence(
@@ -364,7 +371,9 @@ class RightsRailState:
         self.evidence[evidence_id] = evidence
         self.evidence_by_request[request_id] = evidence_id
         self.requests[request_id] = replace(request, state=RequestState.EVIDENCE_COMMITTED)
-        self._record("COMMIT_EVIDENCE", evidence_id, {"request_id": request_id, "schema": schema_version})
+        self._record(
+            "COMMIT_EVIDENCE", evidence_id, {"request_id": request_id, "schema": schema_version}
+        )
         return evidence
 
     def record_adjudication(
@@ -384,6 +393,8 @@ class RightsRailState:
             raise StateTransitionError("the first canonical adjudication is authoritative")
         if type(generation) is not int or generation < 0:
             raise ValueError("generation must be a non-negative integer")
+        if generation != request.generation + 1:
+            raise InvariantViolation("adjudication generation must increment exactly once")
         vector = parse_semantic_vector(semantic_output)
         result = evaluate_policy(vector)
         adjudication_id = "adj-" + canonical_digest(
@@ -404,8 +415,14 @@ class RightsRailState:
         )
         self.adjudications[adjudication_id] = adjudication
         self.adjudication_by_request[request_id] = adjudication_id
-        self.requests[request_id] = replace(request, state=RequestState.ADJUDICATED, generation=generation)
-        self._record("FINALIZE_ADJUDICATION", adjudication_id, {"request_id": request_id, "result": result.value})
+        self.requests[request_id] = replace(
+            request, state=RequestState.ADJUDICATED, generation=generation
+        )
+        self._record(
+            "FINALIZE_ADJUDICATION",
+            adjudication_id,
+            {"request_id": request_id, "result": result.value},
+        )
         return adjudication
 
     def settle(self, *, request_id: str) -> Settlement:
@@ -439,7 +456,11 @@ class RightsRailState:
             )
         self.settlements[request_id] = settlement
         self.requests[request_id] = replace(request, state=RequestState.SETTLED)
-        self._record("SETTLE_REQUEST", request_id, {"result": adjudication.result, "amount": settlement.amount})
+        self._record(
+            "SETTLE_REQUEST",
+            request_id,
+            {"result": adjudication.result, "amount": settlement.amount},
+        )
         return settlement
 
     def _issue_permit(

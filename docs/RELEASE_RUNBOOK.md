@@ -1,26 +1,29 @@
 # Release runbook
 
-Phase 1 is local architecture and implementation foundation only. Do not deploy, spend GEN, push to GitHub, or create a remote repository.
+This phase is local-only. Do not deploy, spend GEN, push to GitHub, create a remote repository, use a faucet, broadcast transactions, or create a Vercel project.
 
-## Required gates before any testnet work
+## Phase 2 gates
 
-1. Install the pinned development tools from `pyproject.toml` in an isolated environment.
-2. Run unit, adversarial, property, mutation, integration, and browser suites.
-3. Run lint and strict typecheck with zero unexplained findings.
-4. Review contract ABI/public methods against the frozen schema and docs.
-5. Run crash/replay tests for journal, settlement, and transfer-intent execution.
-6. Run a local GenLayer runtime test proving leader/validator rejection and rotation behavior.
-7. Run fixture tests for compliant, betting/endorsement adversarial, insufficient-evidence, and unrelated-asset cases.
-8. Verify no owner override, caller semantic vector, evidence overwrite, result shopping, or permit transfer path exists.
-9. Audit every money movement invariant and use exact-value, idempotent execution with precondition audit one state earlier.
-10. Obtain explicit project approval for deployment and GEN spend.
+1. Use the isolated pinned development environment from `requirements-dev.txt`.
+2. Run pytest, including direct, adversarial, property, mutation, and integration suites.
+3. Run Ruff, mypy, and Python compilation.
+4. Run `genvm-lint lint`, `validate`, `typecheck --all`, and `schema` with `GENVM_VERSION=v0.2.16`.
+5. Compare the generated ABI method surface with `docs/PHASE2_AUDIT.md`.
+6. Verify the exact semantic schema and deterministic precedence tests.
+7. Verify one-state-too-early, replay, evidence immutability, permit binding, and settlement tests.
+8. Run a real GenVM execution test in a fixed compatible harness. The current Windows `gltest 0.30.0rc2` file-descriptor decoder is a blocker; do not treat its failure as a business result.
+9. Before any deployment approval, add crash-safe journal replay and end-to-end native-value transfer/refund execution tests.
+10. Obtain explicit approval for any future deployment or GEN spend.
 
-## Production operational requirements
+## Artifact recording
 
-- pin contract and package versions;
-- record contract SHA-256 and ABI artifact;
-- publish semantic schema and evidence schema digests;
-- keep canonical state separate from indexer/read models;
-- monitor consensus rejection/rotation separately from business results;
-- treat finality and execution success as separate status dimensions;
-- rehearse rollback/stop-the-line procedures without deleting historical data.
+Record the contract SHA-256, ABI SHA-256, pinned dependency header, GenVM validation bundle, schema version, and test command outputs in provenance. Keep canonical contract state separate from indexer/read models.
+
+## Production requirements not claimed by Phase 2
+
+- external media/context capture service with durable receipts;
+- a compatible Studio-dev or local GenVM execution harness;
+- crash-safe journal and idempotent transfer/refund worker;
+- operational monitoring separating consensus rotation, evidence failure, business result, and transfer execution;
+- adversarial model/prompt regression corpus;
+- final deployment review and explicit economic sign-off.

@@ -1,37 +1,46 @@
 # RightsRail architecture
 
-## Boundary
+## Scope
 
-RightsRail enforces a frozen issuer policy. It does not determine copyright ownership, title, legal infringement, or any other legal conclusion. The product answer is narrower: does a proposed use satisfy the permission policy that was registered and frozen for this asset version?
+RightsRail answers one narrow question: does a proposed use satisfy the permission policy registered and frozen by the issuer for a specific asset version? It does not determine copyright ownership, legal infringement, damages, or legal advice.
+
+## Runtime boundary
+
+`contracts/rightsrail.py` is a deployable GenLayer contract in the proven local dialect:
+
+- dependency header: `py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6`;
+- canonical state: `TreeMap` and `DynArray` storage, never process-local dictionaries;
+- reads: 18 `@gl.public.view` methods;
+- writes: 9 methods, including one payable request method;
+- semantic execution: `gl.vm.run_nondet`, leader output through `gl.vm.Return`, independent validator evaluation;
+- settlement: deterministic post-consensus native-value transfer/refund path.
+
+The pinned cached validation bundle is `GENVM_VERSION=v0.2.16`. The contract is validated with `genvm-lint`; project-level Python mypy intentionally covers the framework-neutral packages, while the GenLayer typechecker covers the contract dialect.
 
 ## Monorepo boundaries
 
-- `contracts/rightsrail.py` is the GenLayer-facing public contract adapter.
-- `packages/domain` owns canonical records, state transitions, append-only history, permit binding, and settlement intent.
-- `packages/shared` owns canonical serialization and SHA-256 helpers.
-- `packages/evidence` owns evidence-binding validation without storing large media blobs.
-- `packages/media-analysis` is the bounded multimodal boundary: at most a protected/reference image and a proposed-use artifact or webpage screenshot.
-- `packages/policy-engine` parses the exact semantic vector and applies the deterministic result policy.
-- `packages/genlayer-client` contains the custom leader/validator consensus seam.
-- `packages/indexer` will create read models only; it cannot become a second source of truth.
-- `packages/workflow` will own crash-safe orchestration and journal replay.
-- `apps/web` and `apps/api` are phase-two product shells.
+- `contracts/rightsrail.py`: canonical on-chain state, runtime decorators, storage, consensus, and settlement.
+- `packages/domain`: framework-neutral records and deterministic state-machine reference model.
+- `packages/shared`: canonical serialization and SHA-256 helpers.
+- `packages/evidence`: evidence-binding validation.
+- `packages/media-analysis`: the bounded two-image semantic boundary.
+- `packages/policy-engine`: exact parser and deterministic result derivation.
+- `packages/genlayer-client`: leader/validator architecture seam and calldata parser.
+- `packages/indexer`: future rebuildable read models only.
+- `packages/workflow`: future crash-safe journal/retry orchestration.
+- `apps/web`, `apps/api`: typed Phase 3 integration scaffolds; no polished product UI yet.
 
-## Adjudication flow
+## Canonical flow
 
-1. An issuer creates a `DRAFT` policy and may edit it only while draft.
-2. The issuer freezes the policy. The version and all permission fields become immutable.
-3. A requester submits a request against the exact frozen policy version and escrows the exact required fee.
-4. Evidence is authenticated and committed once. The record binds both asset digests, byte length, media/source/authority digests, schema version, request, and policy version.
-5. Anyone may trigger adjudication. The contract validates calldata and loads state-bound context before semantic work.
-6. The leader and validators independently produce exactly seven booleans. Any malformed output is consensus rejection/rotation, not a business result.
-7. The first canonical semantic result is authoritative. The deterministic policy engine maps it to `PERMITTED`, `DENIED`, `INCONCLUSIVE`, or `NOT_APPLICABLE`.
-8. Only `PERMITTED` creates a permit and transfer intent. All other results create a refund intent and no permit.
+1. Create a `DRAFT` policy.
+2. The issuer may update it only while draft.
+3. The issuer freezes it. Frozen semantic and economic fields cannot change.
+4. A requester submits against the exact frozen policy version and escrows the exact frozen fee.
+5. Evidence is committed once and binds both images, optional public context, hashes, lengths, MIME types, source identifiers, request, policy, and version.
+6. Authentication independently fetches/captures and validates the bindings.
+7. Anyone triggers adjudication. The leader and validators independently produce exactly seven booleans.
+8. Consensus output is strictly parsed again, then deterministic precedence derives the result.
+9. Exactly one adjudication generation is persisted.
+10. Exactly one settlement is allowed. Only `PERMITTED` creates a request-bound permit and licensing-fee transfer; all other results refund the requester and create no permit.
 
-## Canonical state versus read models
-
-Canonical records are append-only or immutable after their transition. Read models may be rebuilt from the journal and canonical records. They must not fabricate missing adjudications, collapse historical outcomes, or replace a first result with a later result. `finality` means the adjudication is canonical; it does not mean an external transfer or indexer execution succeeded.
-
-## Money boundary
-
-Phase 1 records deterministic settlement intent and exact amounts. It does not perform unsafe money movement. A production adapter must journal the precondition audit one state earlier, execute idempotently, and distinguish protocol finality from execution success.
+Canonical records and audit entries are append-only or transition-guarded. Read models are projections and never a second source of truth.

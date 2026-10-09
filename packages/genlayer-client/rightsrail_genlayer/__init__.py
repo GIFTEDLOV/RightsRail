@@ -3,9 +3,9 @@
 from .consensus import (
     ConsensusReject,
     SemanticContext,
+    leader_fn,
     parse_adjudication_calldata,
     validator_fn,
-    leader_fn,
 )
 
 __all__ = [

@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
-from typing import Any, Callable, Mapping
+from typing import Any
 
 from rightsrail_domain import Evidence, Policy, UsageRequest
-from rightsrail_policy_engine import SemanticVector, parse_semantic_vector
+from rightsrail_policy_engine import parse_semantic_vector
 
 
 class ConsensusReject(Exception):

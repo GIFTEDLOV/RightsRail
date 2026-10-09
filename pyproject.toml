@@ -8,9 +8,10 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = [
-  "pytest>=8.0",
-  "ruff>=0.6",
-  "mypy>=1.11",
+  "pytest==9.1.1",
+  "hypothesis==6.168.5",
+  "ruff==0.16.10",
+  "mypy==2.4.0",
 ]
 
 [tool.pytest.ini_options]
@@ -35,12 +36,16 @@ extend-exclude = ["apps/web/node_modules"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
 
+[tool.ruff.lint.per-file-ignores]
+# The proven GenLayer contract dialect requires the SDK's star import. The
+# contract is validated by genvm-lint against the pinned runtime bundle.
+"contracts/rightsrail.py" = ["E501", "F403", "F405", "I001"]
+
 [tool.mypy]
 python_version = "3.12"
 strict = true
 warn_unused_configs = true
 files = [
-  "contracts",
   "packages/domain",
   "packages/shared",
   "packages/evidence",

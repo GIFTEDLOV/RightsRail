@@ -1,29 +1,23 @@
 # Trust model
 
-## What RightsRail claims
+## Claim boundary
 
-RightsRail claims only that a proposed use was evaluated against a frozen permission policy and that the deterministic policy outcome was recorded. It does not claim to know who legally owns an asset or whether a use is legally infringing.
+RightsRail enforces a frozen issuer policy. It does not claim legal ownership, legal infringement, damages, or an authoritative legal interpretation.
 
-## Trust boundaries
+## Trust layers
 
-The deterministic layer trusts hashes, exact byte lengths, media types, source identifiers, request/policy IDs, versions, timestamps, fee values, and state-transition preconditions.
+1. Deterministic facts: identities, policy versions, timestamps, SHA-256 digests, exact byte lengths, MIME values, source identifiers, request IDs, evidence IDs, fee values, and state preconditions.
+2. Authenticated evidence: at most a protected/reference image, a proposed-use image or webpage screenshot, and optional public context text/screenshot with exact bindings.
+3. Bounded semantic consensus: exactly seven booleans, independently produced by leader and validator.
+4. Deterministic policy: fixed precedence maps the vector to one of four results.
+5. Deterministic settlement: fixed amount, recipient, request, policy version, generation, and one-shot settlement guard.
 
-The semantic layer is bounded to seven booleans:
+## Authority
 
-1. `asset_match`
-2. `purpose_within_scope`
-3. `prohibited_context_present`
-4. `transformation_within_scope`
-5. `attribution_satisfied`
-6. `endorsement_implied`
-7. `evidence_sufficient`
-
-Nothing else from a model is consensus state. No confidence, prose, address, amount, arbitrary verdict, or explanation is accepted as semantic output.
-
-## Issuer authority
-
-There is no global owner override. An issuer can edit its own draft, freeze its own policy, and close its own frozen policy for future requests. After request/evidence commitment, adjudication does not need issuer cooperation. A frozen policy, evidence record, adverse result, and permit binding cannot be rewritten or deleted.
+There is no global owner override. The issuer controls only its own draft, its freeze, and its close-for-future-requests operation. After request/evidence commitment, adjudication requires no issuer cooperation. The issuer cannot rewrite frozen policy, replace evidence, select booleans, select a verdict, suppress adjudication, or delete an adverse result.
 
 ## Consensus safety
 
-Leader and validator paths both require `gl.vm.Return`, strictly validate calldata and the seven-field output, and reject malformed data. Validators independently evaluate the same bound context and compare only the seven booleans. The first canonical result is authoritative; later attempts cannot shop for a better result.
+The leader must return strict schema data before `gl.vm.Return`. The validator must receive the leader result through `gl.vm.Return`, strictly parse it, independently evaluate the same canonical question, strictly parse its own result, and compare only the seven normalized booleans. The post-consensus path parses once more before any adjudication write.
+
+Malformed output, absent return wrapper, disagreement, and unavailable/changed evidence are consensus or infrastructure failures. None can create `INCONCLUSIVE`, `NOT_APPLICABLE`, `DENIED`, `PERMITTED`, an adjudication, a generation, or a permit.

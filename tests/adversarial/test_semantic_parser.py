@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import unittest
 
 from rightsrail_genlayer import (
@@ -72,13 +73,32 @@ class SemanticParserAdversarialTests(unittest.TestCase):
             parse_semantic_vector(payload)
 
     def test_json_duplicate_keys_and_prose_are_rejected(self) -> None:
-        duplicate = '{"asset_match":true,"asset_match":false}'
+        for payload in (
+            '{"asset_match":true,"asset_match":false}',
+            "PERMITTED",
+            '{"asset_match":NaN}',
+            "```json\n{}\n```",
+            "leading prose " + json.dumps(_vector()),
+            json.dumps(_vector()) + " trailing prose",
+            json.dumps(_vector()) + json.dumps(_vector()),
+            "x" * 100_000 + json.dumps(_vector()),
+        ):
+            with self.subTest(payload=payload[:40]):
+                with self.assertRaises(SemanticSchemaError):
+                    parse_semantic_json(payload)
+
+    def test_nested_values_and_malformed_utf8_are_rejected(self) -> None:
+        for key, value in (
+            ("asset_match", {}),
+            ("asset_match", []),
+            ("asset_match", None),
+        ):
+            payload = {**_vector(), key: value}
+            with self.subTest(key=key, value=value):
+                with self.assertRaises(SemanticSchemaError):
+                    parse_semantic_vector(payload)
         with self.assertRaises(SemanticSchemaError):
-            parse_semantic_json(duplicate)
-        with self.assertRaises(SemanticSchemaError):
-            parse_semantic_json("PERMITTED")
-        with self.assertRaises(SemanticSchemaError):
-            parse_semantic_json('{"asset_match":NaN}')
+            parse_semantic_json(b"\xff\xfe\xfa")
 
     def test_calldata_cannot_supply_semantic_vector(self) -> None:
         bad = {**_call(), "asset_match": True}
@@ -89,22 +109,55 @@ class SemanticParserAdversarialTests(unittest.TestCase):
         class NoReturn:
             calldata = _call()
 
-        context_loader = lambda _: object()
-        with self.assertRaises(ConsensusReject):
-            leader_fn(NoReturn(), lambda _: _vector(), context_loader)
+        def context_loader(_: object) -> object:
+            return object()
+
+        def valid_evaluator(_: object) -> dict[str, bool]:
+            return _vector()
+
+        def malformed_evaluator(_: object) -> dict[str, object]:
+            return {**_vector(), "confidence": 0.9}
+
+        def prose_evaluator(_: object) -> str:
+            return "prose"
 
         with self.assertRaises(ConsensusReject):
-            leader_fn(_GL(_call()), lambda _: {**_vector(), "confidence": 0.9}, context_loader)
+            leader_fn(NoReturn(), valid_evaluator, context_loader)
+
+        with self.assertRaises(ConsensusReject):
+            leader_fn(_GL(_call()), malformed_evaluator, context_loader)
+
+        with self.assertRaises(ConsensusReject):
+            leader_fn(_GL(_call()), prose_evaluator, context_loader)
 
     def test_validator_rejects_malformed_leader_and_independent_disagreement(self) -> None:
-        context_loader = lambda _: object()
+        def context_loader(_: object) -> object:
+            return object()
+
+        def valid_evaluator(_: object) -> dict[str, bool]:
+            return _vector()
+
+        def different_evaluator(_: object) -> dict[str, bool]:
+            return {**_vector(), "endorsement_implied": False}
+
+        def prose_evaluator(_: object) -> str:
+            return "prose"
+
         with self.assertRaises(ConsensusReject):
-            validator_fn(_GL(_call()), "PERMITTED", lambda _: _vector(), context_loader)
+            validator_fn(_GL(_call()), "PERMITTED", valid_evaluator, context_loader)
 
         leader_result = _vector()
-        different = {**_vector(), "endorsement_implied": False}
         with self.assertRaises(ConsensusReject):
-            validator_fn(_GL(_call()), leader_result, lambda _: different, context_loader)
+            validator_fn(_GL(_call()), leader_result, different_evaluator, context_loader)
+
+        class MissingReturn:
+            calldata = _call()
+
+        with self.assertRaises(ConsensusReject):
+            validator_fn(MissingReturn(), leader_result, valid_evaluator, context_loader)
+
+        with self.assertRaises(ConsensusReject):
+            validator_fn(_GL(_call()), leader_result, prose_evaluator, context_loader)
 
     def test_validator_compares_only_the_exact_boolean_vector(self) -> None:
         state = build_state()
@@ -116,8 +169,13 @@ class SemanticParserAdversarialTests(unittest.TestCase):
             proposed_image_source="fixture://proposed/use.png",
             public_evidence_url="https://example.test/article",
         )
-        context_loader = lambda _: context
-        result = validator_fn(_GL(_call()), _vector(), lambda _: _vector(), context_loader)
+        def context_loader(_: object) -> SemanticContext:
+            return context
+
+        def valid_evaluator(_: object) -> dict[str, bool]:
+            return _vector()
+
+        result = validator_fn(_GL(_call()), _vector(), valid_evaluator, context_loader)
         self.assertEqual(result, {"accepted": True})
 
 

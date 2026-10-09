@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import json
-from typing import Any, Mapping
+from collections.abc import Mapping
+from dataclasses import dataclass
+from typing import Any
 
 SEMANTIC_SCHEMA = "RIGHTSRAIL_USAGE_V1"
 SEMANTIC_KEYS = (
@@ -77,6 +78,6 @@ def parse_semantic_json(payload: str | bytes) -> SemanticVector:
             object_pairs_hook=_reject_duplicate_keys,
             parse_constant=_reject_constant,
         )
-    except (json.JSONDecodeError, TypeError) as exc:
+    except (UnicodeDecodeError, json.JSONDecodeError, TypeError) as exc:
         raise SemanticSchemaError("semantic output is not valid JSON") from exc
     return parse_semantic_vector(parsed)

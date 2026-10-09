@@ -3,36 +3,56 @@
 ## Policy
 
 ```text
-DRAFT --issuer freeze--> FROZEN --issuer close--> CLOSED
+DRAFT --issuer update--> DRAFT
+DRAFT --issuer freeze--> FROZEN
+FROZEN --issuer close--> CLOSED
 ```
 
-Only `DRAFT` is editable. `CLOSED` stops new requests but does not erase requests, evidence, adjudications, permits, or settlements already committed.
+Only `DRAFT` permits edits. `FROZEN` and `CLOSED` policy records remain readable forever. Closing stops future requests; it does not erase existing requests, evidence, adjudications, permits, settlements, or audit history.
 
 ## Request
 
 ```text
-SUBMITTED --commit evidence--> EVIDENCE_COMMITTED
-EVIDENCE_COMMITTED --first canonical adjudication--> ADJUDICATED
-ADJUDICATED --deterministic settlement--> SETTLED
+SUBMITTED --commit once--> EVIDENCE_COMMITTED
+EVIDENCE_COMMITTED --first canonical consensus--> ADJUDICATED
+ADJUDICATED --one deterministic settlement--> SETTLED
 ```
 
-Requests bind `policy_id` and `policy_version`. Existing requests may finish after their policy is closed. A second evidence commit, second canonical adjudication, or second settlement is rejected.
+Requests bind the frozen `policy_id` and `policy_version`. Duplicate request digests are rejected. A request has one immutable evidence commitment, one canonical adjudication generation, one permit at most, and one settlement at most.
 
-## Adjudication outcomes
+## Evidence authentication
 
-The semantic vector is parsed first. The policy engine then applies this strict precedence:
+```text
+COMMITTED --authenticated fetch/capture--> AUTHENTICATED
+COMMITTED --transport error--> FETCH_FAILED --retry allowed--> COMMITTED attempt
+COMMITTED --bad content--> INVALID_CONTENT
+COMMITTED --digest/authority mismatch--> AUTHENTICATION_FAILED
+```
 
-1. insufficient evidence => `INCONCLUSIVE`;
-2. asset mismatch => `NOT_APPLICABLE`;
-3. all five positive/negative permission predicates satisfy => `PERMITTED`;
-4. otherwise => `DENIED`.
+Only `FETCH_FAILED` is retryable. `INVALID_CONTENT` and `AUTHENTICATION_FAILED` are terminal evidence outcomes. None is silently converted into a semantic business result. Adjudication requires `AUTHENTICATED`.
 
-Only `PERMITTED` issues a permit. Every other result refunds the request escrow according to the deterministic settlement rule and creates no permit.
+## Result precedence
 
-## Failure semantics
+```text
+evidence_sufficient == false -> INCONCLUSIVE
+else asset_match == false -> NOT_APPLICABLE
+else all five permission predicates pass -> PERMITTED
+else -> DENIED
+```
 
-Malformed calldata, absent `gl.vm.Return`, malformed leader output, malformed validator output, missing bound state, and semantic disagreement are consensus rejection/rotation conditions. They are not transitions to `INCONCLUSIVE`, `DENIED`, `PERMITTED`, or `NOT_APPLICABLE`.
+Only `PERMITTED` issues a permit and transfers the frozen licensing fee. The other three outcomes create no permit and refund the exact escrow under the deterministic settlement rule.
 
-## Journal discipline
+## One-state-too-early audit
 
-Every state mutation appends a journal entry with a monotonic sequence, action, subject ID, details digest, and timestamp. Historical entries are never overwritten. Phase-two execution must use the journal for crash recovery and idempotent settlement.
+| Operation | Required previous state | Earlier state rejected |
+| --- | --- | --- |
+| update policy | `DRAFT`, issuer sender | `FROZEN`/`CLOSED` or wrong sender |
+| freeze policy | `DRAFT`, issuer sender | already frozen/closed or wrong sender |
+| close policy | `FROZEN`, issuer sender | `DRAFT`/`CLOSED` or wrong sender |
+| submit request | `FROZEN`, exact version and fee | `DRAFT`/`CLOSED`, wrong fee/version |
+| commit evidence | `SUBMITTED`, exact request/policy bindings | any other request state |
+| authenticate evidence | committed evidence; only failed transport retry | missing/terminal auth |
+| adjudicate | `EVIDENCE_COMMITTED`, authenticated evidence, no prior adjudication | submitted/settled/duplicate |
+| settle | `ADJUDICATED`, matching generation/version | before final adjudication or duplicate |
+
+The same table is exercised by `tests/direct/test_replay_and_preconditions.py` and the mutation-kill matrix.

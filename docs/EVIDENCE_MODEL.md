@@ -1,30 +1,42 @@
 # Evidence model
 
-Evidence is a committed binding, not a permanent media warehouse. Large image or webpage blobs should remain in an external content-addressed store; the contract stores the identifiers and digests needed to detect substitution.
+Evidence is an immutable content binding, not a permanent media warehouse. Large blobs remain external; the contract stores identifiers, digests, lengths, MIME values, and authentication attempts.
 
-## Required binding
+## Binding fields
 
-Each evidence record contains:
+An evidence record binds:
 
-- `evidence_id` and `request_id`;
-- reference/protected asset SHA-256;
-- proposed-use asset SHA-256;
-- evidence content SHA-256;
-- exact byte length;
-- media type;
-- source digest and authority digest;
-- evidence schema version;
-- explicit policy ID and policy version;
-- authentication timestamp and immutable status;
-- exactly two bounded image sources: reference asset and proposed artifact/screenshot;
-- optional public evidence URL.
+- `evidence_id`, `request_id`, `policy_id`, and `policy_version`;
+- reference source, SHA-256, exact byte length, and MIME;
+- proposed-use source, SHA-256, exact byte length, and MIME;
+- optional public context URL, content digest, and screenshot digest;
+- attribution text and an authority digest over the committed source identifiers;
+- schema version, immutable status, and commit timestamp.
 
-The request and policy remain the authority for the proposed asset and protected asset respectively. Evidence commit checks both bindings before state mutation.
+The request supplies the proposed asset digest. The frozen policy supplies the protected asset digest. Commit rejects either mismatch and rejects evidence overwrite.
 
-## Authenticity and history
+## Two-image boundary
 
-Evidence cannot be overwritten. A request accepts one committed evidence record in phase 1; a replacement is a new request, not an edit. The history and failed attempts remain observable through the journal in the production read model.
+An adjudication can pass at most two image bodies to the semantic evaluator:
 
-## Public URL inspection
+1. the protected/reference asset;
+2. the proposed-use artifact, or a captured webpage screenshot.
 
-Public URL inspection is optional. If used, retrieval metadata and content digest must be committed before semantic evaluation. A URL is not itself proof of authority or permanence. Retrieval failure is infrastructure failure and must not be turned into a business verdict.
+Public context is separate text evidence, with an optional screenshot digest. It cannot add an unbounded third image to the semantic prompt.
+
+## Authentication pipeline
+
+```text
+public source URL
+  -> fetch or capture
+  -> exact bytes/content and MIME/length checks
+  -> SHA-256 comparison
+  -> immutable authentication attempt
+  -> semantic adjudication only when AUTHENTICATED
+```
+
+The pipeline distinguishes `FETCH_FAILED`, `INVALID_CONTENT`, `AUTHENTICATION_FAILED`, and `EVIDENCE_INSUFFICIENT`. Transport failure is not a business verdict. The semantic `evidence_sufficient=false` value is available only to a valid consensus evaluation that determines the authenticated evidence is insufficient for the semantic questions.
+
+## History
+
+Evidence is committed once per request. Authentication attempts are append-only. Only a transport failure may be retried, and each attempt receives a distinct ID. No method overwrites evidence, replaces a source, or deletes an adverse history entry.
