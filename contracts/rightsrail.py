@@ -1,4 +1,4 @@
-# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
+# { "Depends": "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng" }
 
 """RightsRail: policy-bound semantic usage-rights enforcement for GenLayer.
 
@@ -16,8 +16,9 @@ import hashlib
 import json
 import re
 import typing
+from datetime import UTC, datetime
 
-from genlayer import *
+import genlayer as gl
 
 
 CONTRACT_NAME = "RightsRail"
@@ -335,10 +336,7 @@ def _parse_datetime(value: typing.Any) -> int:
 
 
 def _now() -> int:
-    value = _parse_datetime(gl.message_raw["datetime"])
-    if value < 0:
-        _fail("transaction datetime is invalid")
-    return value
+    return int(datetime.now(UTC).timestamp())
 
 
 def _sender() -> str:
@@ -361,13 +359,13 @@ def _page(values: typing.Any, start: int, limit: int, name: str) -> list[str]:
     return output
 
 
-def _address(value: typing.Any, name: str) -> Address:
-    if isinstance(value, Address):
+def _address(value: typing.Any, name: str) -> gl.Address:
+    if isinstance(value, gl.Address):
         return value
     if not isinstance(value, str):
         _fail(name + " must be an address")
     try:
-        return Address(value)
+        return gl.Address(value)
     except Exception:
         _fail(name + " is not a valid address")
 
@@ -544,36 +542,36 @@ class _Payable:
         pass
 
 
-class RightsRail(gl.Contract):
+class RightsRail(gl.contract.Contract):
     """Production-shaped RightsRail contract with actual GenLayer storage."""
 
-    policy_records: TreeMap[str, str]
-    policy_ids: DynArray[str]
-    policy_versions: TreeMap[str, u256]
-    request_records: TreeMap[str, str]
-    request_ids: DynArray[str]
-    request_digests: TreeMap[str, str]
-    evidence_records: TreeMap[str, str]
-    evidence_ids: DynArray[str]
-    evidence_by_request: TreeMap[str, str]
-    evidence_auth_records: TreeMap[str, str]
-    evidence_auth_ids: DynArray[str]
-    evidence_auth_latest: TreeMap[str, str]
-    evidence_auth_attempts: TreeMap[str, u256]
-    adjudication_records: TreeMap[str, str]
-    adjudication_ids: DynArray[str]
-    adjudication_by_request: TreeMap[str, str]
-    permit_records: TreeMap[str, str]
-    permit_ids: DynArray[str]
-    permit_by_request: TreeMap[str, str]
-    settlement_records: TreeMap[str, str]
-    settlement_ids: DynArray[str]
-    settlement_by_request: TreeMap[str, str]
-    audit_records: DynArray[str]
-    sequence: u256
+    policy_records: gl.storage.TreeMap[str, str]
+    policy_ids: gl.storage.DynArray[str]
+    policy_versions: gl.storage.TreeMap[str, gl.u256]
+    request_records: gl.storage.TreeMap[str, str]
+    request_ids: gl.storage.DynArray[str]
+    request_digests: gl.storage.TreeMap[str, str]
+    evidence_records: gl.storage.TreeMap[str, str]
+    evidence_ids: gl.storage.DynArray[str]
+    evidence_by_request: gl.storage.TreeMap[str, str]
+    evidence_auth_records: gl.storage.TreeMap[str, str]
+    evidence_auth_ids: gl.storage.DynArray[str]
+    evidence_auth_latest: gl.storage.TreeMap[str, str]
+    evidence_auth_attempts: gl.storage.TreeMap[str, gl.u256]
+    adjudication_records: gl.storage.TreeMap[str, str]
+    adjudication_ids: gl.storage.DynArray[str]
+    adjudication_by_request: gl.storage.TreeMap[str, str]
+    permit_records: gl.storage.TreeMap[str, str]
+    permit_ids: gl.storage.DynArray[str]
+    permit_by_request: gl.storage.TreeMap[str, str]
+    settlement_records: gl.storage.TreeMap[str, str]
+    settlement_ids: gl.storage.DynArray[str]
+    settlement_by_request: gl.storage.TreeMap[str, str]
+    audit_records: gl.storage.DynArray[str]
+    sequence: gl.u256
 
     def __init__(self) -> None:
-        self.sequence = u256(0)
+        self.sequence = gl.u256(0)  # pyright: ignore[reportCallIssue]
 
     def _record(self, store: typing.Any, key: str, name: str) -> dict:
         if key not in store:
@@ -588,7 +586,7 @@ class RightsRail(gl.Contract):
 
     def _audit(self, action: str, subject_id: str, details: typing.Any) -> None:
         next_sequence = _require_u256(int(self.sequence) + 1, "audit sequence")
-        self.sequence = u256(next_sequence)
+        self.sequence = gl.u256(next_sequence)  # pyright: ignore[reportCallIssue]
         self.audit_records.append(
             _canonical(
                 {
@@ -684,11 +682,11 @@ class RightsRail(gl.Contract):
         return self._policy(policy_id)
 
     @gl.public.view
-    def get_policy_version(self, policy_id: str) -> u256:
-        return u256(self._policy(policy_id)["version"])
+    def get_policy_version(self, policy_id: str) -> gl.u256:
+        return gl.u256(self._policy(policy_id)["version"])  # pyright: ignore[reportCallIssue]
 
     @gl.public.view
-    def get_policy_ids(self, start: u256, limit: u256) -> list[str]:
+    def get_policy_ids(self, start: gl.u256, limit: gl.u256) -> list[str]:
         return _page(self.policy_ids, int(start), int(limit), "policy")
 
     @gl.public.view
@@ -696,7 +694,7 @@ class RightsRail(gl.Contract):
         return self._request(request_id)
 
     @gl.public.view
-    def get_request_ids(self, start: u256, limit: u256) -> list[str]:
+    def get_request_ids(self, start: gl.u256, limit: gl.u256) -> list[str]:
         return _page(self.request_ids, int(start), int(limit), "request")
 
     @gl.public.view
@@ -711,7 +709,7 @@ class RightsRail(gl.Contract):
         return result
 
     @gl.public.view
-    def get_evidence_ids(self, start: u256, limit: u256) -> list[str]:
+    def get_evidence_ids(self, start: gl.u256, limit: gl.u256) -> list[str]:
         return _page(self.evidence_ids, int(start), int(limit), "evidence")
 
     @gl.public.view
@@ -719,7 +717,7 @@ class RightsRail(gl.Contract):
         return self._adjudication(_require_id(adjudication_id, "adjudication_id"))
 
     @gl.public.view
-    def get_adjudication_ids(self, start: u256, limit: u256) -> list[str]:
+    def get_adjudication_ids(self, start: gl.u256, limit: gl.u256) -> list[str]:
         return _page(self.adjudication_ids, int(start), int(limit), "adjudication")
 
     @gl.public.view
@@ -727,7 +725,7 @@ class RightsRail(gl.Contract):
         return self._record(self.permit_records, _require_id(permit_id, "permit_id"), "permit")
 
     @gl.public.view
-    def get_permit_ids(self, start: u256, limit: u256) -> list[str]:
+    def get_permit_ids(self, start: gl.u256, limit: gl.u256) -> list[str]:
         return _page(self.permit_ids, int(start), int(limit), "permit")
 
     @gl.public.view
@@ -739,7 +737,7 @@ class RightsRail(gl.Contract):
         return self._record(self.settlement_records, _require_id(settlement_id, "settlement_id"), "settlement")
 
     @gl.public.view
-    def get_settlement_ids(self, start: u256, limit: u256) -> list[str]:
+    def get_settlement_ids(self, start: gl.u256, limit: gl.u256) -> list[str]:
         return _page(self.settlement_ids, int(start), int(limit), "settlement")
 
     @gl.public.view
@@ -752,11 +750,11 @@ class RightsRail(gl.Contract):
 
     @gl.public.write
     def create_policy(
-        self, policy_id: str, asset_sha256: str, asset_exact_bytes: u256, asset_media_type: str, asset_source: str,
-        license_text_sha256: str, license_text_exact_bytes: u256, license_text: str, allowed_purposes: list,
+        self, policy_id: str, asset_sha256: str, asset_exact_bytes: gl.u256, asset_media_type: str, asset_source: str,
+        license_text_sha256: str, license_text_exact_bytes: gl.u256, license_text: str, allowed_purposes: list,
         prohibited_purposes: list, allowed_channels: list, prohibited_contexts: list, transformation_rules: list,
-        attribution_requirement: str, endorsement_rule: str, valid_from: u256, valid_until: u256,
-        required_fee_wei: u256, settlement_recipient: Address,
+        attribution_requirement: str, endorsement_rule: str, valid_from: gl.u256, valid_until: gl.u256,
+        required_fee_wei: gl.u256, settlement_recipient: gl.Address,
     ) -> None:
         policy_id = _require_id(policy_id, "policy_id")
         if policy_id in self.policy_records:
@@ -778,7 +776,7 @@ class RightsRail(gl.Contract):
         policy = self._validate_policy_fields(policy)
         self._save(self.policy_records, policy_id, policy)
         self.policy_ids.append(policy_id)
-        self.policy_versions[policy_id] = u256(1)
+        self.policy_versions[policy_id] = gl.u256(1)  # pyright: ignore[reportCallIssue]
         self._audit("CREATE_POLICY", policy_id, policy)
 
     @gl.public.write
@@ -832,8 +830,8 @@ class RightsRail(gl.Contract):
 
     @gl.public.write.payable
     def submit_usage_request(
-        self, request_id: str, policy_id: str, policy_version: u256, purpose_description: str, channel: str,
-        context_description: str, proposed_asset_sha256: str, proposed_asset_exact_bytes: u256,
+        self, request_id: str, policy_id: str, policy_version: gl.u256, purpose_description: str, channel: str,
+        context_description: str, proposed_asset_sha256: str, proposed_asset_exact_bytes: gl.u256,
         proposed_media_type: str, public_evidence_url: str, attribution_text: str,
     ) -> None:
         request_id = _require_id(request_id, "request_id")
@@ -891,8 +889,8 @@ class RightsRail(gl.Contract):
     @gl.public.write
     def commit_evidence(
         self, evidence_id: str, request_id: str, reference_source: str, reference_sha256: str,
-        reference_byte_length: u256, reference_mime: str, proposed_source: str, proposed_sha256: str,
-        proposed_byte_length: u256, proposed_mime: str, public_context_url: str, context_content_sha256: str,
+        reference_byte_length: gl.u256, reference_mime: str, proposed_source: str, proposed_sha256: str,
+        proposed_byte_length: gl.u256, proposed_mime: str, public_context_url: str, context_content_sha256: str,
         context_screenshot_sha256: str, authority_digest: str, attribution_text: str,
     ) -> None:
         evidence_id = _require_id(evidence_id, "evidence_id")
@@ -973,14 +971,14 @@ class RightsRail(gl.Contract):
                 return False
             return own == leader
 
-        normalized = _parse_auth_result(gl.vm.run_nondet(leader_fn, validator_fn))
+        normalized = _parse_auth_result(gl.vm.run_nondet_default(leader_fn, validator_fn))
         normalized["auth_id"] = auth_id
         normalized["attempt"] = attempt
         normalized["authenticated_at"] = _now()
         self._save(self.evidence_auth_records, auth_id, normalized)
         self.evidence_auth_ids.append(auth_id)
         self.evidence_auth_latest[evidence_id] = auth_id
-        self.evidence_auth_attempts[evidence_id] = u256(attempt + 1)
+        self.evidence_auth_attempts[evidence_id] = gl.u256(attempt + 1)  # pyright: ignore[reportCallIssue]
         self._audit("AUTHENTICATE_EVIDENCE", evidence_id, normalized)
         return normalized["status"]
 
@@ -1016,7 +1014,7 @@ class RightsRail(gl.Contract):
                 return False
             return _semantic_tuple(leader) == _semantic_tuple(own)
 
-        vector = _parse_semantic_json(gl.vm.run_nondet(leader_fn, validator_fn))
+        vector = _parse_semantic_json(gl.vm.run_nondet_default(leader_fn, validator_fn))
         result_value = _derive_result(vector)
         adjudication_id = "adj-" + _hash_json({"request_id": request_id, "evidence_id": evidence_id, "generation": expected_generation})[:48]
         adjudication = {
@@ -1108,5 +1106,7 @@ class RightsRail(gl.Contract):
         # This is deterministic post-consensus native value movement. If it reverts,
         # the transaction reverts and the permit/settlement writes are not canonical.
         if amount > 0:
-            _Payable(Address(recipient)).emit_transfer(value=u256(amount))
+            _Payable(gl.Address(recipient)).emit_transfer(  # pyright: ignore[reportCallIssue]
+                value=gl.u256(amount)  # pyright: ignore[reportCallIssue]
+            )
         return settlement_status

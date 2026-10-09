@@ -15,7 +15,7 @@ def _source() -> str:
 def test_contract_has_pinned_header_and_blank_line() -> None:
     lines = _source().splitlines()
     assert lines[0] == (
-        '# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }'
+        '# { "Depends": "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng" }'
     )
     assert lines[1] == ""
 
@@ -38,8 +38,10 @@ def test_contract_uses_real_storage_and_consensus_primitives() -> None:
         "adjudication_records",
     } <= annotations
     assert {"permit_records", "settlement_records", "audit_records", "sequence"} <= annotations
-    assert "gl.vm.run_nondet" in source
+    assert "gl.vm.run_nondet_default" in source
     assert "isinstance(leaders_result, gl.vm.Return)" in source
+    assert "_semantic_tuple(leader) == _semantic_tuple(own)" in source
+    assert "from genlayer import *" not in source
     assert "gl.public.view" in source
     assert "gl.public.write" in source
     assert "gl.public.write.payable" in source

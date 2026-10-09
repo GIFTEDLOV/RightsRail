@@ -14,7 +14,7 @@ The prompt asks only the seven `RIGHTSRAIL_USAGE_V1` questions. It explicitly ex
 
 ## Leader
 
-`leader_fn` revalidates the loaded evidence context, fetches the two bound images, builds the bounded policy-relative prompt, evaluates the model, strictly parses the exact object, and returns only normalized seven-boolean data through `gl.vm.Return` via `gl.vm.run_nondet`.
+`leader_fn` revalidates the loaded evidence context, fetches the two bound images, builds the bounded policy-relative prompt, evaluates the model, strictly parses the exact object, and returns only normalized seven-boolean data through the RC5 `gl.vm.Return` path via `gl.vm.run_nondet_default`.
 
 ## Validator
 

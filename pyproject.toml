@@ -12,6 +12,10 @@ dev = [
   "hypothesis==6.168.5",
   "ruff==0.16.10",
   "mypy==2.4.0",
+  "genvm-linter==0.11.1rc2",
+  "pyright==1.1.414",
+  "genlayer-py==0.19.0rc2",
+  "genlayer-test==0.30.0rc2",
 ]
 
 [tool.pytest.ini_options]
@@ -37,9 +41,10 @@ extend-exclude = ["apps/web/node_modules"]
 select = ["E", "F", "I", "B", "UP"]
 
 [tool.ruff.lint.per-file-ignores]
-# The proven GenLayer contract dialect requires the SDK's star import. The
-# contract is validated by genvm-lint against the pinned runtime bundle.
-"contracts/rightsrail.py" = ["E501", "F403", "F405", "I001"]
+# The contract is validated by genvm-lint against the pinned RC5 runtime
+# bundle. E010 is a known static reachability false positive for valid
+# gl.nondet calls in RC5 and is recorded in the Phase 2.5 audit.
+"contracts/rightsrail.py" = ["E501", "I001"]
 
 [tool.mypy]
 python_version = "3.12"

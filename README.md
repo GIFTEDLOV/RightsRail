@@ -6,17 +6,17 @@ It lets an issuer register and freeze a usage permission policy for a digital as
 
 RightsRail does not determine legal copyright ownership or legal infringement. It enforces only the frozen permission policy registered by the issuer.
 
-## Phase 2 status
+## Phase 2.5 status
 
 This repository contains the local runtime foundation only:
 
-- a real GenLayer contract at `contracts/rightsrail.py` using the proven local `py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6` dialect;
-- actual `gl.Contract`, public view/write/payable methods, TreeMap/DynArray storage, `gl.vm.run_nondet`, `gl.vm.Return`, and deterministic native-value settlement calls;
+- a real GenLayer contract at `contracts/rightsrail.py` using the known-good Studio-dev RC5 `py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng` dialect;
+- actual `gl.contract.Contract`, public view/write/payable methods, TreeMap/DynArray storage, `gl.vm.run_nondet_default`, `gl.vm.Return`, and deterministic native-value settlement calls;
 - strict seven-boolean semantic parsing, independent validator evaluation, two-image evidence bounds, authenticated URL/media bindings, append-only records, and frozen-policy state transitions;
 - deterministic `INCONCLUSIVE`, `NOT_APPLICABLE`, `PERMITTED`, and `DENIED` precedence;
 - generated ABI/schema at `artifacts/rightsrail.abi.json`;
-- direct, adversarial, property, mutation, and integration tests;
-- pinned project-local development tools and Phase 2 audit documentation.
+- direct RC5 execution tests using controlled media/LLM mocks, adversarial, property, mutation, and integration tests;
+- pinned project-local development tools and Phase 2.5 runtime qualification documentation.
 
 No deployment, GEN spending, GitHub repository, remote push, faucet use, Vercel project, or polished frontend is part of this phase.
 
@@ -32,15 +32,17 @@ No deployment, GEN spending, GitHub repository, remote push, faucet use, Vercel 
 The contract-specific commands pin the proven cached validation bundle:
 
 ```powershell
-$env:PATH = "C:\Users\DELL\.beacon-v8-v06-rc2\Scripts;" + $env:PATH
-$env:GENVM_VERSION = "v0.2.16"
+$env:GENVM_VERSION = "v0.6.0-rc5"
 genvm-lint lint contracts/rightsrail.py --json
 genvm-lint validate contracts/rightsrail.py --json
 genvm-lint typecheck contracts/rightsrail.py --json --all
 genvm-lint schema contracts/rightsrail.py -o artifacts/rightsrail.abi.json --json
 ```
 
-The exact commands are also available under `tools/` and `package.json`.
+The exact commands are also available under `tools/` and `package.json`. RC5
+reports the documented E010 nondeterministic-reachability warning for valid
+`gl.nondet` helpers; hosted schema, contract validation, and typecheck are the
+authoritative static gates.
 
 ## Core sequence
 
@@ -52,4 +54,9 @@ The first canonical adjudication is authoritative. Malformed model output is a c
 
 ## Runtime note
 
-The installed `genvm-lint` bundle validates and typechecks the contract successfully. The installed Windows `gltest` direct runner currently fails before contract execution while decoding its file-descriptor calldata, including against known-good local reference contracts. This is recorded in `docs/PHASE2_AUDIT.md`; it is not hidden as a passing runtime execution test.
+The old `1jb45...` runner is rejected by current Studio-dev with
+`invalid_contract runner malformed`. The migrated `5jyc...` runner passes the
+exact hosted source schema probe and local RC5 validation. Windows direct
+execution works after a project-local extraction cache and narrow test-only
+compatibility adapter; no chain write is performed. See
+`docs/PHASE2_5_AUDIT.md` for raw qualification evidence and limitations.

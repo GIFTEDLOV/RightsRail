@@ -6,16 +6,16 @@ RightsRail answers one narrow question: does a proposed use satisfy the permissi
 
 ## Runtime boundary
 
-`contracts/rightsrail.py` is a deployable GenLayer contract in the proven local dialect:
+`contracts/rightsrail.py` is a deployable GenLayer contract in the proven current Studio-dev RC5 dialect:
 
-- dependency header: `py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6`;
+- dependency header: `py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng`;
 - canonical state: `TreeMap` and `DynArray` storage, never process-local dictionaries;
 - reads: 18 `@gl.public.view` methods;
 - writes: 9 methods, including one payable request method;
-- semantic execution: `gl.vm.run_nondet`, leader output through `gl.vm.Return`, independent validator evaluation;
+- semantic execution: `gl.vm.run_nondet_default`, leader output through `gl.vm.Return`, independent validator evaluation;
 - settlement: deterministic post-consensus native-value transfer/refund path.
 
-The pinned cached validation bundle is `GENVM_VERSION=v0.2.16`. The contract is validated with `genvm-lint`; project-level Python mypy intentionally covers the framework-neutral packages, while the GenLayer typechecker covers the contract dialect.
+The pinned validation bundle is `GENVM_VERSION=v0.6.0-rc5`. The contract is validated with `genvm-lint`; project-level Python mypy intentionally covers the framework-neutral packages, while the GenLayer typechecker covers the contract dialect.
 
 ## Monorepo boundaries
 
