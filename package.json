@@ -20,6 +20,7 @@
     "typecheck": "mypy",
     "typecheck:ts": "tsc --build",
     "test:ts": "vitest run",
+    "test:deployment": "node --test tests/deployment_fee_policy.test.mjs",
     "test:browser": "playwright test tests/browser",
     "build": "pnpm run typecheck:ts && pnpm --filter @rightsrail/web build && pnpm --filter @rightsrail/api build",
     "genlayer:lint": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/genlayer_lint.ps1",
