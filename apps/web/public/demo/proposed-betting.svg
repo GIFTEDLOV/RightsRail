@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Lumen Finch betting advertisement</title>
+  <desc id="desc">The original Lumen Finch artwork reused in a fictional betting promotion.</desc>
+  <rect width="1200" height="900" fill="#171a21"/>
+  <path d="M0 700L1200 260V900H0Z" fill="#8b2331"/>
+  <circle cx="920" cy="220" r="270" fill="#e8b04a" opacity=".28"/>
+  <text x="90" y="160" fill="#f9e6c7" font-family="Arial, sans-serif" font-weight="800" font-size="62" letter-spacing="3">BET BIG.</text>
+  <text x="90" y="228" fill="#f9e6c7" font-family="Arial, sans-serif" font-size="36">TRUST THE FINCH.</text>
+  <rect x="90" y="292" width="450" height="300" rx="16" fill="#f9e6c7"/>
+  <circle cx="315" cy="420" r="78" fill="#91c9bb"/>
+  <path d="M274 477C247 398 282 338 348 333C412 329 466 370 451 428C432 501 341 522 274 477Z" fill="#fffdf8"/>
+  <path d="M350 334L424 305L438 350L389 366Z" fill="#d56e4d"/>
+  <circle cx="390" cy="382" r="7" fill="#17201f"/>
+  <path d="M273 477L215 526L314 499Z" fill="#264443"/>
+  <text x="90" y="704" fill="#f9e6c7" font-family="monospace" font-weight="700" font-size="26" letter-spacing="2">LUMEN FINCH SAYS: TAKE THE ODDS</text>
+  <text x="90" y="770" fill="#f9e6c7" font-family="Arial, sans-serif" font-size="18">FICTIONAL CONTROLLED FIXTURE · BETTING PROMOTION</text>
+</svg>

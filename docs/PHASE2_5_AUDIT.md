@@ -105,3 +105,10 @@ Windows extraction-tree lock. The cache is ignored and is not protocol state.
 Windows RC5 direct tests pass with that isolated cache; the same direct smoke,
 multimodal, and economic suites also pass under WSL Ubuntu 24.04 (`8 passed`)
 without any network write path.
+
+## Phase 3 carry-forward
+
+The product layer preserves the qualified runner and frozen contract/ABI
+candidate. It adds no contract code, no ABI edits, and no runtime writes. The
+local API and web app expose the qualified metadata with `CONTROLLED_LOCAL` /
+`UNDEPLOYED` provenance until a later deployment phase.

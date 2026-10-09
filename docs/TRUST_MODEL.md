@@ -25,3 +25,10 @@ that an asynchronous external value message has completed.
 The leader must return strict schema data before `gl.vm.Return`. The validator must receive the leader result through `gl.vm.Return`, strictly parse it, independently evaluate the same canonical question, strictly parse its own result, and compare only the seven normalized booleans. The post-consensus path parses once more before any adjudication write.
 
 Malformed output, absent return wrapper, disagreement, and unavailable/changed evidence are consensus or infrastructure failures. None can create `INCONCLUSIVE`, `NOT_APPLICABLE`, `DENIED`, `PERMITTED`, an adjudication, a generation, or a permit.
+
+## Phase 3 product boundary
+
+The frontend is not a trust authority. It consumes typed provider envelopes,
+shows canonical/local provenance, and renders the first provider result. The
+controlled demo is a qualification fixture and is never labeled live,
+canonical network state, or on-chain state.

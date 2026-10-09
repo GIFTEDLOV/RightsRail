@@ -7,9 +7,14 @@ __pycache__/
 .genlayer-cache/
 venv/
 node_modules/
+apps/api/.data/
+test-results/
+playwright-report/
+screenshots/
 dist/
 build/
 *.egg-info/
+*.tsbuildinfo
 .env
 .env.*
 !.env.example

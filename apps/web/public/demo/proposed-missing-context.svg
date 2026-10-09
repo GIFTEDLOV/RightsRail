@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Lumen Finch unavailable context</title>
+  <desc id="desc">A partial use of the Lumen Finch artwork with a capture unavailable notice.</desc>
+  <rect width="1200" height="900" fill="#ebe6dc"/>
+  <rect x="74" y="74" width="1052" height="752" rx="20" fill="#fffdf8" stroke="#d9cebd" stroke-width="2"/>
+  <rect x="124" y="148" width="952" height="390" rx="16" fill="#17201f"/>
+  <circle cx="610" cy="340" r="110" fill="#91c9bb" opacity=".72"/>
+  <path d="M555 414C520 322 572 249 658 242C744 235 812 290 790 371C764 466 658 485 555 414Z" fill="#f7efe1" opacity=".8"/>
+  <path d="M659 245L747 211L764 266L699 285Z" fill="#d56e4d" opacity=".8"/>
+  <circle cx="704" cy="304" r="9" fill="#17201f"/>
+  <rect x="124" y="586" width="952" height="112" rx="12" fill="#f2c46e"/>
+  <text x="164" y="638" fill="#17201f" font-family="monospace" font-size="18" letter-spacing="2">PUBLIC CONTEXT CAPTURE UNAVAILABLE</text>
+  <text x="164" y="672" fill="#5f6b66" font-family="Arial, sans-serif" font-size="17">Evidence is insufficient for semantic adjudication.</text>
+</svg>

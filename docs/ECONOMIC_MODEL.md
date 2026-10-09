@@ -53,3 +53,10 @@ delivered merely because it was emitted.
 
 The local deterministic reference model, direct tests, property tests, and
 mutation tests cover these accounting and state guards.
+
+## Phase 3 product boundary
+
+The web/API product renders this ledger as a read model only. `ENTITLEMENT_ALLOCATED`
+is the current terminal delivery state because the frozen contract has no
+withdrawal method. Product copy must not call this state paid, delivered, or
+complete.

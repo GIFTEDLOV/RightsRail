@@ -5,18 +5,42 @@
   "description": "RightsRail monorepo",
   "workspaces": [
     "apps/web",
-    "apps/api"
+    "apps/api",
+    "packages/genlayer-client",
+    "packages/indexer",
+    "packages/shared-ts"
   ],
   "scripts": {
+    "dev": "concurrently -k \"pnpm --filter @rightsrail/api dev\" \"pnpm --filter @rightsrail/web dev\"",
     "test:python": "python -m unittest discover -s tests -t . -p test_*.py",
     "test:pytest": "pytest -q",
     "test:property": "pytest -q tests/property",
     "check:compile": "python -m compileall -q contracts packages tests",
     "lint": "ruff check .",
     "typecheck": "mypy",
-    "genlayer:lint": "genvm-lint lint contracts/rightsrail.py --json",
+    "typecheck:ts": "tsc --build",
+    "test:ts": "vitest run",
+    "test:browser": "playwright test tests/browser",
+    "build": "pnpm run typecheck:ts && pnpm --filter @rightsrail/web build && pnpm --filter @rightsrail/api build",
+    "genlayer:lint": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/genlayer_lint.ps1",
     "genlayer:validate": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/genlayer_validate.ps1",
     "genlayer:typecheck": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/genlayer_typecheck.ps1",
     "genlayer:schema": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/genlayer_schema.ps1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.8.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^5.0.4",
+    "concurrently": "^9.2.1",
+    "jsdom": "^27.0.0",
+    "playwright": "^1.56.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.9",
+    "vitest": "^3.2.4"
   }
 }

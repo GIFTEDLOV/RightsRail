@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Lumen Finch reference artwork</title>
+  <desc id="desc">An original editorial artwork showing a luminous finch over a terracotta grid.</desc>
+  <rect width="1200" height="900" fill="#e9dfcc"/>
+  <rect x="58" y="58" width="1084" height="784" rx="24" fill="#17201f"/>
+  <path d="M118 690C265 575 310 510 460 476C625 439 686 270 852 259C946 253 1032 291 1081 345V777H118Z" fill="#d56e4d" opacity=".95"/>
+  <path d="M118 722C310 641 367 592 500 590C635 587 710 489 844 477C947 468 1015 502 1081 565V777H118Z" fill="#f5c66b"/>
+  <circle cx="688" cy="338" r="112" fill="#91c9bb"/>
+  <path d="M637 419C604 327 650 245 748 231C837 218 907 278 887 362C862 467 741 503 637 419Z" fill="#f7efe1"/>
+  <path d="M742 237L854 193L873 262L797 286Z" fill="#d56e4d"/>
+  <circle cx="791" cy="302" r="10" fill="#17201f"/>
+  <path d="M636 415L540 511L692 463Z" fill="#264443"/>
+  <path d="M860 364L1019 392L876 412Z" fill="#f7efe1"/>
+  <text x="118" y="142" fill="#f7efe1" font-family="Arial, sans-serif" font-size="28" letter-spacing="8">LUMEN FINCH / 01</text>
+  <text x="118" y="812" fill="#17201f" font-family="monospace" font-size="18" letter-spacing="3">ORIGINAL CONTROLLED FIXTURE · RIGHTSRAIL STUDIO</text>
+</svg>

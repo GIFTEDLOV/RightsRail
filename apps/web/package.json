@@ -2,7 +2,20 @@
   "name": "@rightsrail/web",
   "private": true,
   "version": "0.1.0",
+  "type": "module",
   "scripts": {
-    "dev": "echo Web foundation only; implementation is planned for phase 2"
+    "dev": "vite --host 127.0.0.1 --port 3001",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 3001"
+  },
+  "dependencies": {
+    "@rightsrail/genlayer-client": "workspace:*",
+    "@rightsrail/shared-ts": "workspace:*",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.4"
   }
 }

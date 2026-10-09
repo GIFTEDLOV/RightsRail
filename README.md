@@ -6,9 +6,34 @@ It lets an issuer register and freeze a usage permission policy for a digital as
 
 RightsRail does not determine legal copyright ownership or legal infringement. It enforces only the frozen permission policy registered by the issuer.
 
-## Phase 2.5 status
+## Phase 3 status
 
-This repository contains the local runtime foundation only:
+This repository contains a complete local product foundation around the frozen
+contract candidate. It is intentionally **UNDEPLOYED** and the included
+experience is a **CONTROLLED LOCAL DEMO**. It does not read live GenLayer state,
+broadcast transactions, request a wallet signature, or silently substitute
+fixtures for canonical data.
+
+The product layer now includes:
+
+- a typed client around the frozen 30-method ABI and transaction journal;
+- explicit `CONTROLLED_LOCAL` and `GENLAYER_CANONICAL` provider modes;
+- a persistent JSON-backed local read model with reproducible four-case fixtures;
+- a Node API with provenance metadata on every response;
+- a rights-control web application on port 3001, including policy, request,
+  evidence, adjudication, permit, settlement, activity, integration, and demo
+  routes;
+- original project-created SVG media fixtures under `apps/web/public/demo/`;
+- responsive, keyboard-accessible evidence comparison and semantic matrix views;
+- browser E2E and screenshot audit coverage.
+
+The frozen contract and ABI remain the Phase 2.6 candidate:
+
+- a real GenLayer contract at `contracts/rightsrail.py` using the known-good Studio-dev RC5 `py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng` dialect;
+- actual `gl.contract.Contract`, public view/write/payable methods, TreeMap/DynArray storage, `gl.vm.run_nondet_default`, `gl.vm.Return`, and deterministic entitlement settlement accounting;
+- strict seven-boolean semantic parsing, independent validator evaluation, two-image evidence bounds, authenticated URL/media bindings, append-only records, and frozen-policy state transitions;
+- deterministic `INCONCLUSIVE`, `NOT_APPLICABLE`, `PERMITTED`, and `DENIED` precedence;
+- generated ABI/schema at `artifacts/rightsrail.abi.json`.
 
 - a real GenLayer contract at `contracts/rightsrail.py` using the known-good Studio-dev RC5 `py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng` dialect;
 - actual `gl.contract.Contract`, public view/write/payable methods, TreeMap/DynArray storage, `gl.vm.run_nondet_default`, `gl.vm.Return`, and deterministic entitlement settlement accounting;
@@ -18,7 +43,7 @@ This repository contains the local runtime foundation only:
 - direct RC5 execution tests using controlled media/LLM mocks, adversarial, property, mutation, and integration tests;
 - pinned project-local development tools and Phase 2.5 runtime qualification documentation.
 
-No deployment, GEN spending, GitHub repository, remote push, faucet use, Vercel project, or polished frontend is part of this phase.
+No deployment, GEN spending, GitHub repository, remote push, faucet use, or Vercel project is part of this phase.
 
 ## Run locally
 
@@ -27,7 +52,13 @@ No deployment, GEN spending, GitHub repository, remote push, faucet use, Vercel 
 .venv\Scripts\ruff.exe check .
 .venv\Scripts\mypy.exe
 .venv\Scripts\python.exe -m compileall -q contracts packages tests
+pnpm install
+pnpm run dev
 ```
+
+Open `http://127.0.0.1:3001`. The API runs at `http://127.0.0.1:3002`.
+Use `pnpm run test:ts`, `pnpm run test:browser`, and `pnpm run build` for the
+local product gates. Playwright requires its local Chromium browser installed.
 
 The contract-specific commands pin the proven cached validation bundle:
 

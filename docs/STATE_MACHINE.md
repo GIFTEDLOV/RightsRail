@@ -59,3 +59,10 @@ Settlement is canonical entitlement allocation, not external delivery.
 | settle | `ADJUDICATED`, matching generation/version | before final adjudication or duplicate |
 
 The same table is exercised by `tests/direct/test_replay_and_preconditions.py` and the mutation-kill matrix.
+
+## Product/provider states
+
+The local product has an additional noncanonical provenance state:
+`CONTROLLED_LOCAL`. It is never a contract state and is displayed alongside
+`UNDEPLOYED`. `GENLAYER_CANONICAL` is a separate provider mode and must fail
+explicitly when no deployed address is configured.
