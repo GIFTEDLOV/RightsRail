@@ -14,8 +14,9 @@ successor is deployed separately at
 `0xfB3335350b0e02ceFb384753990E9B377B4BCB1F`, but it has **zero qualification
 records**. The included product experience remains a **CONTROLLED LOCAL DEMO**:
 it does not silently substitute fixtures for canonical data. Live V2.3
-qualification is blocked until stable HTTPS PNG evidence is publicly served
-and byte-verified.
+qualification is stopped at the frozen policy because Studio-dev fee
+simulation rejects the exact payable request before broadcast. The V2.3 PNG
+evidence bundle is publicly served and byte-verified.
 
 The product layer now includes:
 
@@ -46,8 +47,9 @@ official ABI SHA-256 is
 
 The V2.3 deployment transaction is
 `0xb72fcde704b994982892a88ef45d51bc2133625c80f5c405f1bf838cced83dde` and
-finished with `FINALIZED / FINISHED_WITH_RETURN`. No qualification write has
-been attempted.
+finished with `FINALIZED / FINISHED_WITH_RETURN`. The authorized qualification
+run finalized policy creation and freezing, then stopped before the first
+request; see `docs/V23_QUALIFICATION_RUN_BLOCKER.md`.
 
 No GitHub push, Portal submission, faucet use, or Vercel application deployment
 was performed. The single authorized V2.3 deployment did consume its explicit

@@ -1,8 +1,8 @@
 # RightsRail Live Qualification Evidence
 
-This bundle is prepared for a future Studio-dev qualification only. It does
-not represent canonical contract state, and none of the V2.3 qualification
-writes has been executed.
+This bundle is prepared for Studio-dev qualification. It does not represent
+semantic or settlement state. V2.3 policy creation and freezing have executed;
+no request/evidence/adjudication/settlement/withdrawal write has executed.
 
 ## Evidence host
 
@@ -10,12 +10,9 @@ Previously referenced evidence-only static host:
 
 `https://rightsrail-evidence.vercel.app`
 
-The five SVG files are original project-created controlled fixtures from the
-historical local demo. The required V2.3 qualification boundary is PNG. The
-local PNG renditions are recorded in
-`provenance/media/png-evidence-manifest.json`, but the advertised public PNG
-URLs currently return HTTP 404. They must not be used for live evidence
-commits until a stable HTTPS host serves byte-identical content.
+The five PNG files are original project-created controlled fixtures. The
+public PNG URLs below were fetched and verified as HTTP 200, `image/png`,
+valid PNG bytes, with exact local/public byte lengths and SHA-256 hashes.
 
 ## Historical SVG reference table (not live V2.3 evidence)
 
@@ -29,13 +26,13 @@ commits until a stable HTTPS host serves byte-identical content.
 
 ## Manifest
 
-Historical manifest URL: [manifest.json](https://rightsrail-evidence.vercel.app/manifest.json)
+V2.3 PNG manifest: [manifest.json](https://rightsrail-evidence.vercel.app/manifest.json)
 
 ```text
-BYTES: 2351
-SHA256: 7114DAD3B100993B17DEEA40EE3A7D048E75B27568EDAC8DA1C2DD53600205DA
+BYTES: 2076
+SHA256: A6AA797FE9439CDEF689F65F8F6BCFA98BB1EC0C502E6F59EE0B2F0083D9A863
 MIME: application/json; charset=utf-8
-HTTP: historical record only; do not treat as V2.3 PNG-host verification
+HTTP: 200
 ```
 
 The local source manifest is
@@ -44,9 +41,13 @@ The local source manifest is
 ## Verification result
 
 ```text
-ALL_HTTP_200: YES
-ALL_PUBLIC_BYTES_MATCH: YES
-ALL_PUBLIC_HASHES_MATCH: YES
+ALL_PNG_HTTP_200: YES
+ALL_PNG_PUBLIC_BYTES_MATCH: YES
+ALL_PNG_PUBLIC_HASHES_MATCH: YES
+
+Qualification status: STOPPED before Case A request broadcast because the
+exact payable fee simulation returned `Missing or invalid parameters` while
+the policy was active by canonical chain time. This is not a semantic result.
 ```
 
 The expected results are planning labels only. They are not permission to

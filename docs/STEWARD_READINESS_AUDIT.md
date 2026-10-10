@@ -1,8 +1,8 @@
 # RightsRail steward-readiness audit
 
 Audit scope: V2.3 successor hardening against immutable deployed V1 history.
-One authorized V2.3 deployment was performed; no qualification or publication
-was performed by this audit.
+One authorized V2.3 deployment and the two policy lifecycle writes were
+performed; no usage qualification or publication was completed by this audit.
 
 ## Baseline and truth boundary
 
@@ -12,9 +12,10 @@ was performed by this audit.
   `docs/PREDEPLOY_AUDIT.md`, and transaction provenance.
 - V1 canonical state remains one frozen policy and zero request, evidence,
   adjudication, permit, or settlement records.
-- V2.3 is deployed at `0xfB3335350b0e02ceFb384753990E9B377B4BCB1F` with zero
-  policies, requests, evidence, adjudications, permits, settlements, and
-  accounting allocations.
+- V2.3 is deployed at `0xfB3335350b0e02ceFb384753990E9B377B4BCB1F` with one
+  frozen policy, zero requests, evidence, adjudications, permits, settlements,
+  withdrawals, and accounting allocations. The two audit events are the
+  successful policy create and freeze transactions.
 - V2.3 source SHA-256:
   `E22EF2CCF7BFD03C555A13ADD2FADD3C2891C33E34522AB178B7785F9E8571EE`.
 - V2.3 official ABI SHA-256:
@@ -25,7 +26,7 @@ was performed by this audit.
 | ID | Severity | Affected file / method | Evidence / reproducer | Resolution | Regression | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | AUD-001 | CRITICAL | V1 settlement cash custody | `settle_request` allocates claimable/refundable balances but V1 has no withdrawal method | Added candidate pull withdrawals, exact liabilities, claimant binding, and no retry | RC5 economic mocks; distinct-actor domain tests | FIXED locally; V1 paid release BLOCKED |
-| AUD-002 | HIGH | `_now`, validity guard | Studio-dev read-only simulation rejected an active unbounded policy; canonical block time was active | Candidate reads `gl.message.raw["datetime"]`, parses UTC Unix seconds, and fails closed | timestamp direct tests | FIXED locally; candidate hosted proof pending |
+| AUD-002 | HIGH | `_now`, validity guard | Studio-dev fee simulation rejected an active candidate policy window before the first request; canonical block time was active | Candidate reads `gl.message.raw["datetime"]`, parses UTC Unix seconds, and fails closed | timestamp direct tests; V2.3 fee-estimation journal | BLOCKED by hosted simulator context; no request broadcast |
 | AUD-003 | HIGH | accounting conservation | Historical allocation counters did not expose current outstanding liabilities | Candidate adds outstanding claimable/refundable totals | settlement and withdrawal tests | FIXED locally |
 | AUD-004 | HIGH | canonical provenance | Canonical provider discarded configured address | Provider now returns configured address and regression asserts it | `tests/ts/rightsrail.test.ts` | FIXED locally |
 | AUD-005 | MEDIUM | semantic prompt boundary | Arbitrary policy/request/evidence text was adjacent to instructions | All model-input blocks are explicit untrusted-data delimiters; image text is declared non-instructional | adversarial source regression | FIXED locally |

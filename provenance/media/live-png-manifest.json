@@ -1,0 +1,58 @@
+{
+  "schema": "RIGHTSRAIL_EVIDENCE_MANIFEST_V1",
+  "status": "PUBLICLY_HOSTED_BYTE_VERIFIED",
+  "host": "https://rightsrail-evidence.vercel.app",
+  "source": "RightsRail project-created controlled PNG fixtures",
+  "entries": [
+    {
+      "case": "REFERENCE",
+      "role": "protected source asset",
+      "filename": "reference.png",
+      "url": "https://rightsrail-evidence.vercel.app/reference.png",
+      "mime": "image/png",
+      "exact_bytes": 35344,
+      "sha256": "e0d804ab77a13f6f892b564f58656e72bf4daff123225b58cb637537b2aad0c8",
+      "expected_result": null
+    },
+    {
+      "case": "CASE_A",
+      "role": "proposed use artifact",
+      "filename": "proposed-editorial.png",
+      "url": "https://rightsrail-evidence.vercel.app/proposed-editorial.png",
+      "mime": "image/png",
+      "exact_bytes": 52132,
+      "sha256": "da782460a0de765d49ebcbe4f116cfab0c42b42d3aea99e4bfc3763e5b63f223",
+      "expected_result": "PERMITTED"
+    },
+    {
+      "case": "CASE_B",
+      "role": "proposed use artifact",
+      "filename": "proposed-betting.png",
+      "url": "https://rightsrail-evidence.vercel.app/proposed-betting.png",
+      "mime": "image/png",
+      "exact_bytes": 48481,
+      "sha256": "bf7799c32a4d8a46f5def7c06e39e1926c2e49df2461b35ea6111026699fef89",
+      "expected_result": "DENIED"
+    },
+    {
+      "case": "CASE_C",
+      "role": "proposed use artifact",
+      "filename": "proposed-missing-context.png",
+      "url": "https://rightsrail-evidence.vercel.app/proposed-missing-context.png",
+      "mime": "image/png",
+      "exact_bytes": 32221,
+      "sha256": "a9f99ccd842e6ce2dd664d0aea21c94538a3eba40bf93040ab9fcb0158fe2584",
+      "expected_result": "INCONCLUSIVE"
+    },
+    {
+      "case": "CASE_D",
+      "role": "proposed use artifact",
+      "filename": "unrelated.png",
+      "url": "https://rightsrail-evidence.vercel.app/unrelated.png",
+      "mime": "image/png",
+      "exact_bytes": 41410,
+      "sha256": "5d6cfa94971725d3d367a2c18d8cababd31668b0f3d33ed6d96712d222fb993d",
+      "expected_result": "NOT_APPLICABLE"
+    }
+  ]
+}

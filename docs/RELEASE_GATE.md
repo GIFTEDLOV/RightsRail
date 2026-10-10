@@ -14,6 +14,7 @@
 - V2.3 source SHA-256: `E22EF2CCF7BFD03C555A13ADD2FADD3C2891C33E34522AB178B7785F9E8571EE`.
 - V2.3 official ABI SHA-256: `010C074E7FA8892AEFB26C443F62DFAA4E379897DFE950A93927F9E9E081CF3B`.
 - V2.3 state at deployment readback: zero policies, requests, evidence, adjudications, permits, settlements and accounting allocations.
+- Current V2.3 state after the authorized run: one frozen policy; zero requests, evidence, adjudications, permits, settlements, withdrawals, and accounting allocations; audit count `2`.
 
 ## Gate checklist
 
@@ -21,13 +22,24 @@
 | --- | --- | --- |
 | Source/ABI parity | V2.3 source/schema match the deployed successor | PASS, read-only verified |
 | Contract safety | Hardened source passed RC5 validate/typecheck/schema and local adversarial gates | PASS locally; live qualification pending |
-| Cash exit | Beneficiary payout and requester refund are withdrawable | Candidate/deployment path present; external delivery unconfirmed |
-| Timestamp | Contract uses GenVM transaction datetime | PASS in candidate; hosted payable qualification still pending |
+| Cash exit | Beneficiary payout and requester refund are withdrawable | Candidate/deployment path present; no live settlement exists, so external delivery is unconfirmed |
+| Timestamp | Contract uses GenVM transaction datetime | BLOCKED: exact V2.3 payable fee simulation rejects the active-window request; no request broadcast |
 | Semantic consensus | Exact seven-key parsing and independent validator | PASS in local direct/adversarial suite |
-| Evidence | Two bounded images, immutable digest/byte/MIME binding | BLOCKED: required public PNG URLs return 404 |
+| Evidence | Two bounded images, immutable digest/byte/MIME binding | PASS for five public PNG fixtures; HTTP 200 and exact local/public bytes and hashes |
 | Canonical provider | Reads V2.3 state without fixture fallback | PASS for deployment readback; qualification state is empty |
 | Regression suite | Python, TS, API, browser, build, mutation/property gates | PASS locally; no live semantic qualification |
-| External publication | GitHub, Vercel, portal submission | NOT DONE; explicit publication approval remains required |
+| External publication | GitHub, Vercel, portal submission | GitHub/Portal NOT DONE; evidence-only Vercel host deployed and verified; app deployment not performed |
+
+## Latest V2.3 qualification stop
+
+The authorized run finalized exactly two policy writes (create and freeze),
+then stopped before Case A because `sim_estimateTransactionFees` rejected the
+exact payable `submit_usage_request` call with `Missing or invalid parameters`.
+The request carried all 11 ABI arguments, empty kwargs, and the frozen fee of
+10 wei. No request, evidence, adjudication, settlement, withdrawal, or refund
+write was broadcast. The exact hashes and stop record are in
+`docs/provenance/live-transactions/rightsrail-v23-live-qualification.json` and
+`docs/V23_QUALIFICATION_RUN_BLOCKER.md`.
 
 ## Stop conditions
 
