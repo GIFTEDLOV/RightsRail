@@ -45,7 +45,7 @@ The public PNG evidence boundary is now verified:
 
 Manifest: `https://rightsrail-evidence.vercel.app/manifest.json`, HTTP 200, 2,076 bytes, SHA-256 `A6AA797FE9439CDEF689F65F8F6BCFA98BB1EC0C502E6F59EE0B2F0083D9A863`. No fallback to SVG, localhost, fixture-only bytes, or fabricated model output was used.
 
-The qualification blocker is now runtime-side: the exact Case A payable fee simulation (`submit_usage_request`, 11 ABI arguments, empty kwargs, `value=10` wei) returns `sim_estimateTransactionFees: execution failed; InvalidInputRpcError: Missing or invalid parameters.` The policy is active by canonical chain time, so the run stopped before request broadcast and did not reinterpret the error as a semantic verdict. See `docs/V23_QUALIFICATION_RUN_BLOCKER.md`.
+The qualification blocker is now runtime-side: the exact Case A payable write (`submit_usage_request`, 11 ABI arguments, empty kwargs, `value=10` wei) fails both `sim_call` and `sim_estimateTransactionFees` inside contract execution. The deepest available result decodes to `[EXPECTED] policy is outside its validity window`. The same failure occurs for `latest-nonfinal` and `latest-finalized`, while canonical chain time is inside the stored policy window. The raw request/response artifact is `docs/provenance/simulations/v23-case-a-simulation.json`; analysis is in `docs/V23_SIMULATION_FORENSICS.md`.
 
 Local and public PNG provenance is recorded in `provenance/media/png-evidence-manifest.json` and `provenance/media/live-png-manifest.json`.
 
@@ -56,7 +56,7 @@ Local and public PNG provenance is recorded in `provenance/media/png-evidence-ma
 - Python: 85 passed, 18 subtests; compile pass; Ruff pass; mypy pass.
 - TypeScript tests: 13 passed.
 - API tests: 2 passed.
-- Deployment/fee/reconciliation tests: 11 passed.
+- Deployment/fee/reconciliation and Case A simulation-forensics tests: 14 passed.
 - Browser E2E: 28 passed across desktop, tablet, mobile, keyboard, workflows, screenshots, and console-error checks.
 - Production web/API build: PASS.
 - Contract/source/ABI invariant checks: PASS for the V2.3 deployed candidate and preserved V1 history.
@@ -77,7 +77,7 @@ External delivery has not been independently reconciled because no qualification
 
 ## Required next actions
 
-1. Resolve the Studio-dev simulator timestamp/context rejection for the exact payable request, without changing the frozen deployed contract implicitly.
+1. Resolve the Studio-dev simulator timestamp/context rejection for the exact payable request through a supported runtime path, without changing the frozen deployed contract implicitly.
 2. Obtain a fresh explicit authorization after a successful read-only payable preflight, then run the remaining qualification writes with exact-hash reconciliation.
 3. Verify the four canonical outcomes and independently reconcile entitlement delivery with distinct creator/requester actors.
 4. Obtain separate publication approval before GitHub push or Portal submission; the evidence-only Vercel host is already live.

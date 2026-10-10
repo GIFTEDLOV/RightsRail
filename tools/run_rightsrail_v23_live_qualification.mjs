@@ -184,6 +184,21 @@ async function writeTx({ readClient, writeClient, signer, journal, label, method
   const before = await state(readClient, signer.address);
   if (before.latest !== before.pending) throw new Error("NONCE_NOT_RECONCILED:" + label);
   const spec = buildQualificationWriteSpec({ account: signer, address, functionName: method, args, kwargs: {}, value, frozenPolicyFee: fee });
+  // Run the exact payable Case A object through the supported Studio simulation
+  // before fee estimation. This makes a contract-execution blocker explicit
+  // and prevents a later operator from treating a fee-estimator error as a
+  // missing-value problem or bypassing the precondition before broadcast.
+  if (label === "case-A:submit_usage_request") {
+    try {
+      await retry("simulate:" + label, () => writeClient.simulateWriteContract({ ...spec, includeReceipt: true }));
+    } catch (e) {
+      journal.failures.push({ label, failure_stage: "SIMULATION_EXECUTION_BEFORE_BROADCAST", error: errText(e) });
+      journal.phase = "STOPPED_FIRST_FAILURE";
+      journal.stop_reason = "SIMULATION_EXECUTION_FAILURE_BEFORE_FEE_ESTIMATION";
+      journalWrite(journal);
+      throw new Error("SIMULATION_EXECUTION_FAILURE:" + label);
+    }
+  }
   let estimated;
   try {
     estimated = await retry("estimate:" + label, () => writeClient.estimateTransactionFeesForWrite(spec));
