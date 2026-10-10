@@ -9,24 +9,25 @@
 - Frozen V1 ABI SHA-256:
   `E1314699D11B66D903E049F3D4DF558486E93225DFFD861A7A2E7210697969DB`
 - Current deployed state: one frozen policy, zero qualification records.
-- Local successor candidate source SHA-256:
-  `CEC17DF5D0D096591706B9547349DC870CE20C9276C9BCA2B0270204FDD29F0F`.
-- Local successor candidate ABI SHA-256:
-  `E7FC1AB9E0EC3BC20BB06C992318F300000B1F617FA6F8977F0DEEF2B688F805`.
+- V2.3 successor: `0xfB3335350b0e02ceFb384753990E9B377B4BCB1F`.
+- V2.3 deployment transaction: `0xb72fcde704b994982892a88ef45d51bc2133625c80f5c405f1bf838cced83dde`.
+- V2.3 source SHA-256: `E22EF2CCF7BFD03C555A13ADD2FADD3C2891C33E34522AB178B7785F9E8571EE`.
+- V2.3 official ABI SHA-256: `010C074E7FA8892AEFB26C443F62DFAA4E379897DFE950A93927F9E9E081CF3B`.
+- V2.3 state at deployment readback: zero policies, requests, evidence, adjudications, permits, settlements and accounting allocations.
 
 ## Gate checklist
 
 | Gate | Requirement | Current status |
 | --- | --- | --- |
-| Source/ABI parity | Hashes match the historical deployment | PASS for V1 history; local candidate is a different release |
-| Contract safety | No unreviewed source mutation | PASS for deployed V1; candidate changes documented |
-| Cash exit | Beneficiary payout and requester refund are withdrawable | BLOCKED for deployed V1; candidate fixed locally |
-| Timestamp | GenVM time is deterministic and simulation-compatible | BLOCKED for V1 live qualification; candidate uses transaction datetime |
+| Source/ABI parity | V2.3 source/schema match the deployed successor | PASS, read-only verified |
+| Contract safety | Hardened source passed RC5 validate/typecheck/schema and local adversarial gates | PASS locally; live qualification pending |
+| Cash exit | Beneficiary payout and requester refund are withdrawable | Candidate/deployment path present; external delivery unconfirmed |
+| Timestamp | Contract uses GenVM transaction datetime | PASS in candidate; hosted payable qualification still pending |
 | Semantic consensus | Exact seven-key parsing and independent validator | PASS in local direct/adversarial suite |
-| Evidence | Two bounded images, immutable digest/byte/MIME binding | PASS locally; hosted candidate qualification pending |
-| Canonical provider | Reads contract state without fixture fallback | BLOCKED; adapter intentionally fails closed |
-| Regression suite | Python, TS, API, browser, build, mutation/property gates | Must be rerun at final candidate hash |
-| External publication | GitHub, Vercel, portal submission | NOT AUTHORIZED / NOT DONE |
+| Evidence | Two bounded images, immutable digest/byte/MIME binding | BLOCKED: required public PNG URLs return 404 |
+| Canonical provider | Reads V2.3 state without fixture fallback | PASS for deployment readback; qualification state is empty |
+| Regression suite | Python, TS, API, browser, build, mutation/property gates | PASS locally; no live semantic qualification |
+| External publication | GitHub, Vercel, portal submission | NOT DONE; explicit publication approval remains required |
 
 ## Stop conditions
 

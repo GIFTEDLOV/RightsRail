@@ -1,0 +1,45 @@
+{
+  "status": "LOCAL_PREPARED_NOT_PUBLICLY_HOSTED",
+  "images": [
+    {
+      "file": "proposed-betting.png",
+      "sha256": "bf7799c32a4d8a46f5def7c06e39e1926c2e49df2461b35ea6111026699fef89",
+      "byte_length": 48481,
+      "media_type": "image/png",
+      "source_svg": "proposed-betting.svg",
+      "source_svg_sha256": "788338f4d84ac1a020b1774b6e06eea1bb259f5e119e1d9235159654a5c98517"
+    },
+    {
+      "file": "proposed-editorial.png",
+      "sha256": "da782460a0de765d49ebcbe4f116cfab0c42b42d3aea99e4bfc3763e5b63f223",
+      "byte_length": 52132,
+      "media_type": "image/png",
+      "source_svg": "proposed-editorial.svg",
+      "source_svg_sha256": "4a6b49323fb5bc1e64a47129e73311ea3a6255300e77c76b94af19968d2d1627"
+    },
+    {
+      "file": "proposed-missing-context.png",
+      "sha256": "a9f99ccd842e6ce2dd664d0aea21c94538a3eba40bf93040ab9fcb0158fe2584",
+      "byte_length": 32221,
+      "media_type": "image/png",
+      "source_svg": "proposed-missing-context.svg",
+      "source_svg_sha256": "f70930915e70d3b23be250e38f6d16fb68b006639e2967b2c3a0e701c38ace69"
+    },
+    {
+      "file": "reference.png",
+      "sha256": "e0d804ab77a13f6f892b564f58656e72bf4daff123225b58cb637537b2aad0c8",
+      "byte_length": 35344,
+      "media_type": "image/png",
+      "source_svg": "reference.svg",
+      "source_svg_sha256": "0fac13cbd9597297d4de5f4b656a9dc97cf6b2d43a866347b5c14ef5de57d3ef"
+    },
+    {
+      "file": "unrelated.png",
+      "sha256": "5d6cfa94971725d3d367a2c18d8cababd31668b0f3d33ed6d96712d222fb993d",
+      "byte_length": 41410,
+      "media_type": "image/png",
+      "source_svg": "unrelated.svg",
+      "source_svg_sha256": "2ccf22846ee7df949ed64a61f7775ecbaa0a8a2ee93dd4c5099e9a9117312d89"
+    }
+  ]
+}

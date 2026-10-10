@@ -22,7 +22,7 @@ import genlayer as gl
 
 
 CONTRACT_NAME = "RightsRail"
-CONTRACT_VERSION = "2.2.0"
+CONTRACT_VERSION = "2.3.0"
 SEMANTIC_SCHEMA = "RIGHTSRAIL_USAGE_V1"
 SEMANTIC_KEYS = (
     "asset_match",
@@ -42,6 +42,10 @@ REQUEST_SUBMITTED = "SUBMITTED"
 REQUEST_EVIDENCE_COMMITTED = "EVIDENCE_COMMITTED"
 REQUEST_ADJUDICATED = "ADJUDICATED"
 REQUEST_SETTLED = "SETTLED"
+
+# Requester-controlled escape from unresolved, pre-adjudication escrow.
+MIN_UNADJUDICATED_REFUND_DELAY_SECONDS = 7 * 24 * 60 * 60
+RESULT_CANCELLED_UNADJUDICATED = "CANCELLED_UNADJUDICATED"
 
 EVIDENCE_COMMITTED = "COMMITTED"
 AUTH_AUTHENTICATED = "AUTHENTICATED"
@@ -147,8 +151,26 @@ def _require_id(value: typing.Any, name: str) -> str:
 
 def _require_url_or_source(value: typing.Any, name: str) -> str:
     value = _require_text(value, name, MAX_URL_BYTES)
-    if "://" not in value:
-        _fail(name + " must contain a source scheme")
+    # Public evidence is fetched by independent validators; non-HTTPS schemes,
+    # credentials and fragments are not stable, authenticated public sources.
+    # A content digest alone cannot make an arbitrary network target safe.
+    if not value.startswith("https://"):
+        _fail(name + " must be a public HTTPS URL")
+    authority_and_path = value[len("https://"):]
+    authority = authority_and_path.split("/", 1)[0].split("?", 1)[0]
+    if not authority or authority.startswith(".") or authority.endswith(".") or "@" in authority or ":" in authority:
+        _fail(name + " must have a valid credential-free HTTPS host")
+    if "#" in value or "\\" in value or any(ch.isspace() for ch in value):
+        _fail(name + " contains an unsafe URL character")
+    if re.fullmatch(r"[a-z0-9.-]+", authority) is None or "." not in authority:
+        _fail(name + " must use a fully qualified DNS hostname")
+    labels = authority.split(".")
+    if any(not label or label[0] == "-" or label[-1] == "-" for label in labels):
+        _fail(name + " contains an invalid DNS label")
+    if authority in ("localhost", "metadata.google.internal") or authority.endswith((".localhost", ".local", ".internal")):
+        _fail(name + " must not access internal network hosts")
+    if all(label.isdigit() for label in labels):
+        _fail(name + " must not access IP literal hosts")
     return value
 
 
@@ -495,12 +517,12 @@ def _parse_auth_result(value: typing.Any) -> dict[str, typing.Any]:
         _consensus_fail("authentication status is invalid")
     for key in ("evidence_id", "request_id", "policy_id"):
         _require_id(value[key], key)
-    if not isinstance(value["policy_version"], int) or value["policy_version"] < 1:
+    if type(value["policy_version"]) is not int or value["policy_version"] < 1:
         _consensus_fail("authentication policy version is invalid")
     for key in ("reference_sha256", "proposed_sha256", "context_content_sha256", "context_screenshot_sha256"):
         _require_sha(value[key], key, allow_empty=True)
     for key in ("reference_byte_length", "proposed_byte_length"):
-        if not isinstance(value[key], int) or value[key] < 0:
+        if type(value[key]) is not int or not 0 <= value[key] <= U256_MAX:
             _consensus_fail("authentication byte length is invalid")
     return value
 
@@ -561,7 +583,7 @@ def _semantic_prompt(policy: dict, request: dict, evidence: dict, context_text: 
 def _evaluate_semantics(policy: dict, request: dict, evidence: dict, auth: dict) -> dict[str, bool]:
     reference_body, proposed_body, context_text = _semantic_context(policy, request, evidence, auth)
     prompt = _semantic_prompt(policy, request, evidence, context_text)
-    raw = gl.nondet.exec_prompt(prompt, images=[reference_body, proposed_body])
+    raw = gl.nondet.exec_prompt(prompt, images=[reference_body, proposed_body], response_format="json")
     return _parse_semantic_json(raw)
 
 
@@ -1051,15 +1073,23 @@ class RightsRail(gl.contract.Contract):
         policy = self._policy(request["policy_id"])
         if reference_sha256 != policy["asset_sha256"]:
             _fail("reference asset does not match the frozen policy asset")
+        if int(reference_byte_length) != policy["asset_exact_bytes"] or _require_mime(reference_mime, "reference_mime") != policy["asset_media_type"]:
+            _fail("reference length or media type does not match the frozen policy")
         if proposed_sha256 != request["proposed_asset_sha256"]:
             _fail("proposed asset does not match the request")
+        if int(proposed_byte_length) != request["proposed_asset_exact_bytes"] or _require_mime(proposed_mime, "proposed_mime") != request["proposed_media_type"]:
+            _fail("proposed length or media type does not match the request")
         if attribution_text != request["attribution_text"]:
             _fail("evidence attribution does not match the request")
         public_context_url = _optional_text(public_context_url, "public_context_url", MAX_URL_BYTES)
         context_content_sha256 = _require_sha(context_content_sha256, "context_content_sha256", allow_empty=True)
         context_screenshot_sha256 = _require_sha(context_screenshot_sha256, "context_screenshot_sha256", allow_empty=True)
-        if context_content_sha256 != "" and public_context_url == "":
+        if public_context_url == "" and (context_content_sha256 != "" or context_screenshot_sha256 != ""):
             _fail("context digest requires a public context URL")
+        if public_context_url != "":
+            public_context_url = _require_url_or_source(public_context_url, "public_context_url")
+            if context_content_sha256 == "":
+                _fail("public context URL requires an exact context content digest")
         reference_source = _require_url_or_source(reference_source, "reference_source")
         proposed_source = _require_url_or_source(proposed_source, "proposed_source")
         expected_authority_digest = _hash_json(
@@ -1097,6 +1127,11 @@ class RightsRail(gl.contract.Contract):
     def authenticate_evidence(self, evidence_id: str) -> str:
         evidence_id = _require_id(evidence_id, "evidence_id")
         evidence = self._evidence(evidence_id)
+        # An escrow-refund cancellation is terminal, including for late auth
+        # callbacks or attempts to resume a previously failed workflow.
+        request = self._request(evidence["request_id"])
+        if request["state"] != REQUEST_EVIDENCE_COMMITTED:
+            _fail("authentication requires EVIDENCE_COMMITTED")
         if evidence_id in self.evidence_auth_latest:
             latest = self._auth(self.evidence_auth_latest[evidence_id])
             if latest["status"] != AUTH_FETCH_FAILED:
@@ -1289,6 +1324,85 @@ class RightsRail(gl.contract.Contract):
         self._audit("SETTLE_REQUEST", settlement_id, settlement)
         return settlement_status
 
+    @gl.public.write
+    def refund_unadjudicated_request(self, request_id: str) -> str:
+        """Allocate a one-time refundable entitlement without fabricating an AI verdict.
+
+        The requester may recover irrecoverably bad evidence immediately, or
+        any unresolved pre-adjudication escrow once its seven-day grace period
+        has elapsed. No third party, policy issuer, or arbitrary model controls
+        the recipient. Racing adjudication and cancellation are serialized by
+        the request state transition and settlement index.
+        """
+        request_id = _require_id(request_id, "request_id")
+        request = self._request(request_id)
+        if _sender() != request["requester"]:
+            _fail("only the original requester may recover unresolved escrow")
+        if request["state"] not in (REQUEST_SUBMITTED, REQUEST_EVIDENCE_COMMITTED):
+            _fail("refund requires an unresolved pre-adjudication request")
+        if request_id in self.adjudication_by_request:
+            _fail("adjudicated requests must use normal settlement")
+        if request_id in self.settlement_by_request:
+            _fail("request already has a settlement")
+        if request["escrow_consumed"] != 0 or request["entitlement_type"] != "":
+            _fail("request escrow has already been consumed")
+        if request["settlement_id"] != "" or request["settled_at"] != 0:
+            _fail("request settlement binding is already populated")
+        if request["escrow_received"] != request["escrowed_value"]:
+            _fail("request escrow accounting is inconsistent")
+        policy = self._policy(request["policy_id"])
+        self._validate_request_binding(request, policy)
+
+        now = _now()
+        created_at = _require_u256(request["created_at"], "request created_at")
+        if now < created_at:
+            _fail("transaction time precedes request creation")
+        terminal_failure = False
+        if request_id in self.evidence_by_request:
+            evidence_id = self.evidence_by_request[request_id]
+            if evidence_id in self.evidence_auth_latest:
+                auth = self._auth(self.evidence_auth_latest[evidence_id])
+                terminal_failure = auth["status"] in (AUTH_INVALID_CONTENT, AUTHENTICATION_FAILED)
+        if not terminal_failure and now - created_at < MIN_UNADJUDICATED_REFUND_DELAY_SECONDS:
+            _fail("unresolved escrow refund grace period has not elapsed")
+
+        amount = _require_u256(request["escrowed_value"], "refund amount")
+        recipient = request["requester"]
+        settlement_id = "settle-" + _hash_json(
+            {"request_id": request_id, "action": RESULT_CANCELLED_UNADJUDICATED}
+        )[:48]
+        if settlement_id in self.settlement_records:
+            _fail("duplicate recovery settlement")
+        settlement = {
+            "settlement_id": settlement_id, "request_id": request_id,
+            "policy_id": request["policy_id"], "policy_version": request["policy_version"],
+            "requester": recipient, "adjudication_id": "", "generation": request["generation"],
+            "result": RESULT_CANCELLED_UNADJUDICATED, "action": "RECOVER_UNADJUDICATED_ESCROW",
+            "amount": amount, "recipient": recipient, "permit_id": "",
+            "status": SETTLEMENT_REFUND_ALLOCATED, "settlement_type": SETTLEMENT_REFUND_ALLOCATED,
+            "escrow_received": request["escrow_received"], "escrow_consumed": amount,
+            "settled_at": now, "schema_version": SETTLEMENT_SCHEMA,
+            "delivery_status": DELIVERY_ENTITLEMENT_ALLOCATED, "withdrawal_id": "",
+        }
+        self._consume_total_escrowed(amount)
+        self._credit(self.refundable_by_address, recipient, amount)
+        self._add_total_refund_allocated(amount)
+        self._add_total_refundable_outstanding(amount)
+        self._save(self.settlement_records, settlement_id, settlement)
+        self.settlement_ids.append(settlement_id)
+        self.settlement_by_request[request_id] = settlement_id
+        request["escrow_consumed"] = amount
+        request["escrowed_value"] = 0
+        request["entitlement_type"] = SETTLEMENT_REFUND_ALLOCATED
+        request["entitlement_recipient"] = recipient
+        request["entitlement_amount"] = amount
+        request["settlement_id"] = settlement_id
+        request["settled_at"] = now
+        request["state"] = REQUEST_SETTLED
+        self._save(self.request_records, request_id, request)
+        self._audit("RECOVER_UNADJUDICATED_ESCROW", settlement_id, settlement)
+        return SETTLEMENT_REFUND_ALLOCATED
+
     def _withdraw_entitlement(self, settlement_id: str, expected_type: str) -> str:
         settlement_id = _require_id(settlement_id, "settlement_id")
         settlement = self._record(self.settlement_records, settlement_id, "settlement")
@@ -1320,7 +1434,11 @@ class RightsRail(gl.contract.Contract):
         if amount > 0:
             if int(self.balance) < amount:
                 _fail("contract balance is insufficient for withdrawal")
-            NativeRecipient(recipient).emit_transfer(value=amount)
+            # RC5's contract-interface decorator is runtime-callable, but its
+            # bundled Pyright annotation is an Annotated marker rather than a
+            # constructor type. Keep the runtime call and suppress only that
+            # static false positive.
+            NativeRecipient(recipient).emit_transfer(value=gl.u256(amount))  # pyright: ignore[reportCallIssue]
             delivery_status = DELIVERY_WITHDRAWAL_EMITTED
         else:
             delivery_status = DELIVERY_ZERO_VALUE

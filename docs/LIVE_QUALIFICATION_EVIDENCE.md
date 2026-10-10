@@ -1,20 +1,23 @@
 # RightsRail Live Qualification Evidence
 
 This bundle is prepared for a future Studio-dev qualification only. It does
-not represent canonical contract state, and none of the qualification writes
-has been executed.
+not represent canonical contract state, and none of the V2.3 qualification
+writes has been executed.
 
 ## Evidence host
 
-Evidence-only static host:
+Previously referenced evidence-only static host:
 
 `https://rightsrail-evidence.vercel.app`
 
-The RightsRail application was not deployed. The five SVG files are original
-project-created controlled fixtures. Every URL below was fetched over HTTPS
-and returned HTTP 200 with the recorded bytes and SHA-256.
+The five SVG files are original project-created controlled fixtures from the
+historical local demo. The required V2.3 qualification boundary is PNG. The
+local PNG renditions are recorded in
+`provenance/media/png-evidence-manifest.json`, but the advertised public PNG
+URLs currently return HTTP 404. They must not be used for live evidence
+commits until a stable HTTPS host serves byte-identical content.
 
-## Verified evidence table
+## Historical SVG reference table (not live V2.3 evidence)
 
 | Case | Role | Public URL | MIME | Bytes | SHA-256 | Expected result |
 | --- | --- | --- | --- | ---: | --- | --- |
@@ -26,13 +29,13 @@ and returned HTTP 200 with the recorded bytes and SHA-256.
 
 ## Manifest
 
-Manifest URL: [manifest.json](https://rightsrail-evidence.vercel.app/manifest.json)
+Historical manifest URL: [manifest.json](https://rightsrail-evidence.vercel.app/manifest.json)
 
 ```text
 BYTES: 2351
 SHA256: 7114DAD3B100993B17DEEA40EE3A7D048E75B27568EDAC8DA1C2DD53600205DA
 MIME: application/json; charset=utf-8
-HTTP: 200
+HTTP: historical record only; do not treat as V2.3 PNG-host verification
 ```
 
 The local source manifest is
@@ -50,4 +53,3 @@ The expected results are planning labels only. They are not permission to
 retry or reinterpret a canonical result. The first successful canonical
 adjudication is authoritative; infrastructure failure stops the qualification
 and is not converted into a business result.
-

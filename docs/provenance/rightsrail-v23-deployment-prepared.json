@@ -1,0 +1,60 @@
+{
+  "preparedAt": "2026-10-10T18:14:22.613Z",
+  "broadcasted": false,
+  "signed": false,
+  "chainId": 61997,
+  "rpc": "https://studio-dev.genlayer.com/api",
+  "sender": "0x33653e6e86807e41682d3346cdf648d6653384b1",
+  "nonce": 67,
+  "latestNonce": 67,
+  "pendingNonce": 67,
+  "balanceWei": "1293996761999938755",
+  "runner": "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng",
+  "sourcePath": "contracts/rightsrail.py",
+  "sourceBytes": 73722,
+  "sourceSha256": "E22EF2CCF7BFD03C555A13ADD2FADD3C2891C33E34522AB178B7785F9E8571EE",
+  "abiPath": "artifacts/rightsrail.abi.json",
+  "abiBytes": 11002,
+  "abiSha256": "010C074E7FA8892AEFB26C443F62DFAA4E379897DFE950A93927F9E9E081CF3B",
+  "userValue": "0",
+  "constructorArgs": [],
+  "constructorKwargs": {},
+  "observedReceiptCost": "78628000000000",
+  "fees": {
+    "feeValue": "100000000000010352",
+    "distribution": {
+      "leaderTimeunitsAllocation": "100",
+      "validatorTimeunitsAllocation": "200",
+      "appealRounds": "0",
+      "executionBudgetPerRound": "25000000000000000",
+      "executionConsumed": "0",
+      "totalMessageFees": "0",
+      "rotations": [
+        "3"
+      ],
+      "maxPriceGenPerTimeUnit": "2",
+      "storageFeeMaxGasPrice": "300000000",
+      "receiptFeeMaxGasPrice": "300000000"
+    },
+    "source": "genlayer-js:estimateTransactionFees -> proven Studio-dev profile",
+    "rawEstimate": {
+      "feeValue": "100000000000010352",
+      "executionBudgetPerRound": "25000000000000000"
+    },
+    "observedReceiptCost": "78628000000000"
+  },
+  "currentFeePolicy": {
+    "enabled": true,
+    "genPerTimeUnit": "1",
+    "storageUnitPrice": "250000000",
+    "receiptGasPrice": "250000000",
+    "executionBudgetFloor": "76548000000000",
+    "timeUnitOverlayBps": "1500"
+  },
+  "sdk": {
+    "package": "genlayer-js",
+    "path": "C:/Users/DELL/CharterLock/frontend/node_modules/genlayer-js/dist/index.js",
+    "explicitCall": "client.deployContract({ account, code, args: [], kwargs: {}, fees })",
+    "invoked": false
+  }
+}

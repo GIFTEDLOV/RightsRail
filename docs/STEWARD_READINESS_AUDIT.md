@@ -1,8 +1,8 @@
 # RightsRail steward-readiness audit
 
-Audit scope: local successor hardening against immutable deployed V1 history.
-No blockchain write, deployment, funding, qualification, or publication was
-performed by this audit.
+Audit scope: V2.3 successor hardening against immutable deployed V1 history.
+One authorized V2.3 deployment was performed; no qualification or publication
+was performed by this audit.
 
 ## Baseline and truth boundary
 
@@ -10,14 +10,15 @@ performed by this audit.
   `61997`.
 - Historical V1 source/ABI hashes are preserved in `README.md`,
   `docs/PREDEPLOY_AUDIT.md`, and transaction provenance.
-- Current canonical state remains one frozen policy and zero request, evidence,
+- V1 canonical state remains one frozen policy and zero request, evidence,
   adjudication, permit, or settlement records.
-- Local successor changes are not deployed and do not alter the historical
-  contract.
-- Local successor candidate source SHA-256:
-  `CEC17DF5D0D096591706B9547349DC870CE20C9276C9BCA2B0270204FDD29F0F`.
-- Local successor candidate ABI SHA-256:
-  `E7FC1AB9E0EC3BC20BB06C992318F300000B1F617FA6F8977F0DEEF2B688F805`.
+- V2.3 is deployed at `0xfB3335350b0e02ceFb384753990E9B377B4BCB1F` with zero
+  policies, requests, evidence, adjudications, permits, settlements, and
+  accounting allocations.
+- V2.3 source SHA-256:
+  `E22EF2CCF7BFD03C555A13ADD2FADD3C2891C33E34522AB178B7785F9E8571EE`.
+- V2.3 official ABI SHA-256:
+  `010C074E7FA8892AEFB26C443F62DFAA4E379897DFE950A93927F9E9E081CF3B`.
 
 ## Findings
 

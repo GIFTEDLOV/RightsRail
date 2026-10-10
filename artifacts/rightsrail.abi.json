@@ -492,6 +492,18 @@
         }
       ]
     },
+    "refund_unadjudicated_request": {
+      "params": [
+        [
+          "request_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
+      "payable": false
+    },
     "settle_request": {
       "params": [
         [

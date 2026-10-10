@@ -9,23 +9,24 @@ RightsRail does not determine legal copyright ownership or legal infringement. I
 ## Release status
 
 The historical V1 deployment is immutable at
-`0x984b996079d2591976FcfFb62d0506DF02E0396A` on Studio-dev. The included
-product experience remains a **CONTROLLED LOCAL DEMO**: it does not activate
-live reads, broadcast transactions, request a wallet signature, or silently
-substitute fixtures for canonical data. A local successor candidate contains
-timestamp and cash-exit hardening, but it is not deployed and must not be
-described as the V1 contract.
+`0x984b996079d2591976FcfFb62d0506DF02E0396A` on Studio-dev. The V2.3
+successor is deployed separately at
+`0xfB3335350b0e02ceFb384753990E9B377B4BCB1F`, but it has **zero qualification
+records**. The included product experience remains a **CONTROLLED LOCAL DEMO**:
+it does not silently substitute fixtures for canonical data. Live V2.3
+qualification is blocked until stable HTTPS PNG evidence is publicly served
+and byte-verified.
 
 The product layer now includes:
 
-- a typed client around the frozen 30-method ABI and transaction journal;
+- a typed client around the V2.3 35-method ABI and transaction journal;
 - explicit `CONTROLLED_LOCAL` and `GENLAYER_CANONICAL` provider modes;
 - a persistent JSON-backed local read model with reproducible four-case fixtures;
 - a Node API with provenance metadata on every response;
 - a rights-control web application on port 3001, including policy, request,
   evidence, adjudication, permit, settlement, activity, integration, and demo
   routes;
-- original project-created SVG media fixtures under `apps/web/public/demo/`;
+- original project-created SVG and deterministic PNG media fixtures under `apps/web/public/demo/`;
 - responsive, keyboard-accessible evidence comparison and semantic matrix views;
 - browser E2E and screenshot audit coverage.
 
@@ -37,14 +38,20 @@ The frozen V1 provenance remains:
 - Studio-dev RC5 runner `py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng`;
 - strict seven-boolean semantic parsing, independent validator evaluation, bounded two-image evidence, and deterministic policy precedence.
 
-The local successor candidate adds claimant-bound withdrawal methods and
-transaction-datetime validity checks. It has 34 generated methods and new
-source SHA-256 `CEC17DF5D0D096591706B9547349DC870CE20C9276C9BCA2B0270204FDD29F0F`
-and ABI SHA-256
-`E7FC1AB9E0EC3BC20BB06C992318F300000B1F617FA6F8977F0DEEF2B688F805`; it has
-not been deployed.
+The deployed V2.3 successor adds claimant-bound withdrawal methods and
+transaction-datetime validity checks. Its source SHA-256 is
+`E22EF2CCF7BFD03C555A13ADD2FADD3C2891C33E34522AB178B7785F9E8571EE` and its
+official ABI SHA-256 is
+`010C074E7FA8892AEFB26C443F62DFAA4E379897DFE950A93927F9E9E081CF3B`.
 
-No deployment, GEN spending, GitHub repository, remote push, faucet use, or Vercel project is part of this phase.
+The V2.3 deployment transaction is
+`0xb72fcde704b994982892a88ef45d51bc2133625c80f5c405f1bf838cced83dde` and
+finished with `FINALIZED / FINISHED_WITH_RETURN`. No qualification write has
+been attempted.
+
+No GitHub push, Portal submission, faucet use, or Vercel application deployment
+was performed. The single authorized V2.3 deployment did consume its explicit
+Studio-dev deployment fee; no qualification writes followed.
 
 ## Run locally
 

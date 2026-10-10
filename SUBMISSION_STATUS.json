@@ -1,0 +1,13 @@
+{
+  "product": "RightsRail",
+  "candidate_version": "2.3.0",
+  "submission_category": "standalone GenLayer Intelligent Contract",
+  "status": "V2_3_DEPLOYED_QUALIFICATION_BLOCKED_EVIDENCE_HOST",
+  "contract_sha256": "e22ef2ccf7bfd03c555a13add2fadd3c2891c33e34522ab178b7785f9e8571ee",
+  "official_abi_sha256": "010c074e7fa8892aefb26c443f62dfaa4e379897dfe950a93927f9e9e081cf3b",
+  "package_source_sha256": "651ca9042885f01d4ef0a6c67e8a5aef54957ab11c5860fad260872bd8640b5d",
+  "official_genvm_validation": "PASS_LOCAL_RC5",
+  "deployment_address": "0xfb3335350b0e02cefb384753990e9b377b4bcb1f",
+  "frontend_required_for_code": "NO",
+  "offline_test_results": "85 pytest passed, 18 subtests; official RC5 validate/typecheck/schema passed; lint emitted only known E010 warnings"
+}
