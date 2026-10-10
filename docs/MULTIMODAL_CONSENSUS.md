@@ -20,6 +20,13 @@ The prompt asks only the seven `RIGHTSRAIL_USAGE_V1` questions. It explicitly ex
 
 `validator_fn` requires the leader result to be a `gl.vm.Return`. It strictly parses the leader payload, independently performs the same semantic evaluation with the same canonical context, strictly parses its own result, and compares only the seven booleans. Any malformed payload or disagreement returns validator rejection/rotation.
 
+The direct RC5 harness proves that the contract passes exactly two fetched byte
+payloads to `gl.nondet.exec_prompt` as the reference and proposed images. It
+does not prove that a hosted production vision model will accept every MIME
+type (in particular SVG) without a deterministic rasterization step. The
+current deployed qualification has no adjudications, so this remains a
+successor-hosting gate rather than a fabricated live claim.
+
 ## Post-consensus
 
 The contract strictly parses the consensus result again before deriving a deterministic result or writing an adjudication. It increments generation exactly once. No malformed or unavailable semantic evaluation can create a verdict, permit, or settlement.

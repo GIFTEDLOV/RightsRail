@@ -12,7 +12,7 @@ This phase is local-only. Do not deploy, spend GEN, push to GitHub, create a rem
 6. Verify the exact semantic schema and deterministic precedence tests.
 7. Verify one-state-too-early, replay, evidence immutability, permit binding, and settlement tests.
 8. Run the RC5 direct execution tests with controlled two-image mocks and explicit validator replay. The test-only adapter must remain isolated from contract code.
-9. Verify settlement allocation and conservation invariants. `settle_request` must not emit an external transfer; withdrawal/delivery reconciliation is a later phase.
+9. Verify settlement allocation and conservation invariants. `settle_request` must not emit an external transfer. For the deployed V1 candidate, stop at entitlement allocation. For any successor with pull withdrawal methods, separately reconcile `WITHDRAWAL_EMITTED` against external delivery; never call an emitted message delivered.
 10. Obtain explicit approval for any future deployment or GEN spend.
 
 ## Artifact recording

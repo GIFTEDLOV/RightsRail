@@ -4,6 +4,7 @@ import unittest
 
 from rightsrail_domain import (
     AuthorizationError,
+    InvariantViolation,
     PolicyState,
     RightsRailState,
     StateTransitionError,
@@ -17,6 +18,7 @@ from tests.test_fixtures import (
     NOW,
     OTHER_ASSET_SHA,
     RECIPIENT,
+    REQUESTER,
     build_state,
     compliant_vector,
 )
@@ -237,6 +239,85 @@ class RightsRailStateMachineTests(unittest.TestCase):
                 semantic_output={**compliant_vector(), "endorsement_implied": True},
                 generation=1,
             )
+
+    def test_distinct_actor_payout_claim_is_exactly_once_and_recipient_bound(self) -> None:
+        state = build_state()
+        state.record_adjudication(
+            request_id="request-001",
+            evidence_id="evidence-001",
+            semantic_output=compliant_vector(),
+            generation=1,
+        )
+        settlement = state.settle(request_id="request-001")
+        with self.assertRaises(AuthorizationError):
+            state.withdraw(
+                caller=REQUESTER,
+                settlement_id=settlement.settlement_id,
+                entitlement_type="PAYOUT_ALLOCATED",
+            )
+        withdrawal = state.withdraw(
+            caller=RECIPIENT,
+            settlement_id=settlement.settlement_id,
+            entitlement_type="PAYOUT_ALLOCATED",
+        )
+        self.assertEqual(withdrawal.recipient, RECIPIENT)
+        self.assertEqual(withdrawal.amount, 10)
+        self.assertEqual(withdrawal.status, "WITHDRAWAL_EMITTED")
+        self.assertEqual(state.claimable_by_address[RECIPIENT], 0)
+        self.assertEqual(state.total_claimable_outstanding, 0)
+        self.assertEqual(state.contract_balance, 0)
+        self.assertEqual(state.total_withdrawal_emitted, 10)
+        with self.assertRaises(StateTransitionError):
+            state.withdraw(
+                caller=RECIPIENT,
+                settlement_id=settlement.settlement_id,
+                entitlement_type="PAYOUT_ALLOCATED",
+            )
+
+    def test_distinct_actor_refund_claim_cannot_be_taken_by_issuer(self) -> None:
+        state = build_state()
+        denied = compliant_vector()
+        denied["prohibited_context_present"] = True
+        state.record_adjudication(
+            request_id="request-001",
+            evidence_id="evidence-001",
+            semantic_output=denied,
+            generation=1,
+        )
+        settlement = state.settle(request_id="request-001")
+        with self.assertRaises(AuthorizationError):
+            state.withdraw(
+                caller=RECIPIENT,
+                settlement_id=settlement.settlement_id,
+                entitlement_type="REFUND_ALLOCATED",
+            )
+        withdrawal = state.withdraw(
+            caller=REQUESTER,
+            settlement_id=settlement.settlement_id,
+            entitlement_type="REFUND_ALLOCATED",
+        )
+        self.assertEqual(withdrawal.recipient, REQUESTER)
+        self.assertEqual(state.refundable_by_address[REQUESTER], 0)
+        self.assertEqual(state.total_refundable_outstanding, 0)
+
+    def test_withdrawal_fails_closed_when_contract_balance_is_short(self) -> None:
+        state = build_state()
+        state.record_adjudication(
+            request_id="request-001",
+            evidence_id="evidence-001",
+            semantic_output=compliant_vector(),
+            generation=1,
+        )
+        settlement = state.settle(request_id="request-001")
+        state.contract_balance = 0
+        with self.assertRaises(InvariantViolation):
+            state.withdraw(
+                caller=RECIPIENT,
+                settlement_id=settlement.settlement_id,
+                entitlement_type="PAYOUT_ALLOCATED",
+            )
+        self.assertEqual(state.claimable_by_address[RECIPIENT], 10)
+        self.assertIsNone(state.settlements["request-001"].withdrawal_id)
 
 
 if __name__ == "__main__":

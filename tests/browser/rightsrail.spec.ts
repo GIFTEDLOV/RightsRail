@@ -56,6 +56,17 @@ test.describe("RightsRail local product qualification", () => {
     await page.screenshot({ path: `screenshots/${testInfo.project.name}-demo-case-b-mobile.png`, fullPage: true });
   });
 
+  test("flagship comparison renders without browser console errors", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("console", (message) => {
+      if (message.type() === "error") errors.push(message.text());
+    });
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto("/demo/case-b");
+    await expect(page.getByRole("heading", { name: "DENIED" }).first()).toBeVisible();
+    expect(errors).toEqual([]);
+  });
+
   test("captures the core visual audit screens", async ({ page }, testInfo) => {
     const screens = [
       ["landing", "/"],

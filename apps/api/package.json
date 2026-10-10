@@ -7,7 +7,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
-    "test": "vitest run src"
+    "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
     "@rightsrail/genlayer-client": "workspace:*",

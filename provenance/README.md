@@ -22,4 +22,6 @@ Phase 2.6 candidate record:
 - contract SHA-256: `C312E73FA9A01DB54A81FB19CBE82DBD0B73C6F9308D71A181E3E07BD13D548B`;
 - ABI SHA-256: `E1314699D11B66D903E049F3D4DF558486E93225DFFD861A7A2E7210697969DB`;
 - conservation: received = escrowed + payout allocated + refund allocated - withdrawals emitted;
-- withdrawals: not implemented; automatic retries: none.
+- deployed V1 withdrawals: not implemented; the local successor candidate has
+  claimant-bound pull withdrawals with `WITHDRAWAL_EMITTED` status only;
+  automatic retries remain disabled.

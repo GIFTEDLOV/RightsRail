@@ -6,8 +6,9 @@ import { localStore } from "./store.js";
 
 const port = Number(process.env.PORT ?? 3002);
 const configuredMode = process.env.RIGHTSRAIL_PROVIDER_MODE === "GENLAYER_CANONICAL" ? "GENLAYER_CANONICAL" : "CONTROLLED_LOCAL";
+const configuredContractAddress = process.env.RIGHTSRAIL_CONTRACT_ADDRESS ?? null;
 const provider: RightsRailProvider = configuredMode === "GENLAYER_CANONICAL"
-  ? new GenLayerCanonicalProvider(null)
+  ? new GenLayerCanonicalProvider(configuredContractAddress)
   : new ControlledFixtureProvider(() => localStore.snapshot());
 
 function headers(): Record<string, string> {
@@ -32,7 +33,7 @@ async function snapshot() {
   return provider.snapshot();
 }
 function error(res: ServerResponse, status: number, code: string, message: string): void {
-  writeJson(res, status, { error: { code, message }, provenance: { mode: configuredMode, canonical: configuredMode === "GENLAYER_CANONICAL", chainId: CHAIN_ID, contractAddress: null, source: configuredMode === "GENLAYER_CANONICAL" ? "genlayer-contract" : "controlled-fixture-store", asOf: nowIso() } });
+  writeJson(res, status, { error: { code, message }, provenance: { mode: configuredMode, canonical: configuredMode === "GENLAYER_CANONICAL", chainId: CHAIN_ID, contractAddress: configuredContractAddress, source: configuredMode === "GENLAYER_CANONICAL" ? "genlayer-contract" : "controlled-fixture-store", asOf: nowIso() } });
 }
 
 const server = createServer(async (req, res) => {

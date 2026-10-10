@@ -20,7 +20,7 @@ export interface ActivityRecord {
 
 export interface DeliveryRecord {
   settlement_id: string;
-  status: "NOT_REQUESTED" | "ENTITLEMENT_ALLOCATED" | "WITHDRAWAL_EMITTED" | "DELIVERY_CONFIRMED" | "DELIVERY_FAILED_OR_UNKNOWN";
+  status: "NOT_REQUESTED" | "ENTITLEMENT_ALLOCATED" | "WITHDRAWAL_EMITTED" | "DELIVERY_CONFIRMED" | "DELIVERY_FAILED_OR_UNKNOWN" | "ZERO_VALUE_NO_TRANSFER";
   recipient: string;
   amount: number;
   external_operation: string | null;
@@ -56,9 +56,9 @@ export class ControlledFixtureProvider implements RightsRailProvider {
 export class GenLayerCanonicalProvider implements RightsRailProvider {
   readonly mode = "GENLAYER_CANONICAL" as const;
   readonly canonical = true as const;
-  constructor(private readonly contractAddress: string | null) {}
+  constructor(readonly address: string | null) {}
   async snapshot(): Promise<IndexedState> {
-    if (!this.contractAddress) throw new Error("Canonical provider unavailable: contract is not deployed");
+    if (!this.address) throw new Error("Canonical provider unavailable: contract is not deployed");
     throw new Error("Canonical provider read adapter is not active until a contract address is configured");
   }
 }
@@ -68,7 +68,7 @@ export function provenance(provider: RightsRailProvider): ProvenanceMeta {
     mode: provider.mode,
     canonical: provider.canonical,
     chainId: CHAIN_ID,
-    contractAddress: provider.canonical ? null : null,
+    contractAddress: provider instanceof GenLayerCanonicalProvider ? provider.address : null,
     source: provider.canonical ? "genlayer-contract" : "controlled-fixture-store",
     asOf: nowIso(),
   };

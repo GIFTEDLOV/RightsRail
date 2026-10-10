@@ -12,6 +12,7 @@ from .models import (
     RequestState,
     Settlement,
     UsageRequest,
+    Withdrawal,
 )
 from .state import (
     AuthorizationError,
@@ -38,4 +39,5 @@ __all__ = [
     "Settlement",
     "StateTransitionError",
     "UsageRequest",
+    "Withdrawal",
 ]

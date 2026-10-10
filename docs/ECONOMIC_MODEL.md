@@ -23,7 +23,7 @@ escrow and allocates exactly one internal entitlement in canonical GenVM state.
 The permitted recipient receives a claimable balance; every other result
 receives a refundable balance for the requester.
 
-The conservation equation is:
+The deployed V1 conservation equation is:
 
 ```text
 total_escrow_received
@@ -33,8 +33,21 @@ total_escrow_received
  - total_withdrawal_emitted
 ```
 
-`total_withdrawal_emitted` remains zero because RightsRail does not expose a
-withdrawal method in this phase. An external message is never treated as
+For deployed V1, `total_withdrawal_emitted` remains zero because V1 does not
+expose a withdrawal method. The local successor candidate uses the more
+precise liability equation:
+
+```text
+total_escrow_received
+== total_escrowed
+ + total_claimable_outstanding
+ + total_refundable_outstanding
+ + total_withdrawal_emitted
+```
+
+Its payout/refund allocation counters remain cumulative history. The candidate
+increments `total_withdrawal_emitted` only when its claimant-bound withdrawal
+path emits the exact native amount. An external message is never treated as
 delivered merely because it was emitted.
 
 ## Invariants
@@ -54,9 +67,10 @@ delivered merely because it was emitted.
 The local deterministic reference model, direct tests, property tests, and
 mutation tests cover these accounting and state guards.
 
-## Phase 3 product boundary
+## Product boundary
 
-The web/API product renders this ledger as a read model only. `ENTITLEMENT_ALLOCATED`
-is the current terminal delivery state because the frozen contract has no
-withdrawal method. Product copy must not call this state paid, delivered, or
-complete.
+The web/API product renders this ledger as a read model only. For deployed V1,
+`ENTITLEMENT_ALLOCATED` is the terminal delivery state because the frozen
+contract has no withdrawal method. Product copy must not call this state paid,
+delivered, or complete. Candidate withdrawal status is also not delivery
+confirmation.

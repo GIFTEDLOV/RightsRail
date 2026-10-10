@@ -462,6 +462,36 @@
       "readonly": true,
       "ret": "dict"
     },
+    "get_withdrawal": {
+      "params": [
+        [
+          "withdrawal_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_withdrawal_ids": {
+      "params": [
+        [
+          "start",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "string"
+        }
+      ]
+    },
     "settle_request": {
       "params": [
         [
@@ -540,6 +570,30 @@
       "kwparams": {},
       "readonly": false,
       "ret": "null",
+      "payable": false
+    },
+    "withdraw_claimable": {
+      "params": [
+        [
+          "settlement_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
+      "payable": false
+    },
+    "withdraw_refund": {
+      "params": [
+        [
+          "settlement_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
       "payable": false
     }
   }

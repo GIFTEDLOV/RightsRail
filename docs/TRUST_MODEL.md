@@ -32,3 +32,10 @@ The frontend is not a trust authority. It consumes typed provider envelopes,
 shows canonical/local provenance, and renders the first provider result. The
 controlled demo is a qualification fixture and is never labeled live,
 canonical network state, or on-chain state.
+
+## Cash-exit boundary
+
+The deployed V1 stops at internal entitlement allocation. The local successor
+candidate adds claimant-bound withdrawal methods, but `WITHDRAWAL_EMITTED` is
+still not `DELIVERY_CONFIRMED`; external message execution must be reconciled
+by the delivery layer. No frontend state can upgrade that status on its own.

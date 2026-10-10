@@ -2,6 +2,12 @@
 
 Status: read-only forensic closure. No Case A transaction was broadcast in this investigation.
 
+This document is a historical V1 record. The local successor candidate no
+longer uses the wall-clock `_now()` implementation described below; it parses
+the deterministic GenLayer transaction datetime and records separate candidate
+hashes in `docs/RELEASE_GATE.md`. The deployed V1 and this failure record are
+unchanged.
+
 ## Canonical policy
 
 | Field | Canonical value |

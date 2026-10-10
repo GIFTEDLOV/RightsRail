@@ -43,6 +43,15 @@ describe("provider and fixture provenance", () => {
     await expect(new GenLayerCanonicalProvider(null).snapshot()).rejects.toThrow("not deployed");
   });
 
+  it("retains the configured canonical address in provenance", () => {
+    const provider = new GenLayerCanonicalProvider("0x984b996079d2591976FcfFb62d0506DF02E0396A");
+    expect(provenance(provider)).toMatchObject({
+      mode: "GENLAYER_CANONICAL",
+      canonical: true,
+      contractAddress: "0x984b996079d2591976FcfFb62d0506DF02E0396A",
+    });
+  });
+
   it("finds typed records by their canonical identifier", () => {
     const state = seedState();
     expect(findById(state.permits, "permit_id", "permit-case-a").request_id).toBe("request-case-a");

@@ -4,6 +4,10 @@ export const CONTRACT_SHA256 =
   "C312E73FA9A01DB54A81FB19CBE82DBD0B73C6F9308D71A181E3E07BD13D548B" as const;
 export const ABI_SHA256 =
   "E1314699D11B66D903E049F3D4DF558486E93225DFFD861A7A2E7210697969DB" as const;
+export const CANDIDATE_CONTRACT_SHA256 =
+  "CEC17DF5D0D096591706B9547349DC870CE20C9276C9BCA2B0270204FDD29F0F" as const;
+export const CANDIDATE_ABI_SHA256 =
+  "E7FC1AB9E0EC3BC20BB06C992318F300000B1F617FA6F8977F0DEEF2B688F805" as const;
 export const RUNNER =
   "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng" as const;
 export const STUDIO_DEV_RPC = "https://studio-dev.genlayer.com/api" as const;
@@ -46,6 +50,11 @@ export const ABI_METHODS = {
   ],
 } as const;
 
+export const CANDIDATE_ABI_METHODS = {
+  reads: [...ABI_METHODS.reads, "get_withdrawal", "get_withdrawal_ids"],
+  writes: [...ABI_METHODS.writes, "withdraw_claimable", "withdraw_refund"],
+} as const;
+
 export type ReadMethod = (typeof ABI_METHODS.reads)[number];
 export type WriteMethod = (typeof ABI_METHODS.writes)[number];
 export type ContractMethod = ReadMethod | WriteMethod;
@@ -58,6 +67,7 @@ export type DeliveryStatus =
   | "NOT_REQUESTED"
   | "ENTITLEMENT_ALLOCATED"
   | "WITHDRAWAL_EMITTED"
+  | "ZERO_VALUE_NO_TRANSFER"
   | "DELIVERY_CONFIRMED"
   | "DELIVERY_FAILED_OR_UNKNOWN";
 
@@ -80,7 +90,9 @@ export interface ContractInfo {
   max_semantic_images: 2;
   owner_override: false;
   settlement_model: "ENTITLEMENT_ALLOCATION";
-  withdrawal_supported: false;
+  withdrawal_supported: boolean;
+  delivery_model?: string;
+  withdrawal_retry?: string;
 }
 
 export interface PolicyRecord {
@@ -134,6 +146,7 @@ export interface RequestRecord {
   settled_at: number;
   state: RequestState;
   generation: number;
+  withdrawal_id?: string;
 }
 
 export interface EvidenceRecord {
@@ -210,7 +223,8 @@ export interface SettlementRecord {
   escrow_received: number;
   escrow_consumed: number;
   settled_at: number;
-  delivery_status: "ENTITLEMENT_ALLOCATED";
+  delivery_status: DeliveryStatus;
+  withdrawal_id: string;
 }
 
 export interface AccountingSnapshot {
@@ -218,8 +232,22 @@ export interface AccountingSnapshot {
   total_escrowed: number;
   total_payout_allocated: number;
   total_refund_allocated: number;
+  total_claimable_outstanding: number;
+  total_refundable_outstanding: number;
   total_withdrawal_emitted: number;
   conservation_rhs: number;
+}
+
+export interface WithdrawalRecord {
+  withdrawal_id: string;
+  settlement_id: string;
+  request_id: string;
+  entitlement_type: SettlementType;
+  recipient: string;
+  amount: number;
+  status: "WITHDRAWAL_EMITTED" | "ZERO_VALUE_NO_TRANSFER";
+  emitted_at: number;
+  delivery_confirmation: "NOT_AVAILABLE";
 }
 
 export interface TransactionJournalEntry {

@@ -45,6 +45,11 @@ def test_contract_uses_real_storage_and_consensus_primitives() -> None:
         "total_escrowed",
         "total_payout_allocated",
         "total_refund_allocated",
+        "withdrawal_records",
+        "withdrawal_ids",
+        "withdrawal_by_settlement",
+        "total_claimable_outstanding",
+        "total_refundable_outstanding",
         "audit_records",
         "sequence",
     } <= annotations
@@ -55,6 +60,7 @@ def test_contract_uses_real_storage_and_consensus_primitives() -> None:
     assert "gl.public.view" in source
     assert "gl.public.write" in source
     assert "gl.public.write.payable" in source
+    assert "gl.nondet.exec_prompt(prompt, images=[reference_body, proposed_body])" in source
 
 
 def test_no_caller_semantic_vector_or_verdict_is_in_the_public_source() -> None:
@@ -75,5 +81,11 @@ def test_settlement_is_after_adjudication_and_permit_binding_is_explicit() -> No
     assert '"settlement_recipient": policy["settlement_recipient"]' in source
     assert '"settlement_type": settlement_type' in source
     assert 'self._consume_total_escrowed(amount)' in source
-    assert "emit_transfer" not in source
+    settle = source[
+        source.index("    def settle_request(") : source.index("    def _withdraw_entitlement(")
+    ]
+    assert "emit_transfer" not in settle
+    assert "def withdraw_claimable" in source
+    assert "def withdraw_refund" in source
+    assert "NativeRecipient(recipient).emit_transfer(value=amount)" in source
     assert "_Payable" not in source

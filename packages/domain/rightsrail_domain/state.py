@@ -27,6 +27,7 @@ from .models import (
     RequestState,
     Settlement,
     UsageRequest,
+    Withdrawal,
 )
 
 
@@ -97,13 +98,17 @@ class RightsRailState:
         self.adjudication_by_request: dict[str, str] = {}
         self.permits: dict[str, Permit] = {}
         self.settlements: dict[str, Settlement] = {}
+        self.withdrawals: dict[str, Withdrawal] = {}
         self.claimable_by_address: dict[str, int] = {}
         self.refundable_by_address: dict[str, int] = {}
         self.total_escrow_received = 0
         self.total_escrowed = 0
         self.total_payout_allocated = 0
         self.total_refund_allocated = 0
+        self.total_claimable_outstanding = 0
+        self.total_refundable_outstanding = 0
         self.total_withdrawal_emitted = 0
+        self.contract_balance = 0
         self.journal: list[JournalEntry] = []
 
     def _record(self, action: str, subject_id: str, details: Mapping[str, Any]) -> None:
@@ -318,6 +323,7 @@ class RightsRailState:
         self.request_digests[request_digest] = request_id
         self.total_escrow_received += escrowed_value
         self.total_escrowed += escrowed_value
+        self.contract_balance += escrowed_value
         self._record(
             "SUBMIT_REQUEST", request_id, {"policy_id": policy_id, "policy_version": policy_version}
         )
@@ -513,6 +519,7 @@ class RightsRailState:
                 self.claimable_by_address.get(recipient, 0) + amount
             )
             self.total_payout_allocated += amount
+            self.total_claimable_outstanding += amount
             if permit is not None:
                 self.permits[permit.permit_id] = permit
         else:
@@ -520,6 +527,7 @@ class RightsRailState:
                 self.refundable_by_address.get(recipient, 0) + amount
             )
             self.total_refund_allocated += amount
+            self.total_refundable_outstanding += amount
         self.settlements[request_id] = settlement
         self.total_escrowed -= amount
         self.requests[request_id] = replace(
@@ -539,6 +547,63 @@ class RightsRailState:
             {"result": adjudication.result, "amount": settlement.amount},
         )
         return settlement
+
+    def withdraw(self, *, caller: str, settlement_id: str, entitlement_type: str) -> Withdrawal:
+        settlement = next(
+            (item for item in self.settlements.values() if item.settlement_id == settlement_id),
+            None,
+        )
+        if settlement is None:
+            raise RightsRailError(f"unknown settlement: {settlement_id}")
+        if settlement.entitlement_type != entitlement_type:
+            raise StateTransitionError("settlement entitlement type does not match withdrawal")
+        if (
+            settlement.delivery_status != "ENTITLEMENT_ALLOCATED"
+            or settlement.withdrawal_id is not None
+        ):
+            raise StateTransitionError("settlement entitlement has already been consumed")
+        if caller != settlement.recipient:
+            raise AuthorizationError("only the frozen entitlement recipient may withdraw")
+        if self.contract_balance < settlement.amount:
+            raise InvariantViolation("contract balance is insufficient for withdrawal")
+        withdrawal_id = "withdraw-" + canonical_digest(
+            {"settlement_id": settlement_id, "recipient": caller, "amount": settlement.amount}
+        )[:48]
+        if withdrawal_id in self.withdrawals:
+            raise StateTransitionError("settlement withdrawal already exists")
+        status = "WITHDRAWAL_EMITTED" if settlement.amount else "ZERO_VALUE_NO_TRANSFER"
+        withdrawal = Withdrawal(
+            withdrawal_id=withdrawal_id,
+            settlement_id=settlement_id,
+            request_id=settlement.request_id,
+            entitlement_type=entitlement_type,
+            recipient=caller,
+            amount=settlement.amount,
+            status=status,
+            emitted_at=self._clock(),
+            delivery_confirmation="NOT_AVAILABLE",
+        )
+        self.withdrawals[withdrawal_id] = withdrawal
+        self.contract_balance -= settlement.amount
+        if entitlement_type == "PAYOUT_ALLOCATED":
+            self.claimable_by_address[caller] -= settlement.amount
+            self.total_claimable_outstanding -= settlement.amount
+        else:
+            self.refundable_by_address[caller] -= settlement.amount
+            self.total_refundable_outstanding -= settlement.amount
+        self.total_withdrawal_emitted += settlement.amount
+        updated = replace(
+            settlement,
+            delivery_status=status,
+            withdrawal_id=withdrawal_id,
+        )
+        self.settlements[settlement.request_id] = updated
+        self._record(
+            "WITHDRAWAL_EMITTED",
+            withdrawal_id,
+            {"settlement_id": settlement_id, "amount": settlement.amount},
+        )
+        return withdrawal
 
     def _issue_permit(
         self,

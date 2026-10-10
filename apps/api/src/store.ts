@@ -77,7 +77,7 @@ function policy(): PolicyRecord {
   const reference = asset("reference.svg");
   return {
     policy_id: "policy-lumen-finch-001",
-    issuer: "0xcreator…7A19",
+    issuer: "CONTROLLED_LOCAL_ISSUER",
     version: 1,
     state: "FROZEN",
     asset_sha256: reference.sha256,
@@ -94,7 +94,7 @@ function policy(): PolicyRecord {
     valid_from: 1767225600,
     valid_until: 0,
     required_fee_wei: 10,
-    settlement_recipient: "0xcreator…7A19",
+    settlement_recipient: "CONTROLLED_LOCAL_RECIPIENT",
     created_at: 1767225600,
     frozen_at: 1767225660,
     closed_at: 0,
@@ -114,7 +114,7 @@ function makeRequest(
     request_id: id,
     policy_id: "policy-lumen-finch-001",
     policy_version: 1,
-    requester: caseId === "case-a" ? "0xstudio…42D0" : "0xrequester…91C4",
+    requester: caseId === "case-a" ? "CONTROLLED_LOCAL_REQUESTER_A" : "CONTROLLED_LOCAL_REQUESTER",
     purpose_description: purpose,
     channel: caseId === "case-b" ? "paid social advertisement" : "newsletter",
     context_description: context,
@@ -129,7 +129,7 @@ function makeRequest(
     escrow_received: 10,
     escrow_consumed: 10,
     entitlement_type: resultState === "SETTLED" && caseId === "case-a" ? "PAYOUT_ALLOCATED" : "REFUND_ALLOCATED",
-    entitlement_recipient: caseId === "case-a" ? "0xcreator…7A19" : "0xrequester…91C4",
+    entitlement_recipient: caseId === "case-a" ? "CONTROLLED_LOCAL_RECIPIENT" : "CONTROLLED_LOCAL_REQUESTER",
     entitlement_amount: 10,
     settlement_id: `settle-${caseId}`,
     created_at: 1767225900,
@@ -193,17 +193,18 @@ function makeSettlement(caseId: string, requestId: string, adjudicationId: strin
     request_id: requestId,
     policy_id: "policy-lumen-finch-001",
     policy_version: 1,
-    requester: caseId === "case-a" ? "0xstudio…42D0" : "0xrequester…91C4",
+    requester: caseId === "case-a" ? "CONTROLLED_LOCAL_REQUESTER_A" : "CONTROLLED_LOCAL_REQUESTER",
     adjudication_id: adjudicationId,
     generation: 1,
     result,
     settlement_type: result === "PERMITTED" ? "PAYOUT_ALLOCATED" : "REFUND_ALLOCATED",
     amount: 10,
-    recipient: result === "PERMITTED" ? "0xcreator…7A19" : "0xrequester…91C4",
+    recipient: result === "PERMITTED" ? "CONTROLLED_LOCAL_RECIPIENT" : "CONTROLLED_LOCAL_REQUESTER",
     escrow_received: 10,
     escrow_consumed: 10,
     settled_at: 1767226200,
     delivery_status: "ENTITLEMENT_ALLOCATED",
+    withdrawal_id: "",
   };
 }
 
@@ -238,6 +239,8 @@ export function seedState(): LocalState {
     total_escrowed: 0,
     total_payout_allocated: 10,
     total_refund_allocated: 30,
+    total_claimable_outstanding: 10,
+    total_refundable_outstanding: 30,
     total_withdrawal_emitted: 0,
     conservation_rhs: 40,
   };
@@ -287,7 +290,7 @@ export function seedState(): LocalState {
     delivery,
     activity,
     claimable_by_address: { [p.settlement_recipient]: 10 },
-    refundable_by_address: { "0xstudio…42D0": 0, "0xrequester…91C4": 30 },
+    refundable_by_address: { CONTROLLED_LOCAL_REQUESTER_A: 0, CONTROLLED_LOCAL_REQUESTER: 30 },
   };
 }
 

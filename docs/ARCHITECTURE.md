@@ -10,10 +10,15 @@ RightsRail answers one narrow question: does a proposed use satisfy the permissi
 
 - dependency header: `py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng`;
 - canonical state: `TreeMap` and `DynArray` storage, never process-local dictionaries;
-- reads: 21 `@gl.public.view` methods;
-- writes: 9 methods, including one payable request method;
+- deployed V1 reads: 21 `@gl.public.view` methods;
+- deployed V1 writes: 9 methods, including one payable request method;
 - semantic execution: `gl.vm.run_nondet_default`, leader output through `gl.vm.Return`, independent validator evaluation;
 - settlement: deterministic post-consensus internal entitlement allocation; no external transfer in `settle_request`.
+
+The current worktree also contains a local successor candidate with 23 reads
+and 11 writes. Its additional withdrawal methods and transaction-datetime
+clock are not part of the deployed V1 and require a new, separately
+authorized deployment.
 
 The pinned validation bundle is `GENVM_VERSION=v0.6.0-rc5`. The contract is validated with `genvm-lint`; project-level Python mypy intentionally covers the framework-neutral packages, while the GenLayer typechecker covers the contract dialect.
 
@@ -28,7 +33,8 @@ The pinned validation bundle is `GENVM_VERSION=v0.6.0-rc5`. The contract is vali
 - `packages/genlayer-client`: leader/validator architecture seam and calldata parser.
 - `packages/indexer`: future rebuildable read models only.
 - `packages/workflow`: future crash-safe journal/retry orchestration.
-- `apps/web`, `apps/api`: typed Phase 3 integration scaffolds; no polished product UI yet.
+- `apps/web`, `apps/api`: product/read-model surfaces that remain explicitly
+  controlled-local until a canonical read adapter is activated.
 
 ## Canonical flow
 

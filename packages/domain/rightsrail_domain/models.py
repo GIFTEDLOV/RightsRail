@@ -154,6 +154,21 @@ class Settlement:
     entitlement_type: str
     escrow_received: int
     escrow_consumed: int
+    delivery_status: str = "ENTITLEMENT_ALLOCATED"
+    withdrawal_id: str | None = None
+
+
+@dataclass(frozen=True)
+class Withdrawal:
+    withdrawal_id: str
+    settlement_id: str
+    request_id: str
+    entitlement_type: str
+    recipient: str
+    amount: int
+    status: str
+    emitted_at: datetime
+    delivery_confirmation: str
 
 
 @dataclass(frozen=True)

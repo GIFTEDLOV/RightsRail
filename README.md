@@ -6,13 +6,15 @@ It lets an issuer register and freeze a usage permission policy for a digital as
 
 RightsRail does not determine legal copyright ownership or legal infringement. It enforces only the frozen permission policy registered by the issuer.
 
-## Phase 3 status
+## Release status
 
-This repository contains a complete local product foundation around the frozen
-contract candidate. It is intentionally **UNDEPLOYED** and the included
-experience is a **CONTROLLED LOCAL DEMO**. It does not read live GenLayer state,
-broadcast transactions, request a wallet signature, or silently substitute
-fixtures for canonical data.
+The historical V1 deployment is immutable at
+`0x984b996079d2591976FcfFb62d0506DF02E0396A` on Studio-dev. The included
+product experience remains a **CONTROLLED LOCAL DEMO**: it does not activate
+live reads, broadcast transactions, request a wallet signature, or silently
+substitute fixtures for canonical data. A local successor candidate contains
+timestamp and cash-exit hardening, but it is not deployed and must not be
+described as the V1 contract.
 
 The product layer now includes:
 
@@ -27,21 +29,20 @@ The product layer now includes:
 - responsive, keyboard-accessible evidence comparison and semantic matrix views;
 - browser E2E and screenshot audit coverage.
 
-The frozen contract and ABI remain the Phase 2.6 candidate:
+The frozen V1 provenance remains:
 
-- a real GenLayer contract at `contracts/rightsrail.py` using the known-good Studio-dev RC5 `py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng` dialect;
-- actual `gl.contract.Contract`, public view/write/payable methods, TreeMap/DynArray storage, `gl.vm.run_nondet_default`, `gl.vm.Return`, and deterministic entitlement settlement accounting;
-- strict seven-boolean semantic parsing, independent validator evaluation, two-image evidence bounds, authenticated URL/media bindings, append-only records, and frozen-policy state transitions;
-- deterministic `INCONCLUSIVE`, `NOT_APPLICABLE`, `PERMITTED`, and `DENIED` precedence;
-- generated ABI/schema at `artifacts/rightsrail.abi.json`.
+- source SHA-256 `C312E73FA9A01DB54A81FB19CBE82DBD0B73C6F9308D71A181E3E07BD13D548B`;
+- ABI SHA-256 `E1314699D11B66D903E049F3D4DF558486E93225DFFD861A7A2E7210697969DB`;
+- 30 public methods: 21 reads and 9 writes;
+- Studio-dev RC5 runner `py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng`;
+- strict seven-boolean semantic parsing, independent validator evaluation, bounded two-image evidence, and deterministic policy precedence.
 
-- a real GenLayer contract at `contracts/rightsrail.py` using the known-good Studio-dev RC5 `py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng` dialect;
-- actual `gl.contract.Contract`, public view/write/payable methods, TreeMap/DynArray storage, `gl.vm.run_nondet_default`, `gl.vm.Return`, and deterministic entitlement settlement accounting;
-- strict seven-boolean semantic parsing, independent validator evaluation, two-image evidence bounds, authenticated URL/media bindings, append-only records, and frozen-policy state transitions;
-- deterministic `INCONCLUSIVE`, `NOT_APPLICABLE`, `PERMITTED`, and `DENIED` precedence;
-- generated ABI/schema at `artifacts/rightsrail.abi.json`;
-- direct RC5 execution tests using controlled media/LLM mocks, adversarial, property, mutation, and integration tests;
-- pinned project-local development tools and Phase 2.5 runtime qualification documentation.
+The local successor candidate adds claimant-bound withdrawal methods and
+transaction-datetime validity checks. It has 34 generated methods and new
+source SHA-256 `CEC17DF5D0D096591706B9547349DC870CE20C9276C9BCA2B0270204FDD29F0F`
+and ABI SHA-256
+`E7FC1AB9E0EC3BC20BB06C992318F300000B1F617FA6F8977F0DEEF2B688F805`; it has
+not been deployed.
 
 No deployment, GEN spending, GitHub repository, remote push, faucet use, or Vercel project is part of this phase.
 
