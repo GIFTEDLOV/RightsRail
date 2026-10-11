@@ -122,9 +122,11 @@ available execution result decodes to:
 [EXPECTED] policy is outside its validity window
 ```
 
-No `datetime` or equivalent GenVM transaction context was present in any
-Studio-dev simulation request or response. The installed SDK exposes no
-documented datetime override; no undocumented RPC override was attempted.
+No `datetime` or equivalent GenVM transaction context was present in the
+original `genlayer-js` Studio-dev simulation requests or responses. That
+runner exposed no documented datetime override at the time; no undocumented
+RPC override was attempted. The compatible Python testing path and its
+explicit context are qualified below.
 
 ## Local evidence
 
@@ -159,5 +161,67 @@ observing the GenVM transaction datetime used by `sim_call` and
 stored V2.3 window, while both supported simulation variants execute the
 contract as if the validity guard were outside that window.
 
-The project remains **NO-GO** for qualification until the exact supported
-Studio-dev timestamp context is available and the payable simulation succeeds.
+At the time of the original reproduction, the project was **NO-GO** for
+qualification until the exact supported Studio-dev timestamp context was
+available and the payable simulation succeeded. The read-only qualification
+below records that preflight resolution; it does not authorize a write.
+
+## Official no-write transaction-context qualification
+
+The current official guidance distinguishes read-only calls, write simulation,
+and state-changing transactions:
+
+- The [GenLayer Testing Suite Studio runner](https://github.com/genlayerlabs/genlayer-testing-suite/blob/main/docs/studio-runner.md)
+  documents `genvm_datetime` in `transaction_context` and identifies
+  `.transact()` as the write path. It also documents `.analyze()` for repeated
+  write simulations.
+- The [GenLayer Test integration reference](https://docs.genlayer.com/api-references/genlayer-test/integration)
+  exposes `.analyze(..., genvm_datetime=...)` and
+  `.call(..., transaction_context=...)` as separate APIs.
+- The [genlayer-py reference](https://github.com/genlayerlabs/genlayer-py)
+  documents the explicit no-write `simulate_write_contract` path, which sends
+  `sim_call`, and the corresponding fee-estimation path.
+
+The installed compatible packages are `genlayer-test==0.30.0rc2` and
+`genlayer-py==0.19.0rc2`. Inspection of the installed implementation showed:
+
+```text
+ContractFunction.analyze
+  -> StatsCollector.run_simulations
+  -> GenLayerClient.simulate_write_contract
+  -> provider.make_request("sim_call", ...)
+```
+
+The analyzer is not suitable for this payable case: its public method has no
+`value` parameter, and the installed implementation constructs a simulation
+with `value` omitted while adding a synthetic `validators` context. In the
+probe it reached Studio-dev `sim_call`, but returned `Internal error` and the
+summary contained `server_error_runs=1` and `successful_runs=0`. That result
+is not treated as a passing payable simulation.
+
+The exact payable no-write primitive was therefore exercised directly through
+the installed SDK with the same calldata, `value=10`, and:
+
+```json
+{"genvm_datetime":"2026-10-11T06:57:24Z"}
+```
+
+The probe artifact is
+`docs/provenance/simulations/gltest-studio-timestamp-probe.json`. It recorded:
+
+| Check | Result |
+| --- | --- |
+| Latest block timestamp | `0x6acb330c` / `1791701844` / `2026-10-11T06:57:24Z` |
+| Exact payable `simulate_write_contract` | `sim_call` returned `execution_result=SUCCESS` |
+| Exact payable fee estimate | `sim_estimateTransactionFees` returned a fee profile without the validity error |
+| Returned distribution budget | `25000000000000000` per round |
+| Returned fee value | `378555600010352` |
+| Canonical state before/after | identical: one policy, zero later records, zero accounting |
+| State-changing API called | no; `.transact()`, `write_contract`, and raw send were not called |
+
+This establishes a supported read-only Studio-dev preflight path with explicit
+GenVM datetime context for the frozen V2.3 payable request. It does not create
+a request, run validator consensus, produce a semantic adjudication, or prove
+a business verdict. The original no-context failure remains immutable history;
+the support question is narrowed to whether the same context must be supplied
+by any future production qualification runner.

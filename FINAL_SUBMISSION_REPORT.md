@@ -51,7 +51,7 @@ The public PNG evidence boundary is now verified:
 
 Manifest: `https://rightsrail-evidence.vercel.app/manifest.json`, HTTP 200, 2,076 bytes, SHA-256 `A6AA797FE9439CDEF689F65F8F6BCFA98BB1EC0C502E6F59EE0B2F0083D9A863`. No fallback to SVG, localhost, fixture-only bytes, or fabricated model output was used.
 
-The qualification blocker is now runtime-side: the exact Case A payable write (`submit_usage_request`, 11 ABI arguments, empty kwargs, `value=10` wei) fails both `sim_call` and `sim_estimateTransactionFees` inside contract execution. The deepest available result decodes to `[EXPECTED] policy is outside its validity window`. The same failure occurs for `latest-nonfinal` and `latest-finalized`, while canonical chain time is inside the stored policy window. The raw request/response artifact is `docs/provenance/simulations/v23-case-a-simulation.json`; analysis is in `docs/V23_SIMULATION_FORENSICS.md`.
+The historical qualification blocker was runtime-side: the exact Case A payable write (`submit_usage_request`, 11 ABI arguments, empty kwargs, `value=10` wei) failed both `sim_call` and `sim_estimateTransactionFees` when no explicit GenVM datetime context was supplied. The deepest available result decoded to `[EXPECTED] policy is outside its validity window`, despite canonical chain time being inside the stored policy window. A current read-only probe using the documented datetime context now makes both the exact payable `sim_call` and fee estimate succeed; it does not authorize a write or create a business result. The original request/response artifact remains `docs/provenance/simulations/v23-case-a-simulation.json`; the new probe is `docs/provenance/simulations/gltest-studio-timestamp-probe.json`.
 
 The current read-only gate was rerun on 2026-10-11. All five public PNGs
 again matched HTTP 200, MIME, byte-length, and SHA-256 expectations. The
@@ -64,8 +64,9 @@ An isolated localhost GLSim probe was added using the documented
 project-local server dependencies were installed, but exact V2.3 deployment
 stopped before contract initialization because the local RC5 bundle does not
 contain the pinned `py-genlayer:5jyc...` runner. The supported direct RC5 suite
-passes the active-window boundary cases; this local evidence does not clear
-the hosted Studio-dev gate. The support reproduction is
+passes the active-window boundary cases. A separate hosted no-write probe now
+passes with explicit datetime context while confirming canonical state is
+unchanged. The support reproduction is
 `docs/provenance/GENLAYER_SUPPORT_V23_TIMESTAMP_REPRO.md`.
 
 Local and public PNG provenance is recorded in `provenance/media/png-evidence-manifest.json` and `provenance/media/live-png-manifest.json`.
@@ -100,8 +101,8 @@ External delivery has not been independently reconciled because no qualification
 ## Required next actions
 
 1. Supply the exact V2.4 candidate source and generated ABI if V2.4 integration is required; do not infer it from the V2.3 deployment.
-2. Resolve the Studio-dev simulator timestamp/context rejection for the exact payable request through a supported runtime path, without changing the frozen deployed contract implicitly.
-3. Obtain a fresh explicit authorization after a successful read-only payable preflight, then run the remaining qualification writes with exact-hash reconciliation.
+2. Carry the tested explicit Studio-dev datetime context into the qualification runner and obtain fresh explicit authorization before any write; do not treat the read-only simulation as qualification.
+3. Run the remaining qualification writes with exact-hash reconciliation only after authorization.
 4. Verify the four canonical outcomes and independently reconcile entitlement delivery with distinct creator/requester actors.
 5. Obtain separate publication approval before GitHub push or Portal submission; the evidence-only Vercel host is already live.
 

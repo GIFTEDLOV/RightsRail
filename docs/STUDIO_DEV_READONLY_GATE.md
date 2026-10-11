@@ -34,8 +34,9 @@ address above is `policy-v23-lumen-finch-001` with
 `valid_from=1791658016` and `valid_until=1794253616`.
 
 For both policies, the current chain timestamp is not before `valid_from` and
-does not exceed a nonzero `valid_until`. The V1 and V2.3 contracts nevertheless
-produce the same validity error in the supported Studio-dev simulation path.
+does not exceed a nonzero `valid_until`. The V1 and V2.3 contracts previously
+produced the same validity error when the simulation request omitted an
+explicit GenVM datetime context.
 
 ## Public evidence retrieval
 
@@ -92,7 +93,7 @@ The raw sanitized artifact remains at
 | --- | --- | --- |
 | Public evidence fetching | PASS read-only |
 | Deployed source/schema parity | PASS read-only |
-| Fee estimation for payable request | BLOCKED by simulator execution failure |
+| Fee estimation for payable request | PASS read-only with explicit `genvm_datetime`; no-context failure preserved as history |
 | Validator consensus | NOT RUN; no authenticated evidence/request exists |
 | Policy-window settlement | NOT RUN; no request/adjudication exists |
 | GEN accounting | PASS read-only zero-state only; no delivery claim |
@@ -108,8 +109,9 @@ an ABI mismatch; the deployed Studio-dev schema was read successfully and
 matches the tracked 35-method V2.3 ABI.
 
 No semantic result, permit, settlement, payout, refund, or delivered payment
-is claimed. A future live qualification requires a separately authorized write
-plan after the exact simulator/runtime blocker is resolved.
+is claimed. A future live qualification still requires a separately authorized
+write plan and must carry the tested datetime context through the exact write
+runner. This read-only gate does not authorize or replace any write.
 
 ## Local GLSim timestamp probe
 
@@ -118,10 +120,12 @@ attempt using the installed `genlayer_py` transaction path and the documented
 `sim_config.genvm_datetime` mechanism. GLSim started, but exact deployment
 stopped before contract initialization because the local RC5 runner tree does
 not contain the source header's pinned `py-genlayer:5jyc...` runner. The probe
-did not substitute another runner or modify the source. This is recorded in
-`docs/LOCAL_GLSIM_TIMESTAMP_EVIDENCE.md` and the support reproduction at
-`docs/provenance/GENLAYER_SUPPORT_V23_TIMESTAMP_REPRO.md`.
+did not substitute another runner or modify the source. This remains a local
+GLSim cache limitation. The supported hosted no-write probe is recorded in
+`docs/provenance/simulations/gltest-studio-timestamp-probe.json` and the
+support reproduction at `docs/provenance/GENLAYER_SUPPORT_V23_TIMESTAMP_REPRO.md`.
 
 The direct RC5 timestamp-context suite remains passing for exact-start,
-pre-start, post-expiry, and `0/0` windows. That local evidence does not clear
-the hosted Studio-dev simulation gate.
+pre-start, post-expiry, and `0/0` windows. The hosted timestamp/fee-preflight
+gate now passes read-only when the explicit datetime context is carried; live
+qualification remains unexecuted.
