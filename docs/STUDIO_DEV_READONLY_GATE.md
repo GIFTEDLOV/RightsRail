@@ -110,3 +110,18 @@ matches the tracked 35-method V2.3 ABI.
 No semantic result, permit, settlement, payout, refund, or delivered payment
 is claimed. A future live qualification requires a separately authorized write
 plan after the exact simulator/runtime blocker is resolved.
+
+## Local GLSim timestamp probe
+
+The exact V2.3 source was exercised through an isolated localhost GLSim
+attempt using the installed `genlayer_py` transaction path and the documented
+`sim_config.genvm_datetime` mechanism. GLSim started, but exact deployment
+stopped before contract initialization because the local RC5 runner tree does
+not contain the source header's pinned `py-genlayer:5jyc...` runner. The probe
+did not substitute another runner or modify the source. This is recorded in
+`docs/LOCAL_GLSIM_TIMESTAMP_EVIDENCE.md` and the support reproduction at
+`docs/provenance/GENLAYER_SUPPORT_V23_TIMESTAMP_REPRO.md`.
+
+The direct RC5 timestamp-context suite remains passing for exact-start,
+pre-start, post-expiry, and `0/0` windows. That local evidence does not clear
+the hosted Studio-dev simulation gate.

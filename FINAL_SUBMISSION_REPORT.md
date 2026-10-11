@@ -59,16 +59,26 @@ deployed source hash again matched local V2.3 source `E22EF2CC...`; the schema
 again reported 35 methods (23 reads / 12 writes) and no `get_audit_events`.
 The complete gate is in `docs/STUDIO_DEV_READONLY_GATE.md`.
 
+An isolated localhost GLSim probe was added using the documented
+`sim_config.genvm_datetime` transaction context. GLSim started after the
+project-local server dependencies were installed, but exact V2.3 deployment
+stopped before contract initialization because the local RC5 bundle does not
+contain the pinned `py-genlayer:5jyc...` runner. The supported direct RC5 suite
+passes the active-window boundary cases; this local evidence does not clear
+the hosted Studio-dev gate. The support reproduction is
+`docs/provenance/GENLAYER_SUPPORT_V23_TIMESTAMP_REPRO.md`.
+
 Local and public PNG provenance is recorded in `provenance/media/png-evidence-manifest.json` and `provenance/media/live-png-manifest.json`.
 
 ## Engineering gates
 
-- Official RC5 validate/typecheck/schema: PASS.
+- Official RC5 validate/typecheck: PASS; deployed hosted schema readback: PASS; local `genvm-lint schema`: BLOCKED by E101 because the pinned RC5 runner is absent from the local cache.
 - Official lint: only the known E010 diagnostics for nondeterministic calls; no unexpected lint failure.
 - Python: 85 passed, 18 subtests; compile pass; Ruff pass; mypy pass.
 - TypeScript tests: 13 passed.
 - API tests: 2 passed.
 - Deployment/fee/reconciliation and Case A simulation-forensics tests: 14 passed.
+- Direct timestamp boundary tests: 2 passed; exact V2.3 GLSim probe: blocked before initialization by missing pinned RC5 runner.
 - Browser E2E: 28 passed across desktop, tablet, mobile, keyboard, workflows, screenshots, and console-error checks.
 - Production web/API build: PASS.
 - Contract/source/ABI invariant checks: PASS for the V2.3 deployed candidate and preserved V1 history.
