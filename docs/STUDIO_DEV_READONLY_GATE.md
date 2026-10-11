@@ -23,9 +23,19 @@ other blockchain write was broadcast.
 | Canonical status | one frozen policy; zero requests/evidence/adjudications/permits/settlements |
 | Accounting | all zero |
 
-The latest read-only block observed was `0x6acb2670` with timestamp
-`1791698544` (`2026-10-11T06:02:24Z`). This is a chain-time observation only;
+The latest read-only block observed was `0x6acb2a07` with timestamp
+`1791699463` (`2026-10-11T06:17:43Z`). This is a chain-time observation only;
 it does not authorize a write.
+
+The values `valid_from=1767225600` and `valid_until=0` belong to the separate
+historical V1 policy `policy-lumen-finch-001` at
+`0x984b996079d2591976FcfFb62d0506DF02E0396A`. The current V2.3 policy at the
+address above is `policy-v23-lumen-finch-001` with
+`valid_from=1791658016` and `valid_until=1794253616`.
+
+For both policies, the current chain timestamp is not before `valid_from` and
+does not exceed a nonzero `valid_until`. The V1 and V2.3 contracts nevertheless
+produce the same validity error in the supported Studio-dev simulation path.
 
 ## Public evidence retrieval
 
@@ -87,6 +97,15 @@ The raw sanitized artifact remains at
 | Policy-window settlement | NOT RUN; no request/adjudication exists |
 | GEN accounting | PASS read-only zero-state only; no delivery claim |
 | V2.4 `get_audit_events` client integration | BLOCKED; candidate source/ABI unavailable |
+
+## Local schema-tool limitation
+
+The tracked V2.3 ABI remains hash-verified, and the project validation and
+typecheck gates pass. A fresh local `genvm-lint schema` invocation could not
+load the declared RC5 runner because that runner archive is absent from the
+local GenVM cache (`E101`). This is a tooling-cache limitation, not evidence of
+an ABI mismatch; the deployed Studio-dev schema was read successfully and
+matches the tracked 35-method V2.3 ABI.
 
 No semantic result, permit, settlement, payout, refund, or delivered payment
 is claimed. A future live qualification requires a separately authorized write
