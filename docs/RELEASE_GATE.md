@@ -41,6 +41,15 @@ write was broadcast. The exact hashes and stop record are in
 `docs/provenance/live-transactions/rightsrail-v23-live-qualification.json` and
 `docs/V23_QUALIFICATION_RUN_BLOCKER.md`.
 
+## V2.4 candidate gate
+
+The current repository and deployed Studio-dev schema contain no V2.4
+candidate and no `get_audit_events(start, limit)` view. The exact source/ABI
+reconciliation and read-only network results are recorded in
+`docs/SOURCE_PROVENANCE_RECONCILIATION.md` and
+`docs/STUDIO_DEV_READONLY_GATE.md`. Do not add a speculative ABI/client method
+until the candidate source and generated ABI are supplied.
+
 ## Stop conditions
 
 Stop on any hash mismatch, unresolved nonce, nonterminal execution status,

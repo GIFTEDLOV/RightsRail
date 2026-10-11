@@ -1,6 +1,6 @@
 # RightsRail V2.3 final submission report
 
-Date: 2026-10-10
+Date: 2026-10-11
 Network: GenLayer Studio-dev, chain `61997`
 Historical V1 address: `0x984b996079d2591976FcfFb62d0506DF02E0396A`
 V2.3 successor address: `0xfB3335350b0e02ceFb384753990E9B377B4BCB1F`
@@ -10,6 +10,12 @@ V2.3 successor address: `0xfB3335350b0e02ceFb384753990E9B377B4BCB1F`
 **NO-GO for live qualification, paid-product release, GitHub publication, and Portal submission.**
 
 **Deployment status: PASS.** One authorized V2.3 deployment finalized with successful execution and read-only canonical verification. The five original PNG fixtures are now publicly served and byte-verified. The authorized qualification run performed exactly two policy writes, then stopped before Case A because Studio-dev fee simulation rejected the exact payable request.
+
+The claimed V2.4 candidate was not present in the workspace, repository
+history, or available source archives inspected on 2026-10-11. The live schema
+has no `get_audit_events` method. The authoritative-source reconciliation is in
+`docs/SOURCE_PROVENANCE_RECONCILIATION.md`; no speculative V2.4 ABI or client
+surface was added.
 
 ## Canonical deployment proof
 
@@ -47,6 +53,12 @@ Manifest: `https://rightsrail-evidence.vercel.app/manifest.json`, HTTP 200, 2,07
 
 The qualification blocker is now runtime-side: the exact Case A payable write (`submit_usage_request`, 11 ABI arguments, empty kwargs, `value=10` wei) fails both `sim_call` and `sim_estimateTransactionFees` inside contract execution. The deepest available result decodes to `[EXPECTED] policy is outside its validity window`. The same failure occurs for `latest-nonfinal` and `latest-finalized`, while canonical chain time is inside the stored policy window. The raw request/response artifact is `docs/provenance/simulations/v23-case-a-simulation.json`; analysis is in `docs/V23_SIMULATION_FORENSICS.md`.
 
+The current read-only gate was rerun on 2026-10-11. All five public PNGs
+again matched HTTP 200, MIME, byte-length, and SHA-256 expectations. The
+deployed source hash again matched local V2.3 source `E22EF2CC...`; the schema
+again reported 35 methods (23 reads / 12 writes) and no `get_audit_events`.
+The complete gate is in `docs/STUDIO_DEV_READONLY_GATE.md`.
+
 Local and public PNG provenance is recorded in `provenance/media/png-evidence-manifest.json` and `provenance/media/live-png-manifest.json`.
 
 ## Engineering gates
@@ -77,10 +89,11 @@ External delivery has not been independently reconciled because no qualification
 
 ## Required next actions
 
-1. Resolve the Studio-dev simulator timestamp/context rejection for the exact payable request through a supported runtime path, without changing the frozen deployed contract implicitly.
-2. Obtain a fresh explicit authorization after a successful read-only payable preflight, then run the remaining qualification writes with exact-hash reconciliation.
-3. Verify the four canonical outcomes and independently reconcile entitlement delivery with distinct creator/requester actors.
-4. Obtain separate publication approval before GitHub push or Portal submission; the evidence-only Vercel host is already live.
+1. Supply the exact V2.4 candidate source and generated ABI if V2.4 integration is required; do not infer it from the V2.3 deployment.
+2. Resolve the Studio-dev simulator timestamp/context rejection for the exact payable request through a supported runtime path, without changing the frozen deployed contract implicitly.
+3. Obtain a fresh explicit authorization after a successful read-only payable preflight, then run the remaining qualification writes with exact-hash reconciliation.
+4. Verify the four canonical outcomes and independently reconcile entitlement delivery with distinct creator/requester actors.
+5. Obtain separate publication approval before GitHub push or Portal submission; the evidence-only Vercel host is already live.
 
 ## Historical provenance
 

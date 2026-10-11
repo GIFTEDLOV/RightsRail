@@ -42,7 +42,7 @@
       "method": "sim_estimateTransactionFees",
       "request": {
         "jsonrpc": "2.0",
-        "id": 1791663658198,
+        "id": 1791698566281,
         "method": "sim_estimateTransactionFees",
         "params": [
           {
@@ -616,21 +616,21 @@
                   }
                 }
               },
-              "processing_time": 453,
+              "processing_time": 1363,
               "nondet_disagree": null,
               "execution_stats": {
                 "manager_run_attempt_success": {
                   "attempt": 0,
-                  "duration_ms": 1
+                  "duration_ms": 2
                 },
-                "host_loop_entered_s": 1224598.519042679,
-                "host_loop_enter_wait_ms": 15,
-                "host_first_method_received_s": 1224598.519257897,
+                "host_loop_entered_s": 1259507.518872513,
+                "host_loop_enter_wait_ms": 550,
+                "host_first_method_received_s": 1259507.519075361,
                 "host_accept_to_first_method_ms": 0,
                 "host_first_method": "STORAGE_READ",
-                "host_total_handling_time_ms": 9,
+                "host_total_handling_time_ms": 102,
                 "host_time_per_method_ms": {
-                  "STORAGE_READ": 9
+                  "STORAGE_READ": 102
                 },
                 "call_counts": {
                   "STORAGE_READ": 25
@@ -667,14 +667,14 @@
             }
           }
         },
-        "id": 1791663658198
+        "id": 1791698566281
       }
     },
     {
       "method": "sim_call",
       "request": {
         "jsonrpc": "2.0",
-        "id": 1791663659083,
+        "id": 1791698568209,
         "method": "sim_call",
         "params": [
           {
@@ -934,21 +934,21 @@
                   "submitted_messages_count": 0
                 }
               },
-              "processing_time": 451,
+              "processing_time": 462,
               "nondet_disagree": null,
               "execution_stats": {
                 "manager_run_attempt_success": {
                   "attempt": 0,
-                  "duration_ms": 1
+                  "duration_ms": 2
                 },
-                "host_loop_entered_s": 1224599.395152008,
-                "host_loop_enter_wait_ms": 16,
-                "host_first_method_received_s": 1224599.395352246,
+                "host_loop_entered_s": 1259508.896438067,
+                "host_loop_enter_wait_ms": 17,
+                "host_first_method_received_s": 1259508.896625814,
                 "host_accept_to_first_method_ms": 0,
                 "host_first_method": "STORAGE_READ",
-                "host_total_handling_time_ms": 9,
+                "host_total_handling_time_ms": 8,
                 "host_time_per_method_ms": {
-                  "STORAGE_READ": 9
+                  "STORAGE_READ": 8
                 },
                 "call_counts": {
                   "STORAGE_READ": 25
@@ -965,14 +965,14 @@
             }
           }
         },
-        "id": 1791663659083
+        "id": 1791698568209
       }
     },
     {
       "method": "sim_call",
       "request": {
         "jsonrpc": "2.0",
-        "id": 1791663659961,
+        "id": 1791698568993,
         "method": "sim_call",
         "params": [
           {
@@ -1232,21 +1232,21 @@
                   "submitted_messages_count": 0
                 }
               },
-              "processing_time": 459,
+              "processing_time": 465,
               "nondet_disagree": null,
               "execution_stats": {
                 "manager_run_attempt_success": {
                   "attempt": 0,
-                  "duration_ms": 3
+                  "duration_ms": 2
                 },
-                "host_loop_entered_s": 1224600.292072098,
-                "host_loop_enter_wait_ms": 24,
-                "host_first_method_received_s": 1224600.292592888,
+                "host_loop_entered_s": 1259509.683182956,
+                "host_loop_enter_wait_ms": 18,
+                "host_first_method_received_s": 1259509.683376654,
                 "host_accept_to_first_method_ms": 0,
                 "host_first_method": "STORAGE_READ",
-                "host_total_handling_time_ms": 12,
+                "host_total_handling_time_ms": 8,
                 "host_time_per_method_ms": {
-                  "STORAGE_READ": 12
+                  "STORAGE_READ": 8
                 },
                 "call_counts": {
                   "STORAGE_READ": 25
@@ -1263,7 +1263,7 @@
             }
           }
         },
-        "id": 1791663659961
+        "id": 1791698568993
       }
     }
   ]
