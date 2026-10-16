@@ -4,5 +4,5 @@ $env:PATH = (Resolve-Path (Join-Path $PSScriptRoot "..\.venv\Scripts")).Path + "
 New-Item -ItemType Directory -Force artifacts | Out-Null
 $lint = Join-Path $PSScriptRoot "..\.venv\Scripts\genvm-lint.exe"
 if (!(Test-Path $lint)) { $lint = "genvm-lint" }
-& $lint schema contracts/rightsrail.py -o artifacts/rightsrail.abi.json --json
+& $lint schema contracts/rightsrail_v24.py -o artifacts/rightsrail-v24.abi.json --json
 exit $LASTEXITCODE

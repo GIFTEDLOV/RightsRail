@@ -1,0 +1,84 @@
+﻿{
+    "schema":  "RIGHTSRAIL_V24_STUDIONET_QUALIFICATION_JOURNAL_V1",
+    "recorded_at_utc":  "2026-10-16T13:44:36Z",
+    "network":  {
+                    "alias":  "studionet",
+                    "rpc":  "https://studio.genlayer.com/api",
+                    "chain_id":  61999
+                },
+    "candidate":  {
+                      "source_sha256":  "5C99DEB31EB29B171B94F343950CBFF5204945D02160B2ADA3D742A1FFC6D321",
+                      "abi_sha256":  "11548EA63B1C365C7985BE8C748109C4B7F4A33A1A55DE8394EF1CE90E6BE4EA",
+                      "schema_shape":  {
+                                           "methods":  36,
+                                           "reads":  24,
+                                           "writes":  12
+                                       }
+                  },
+    "workflow":  "tools/run_rightsrail_v24_live_qualification.mjs",
+    "workflow_network":  "Built-in Studionet only; no RPC override.",
+    "workflow_fee_guard":  "Requires a supported SDK estimate with gasless=true and zero feeValue before signing; unavailable in installed genlayer-js 1.1.8.",
+    "phase":  "NOT_STARTED_DEPLOYMENT_BLOCKED",
+    "stop_reason":  "No verified Studionet deployment address; current hosted runtime also lacks genlayer.evm required for delivery.",
+    "deployment_transaction_id":  null,
+    "contract_address":  null,
+    "broadcast_count":  0,
+    "qualification_writes":  0,
+    "transaction_ids":  [
+
+                        ],
+    "receipts":  [
+
+                 ],
+    "consensus_results":  "NOT_REACHED",
+    "state_transitions":  "NOT_REACHED",
+    "settlements":  "NOT_REACHED",
+    "accounting_and_gen_costs":  "NOT_REACHED",
+    "final_readback":  "NOT_REACHED",
+    "delivery":  {
+                     "required_interface":  "@gl.evm.contract_interface",
+                     "status":  "UNSUPPORTED_ON_CURRENT_HOSTED_STUDIONET_RUNTIME",
+                     "evidence":  "Read-only runtime probe: AttributeError module genlayer has no attribute evm at source line 376; official Studio docs state no EVM layer or ghost contracts."
+                 },
+    "scenarios":  [
+                      {
+                          "case":  "A",
+                          "expected":  "PERMITTED",
+                          "observed":  null,
+                          "status":  "NOT_RUN",
+                          "transaction_ids":  [
+
+                                              ]
+                      },
+                      {
+                          "case":  "B",
+                          "expected":  "DENIED",
+                          "observed":  null,
+                          "status":  "NOT_RUN",
+                          "transaction_ids":  [
+
+                                              ]
+                      },
+                      {
+                          "case":  "C",
+                          "expected":  "INCONCLUSIVE",
+                          "observed":  null,
+                          "status":  "NOT_RUN",
+                          "transaction_ids":  [
+
+                                              ]
+                      },
+                      {
+                          "case":  "D",
+                          "expected":  "NOT_APPLICABLE",
+                          "observed":  null,
+                          "status":  "NOT_RUN",
+                          "transaction_ids":  [
+
+                                              ]
+                      }
+                  ],
+    "no_claims":  [
+                      "No consensus result, execution result, receipt, state transition, settlement, accounting value, fee/refund, GEN cost, or external delivery confirmation is available."
+                  ]
+}

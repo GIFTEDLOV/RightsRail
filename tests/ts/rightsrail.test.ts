@@ -1,15 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { ABI_METHODS, ABI_SHA256, CONTRACT_SHA256, FrozenContractClient, SEMANTIC_KEYS, assertSemanticVector, contractConfig } from "@rightsrail/genlayer-client";
+import { readFileSync } from "node:fs";
+import { ABI_METHODS, ABI_SHA256, CONTRACT_SHA256, FrozenContractClient, SEMANTIC_KEYS, STUDIONET_CHAIN_ID, STUDIONET_RPC, assertSemanticVector, contractConfig } from "@rightsrail/genlayer-client";
 import { ControlledFixtureProvider, GenLayerCanonicalProvider, findById, provenance } from "@rightsrail/indexer";
 import { seedState } from "../../apps/api/src/store.js";
 
 describe("RightsRail frozen client boundary", () => {
-  it("keeps the contract candidate metadata and 30-method ABI explicit", () => {
-    expect(CONTRACT_SHA256).toBe("C312E73FA9A01DB54A81FB19CBE82DBD0B73C6F9308D71A181E3E07BD13D548B");
-    expect(ABI_SHA256).toBe("E1314699D11B66D903E049F3D4DF558486E93225DFFD861A7A2E7210697969DB");
-    expect(ABI_METHODS.reads).toHaveLength(21);
-    expect(ABI_METHODS.writes).toHaveLength(9);
+  it("keeps the V2.4 candidate metadata and 36-method ABI explicit", () => {
+    expect(CONTRACT_SHA256).toBe("5C99DEB31EB29B171B94F343950CBFF5204945D02160B2ADA3D742A1FFC6D321");
+    expect(ABI_SHA256).toBe("11548EA63B1C365C7985BE8C748109C4B7F4A33A1A55DE8394EF1CE90E6BE4EA");
+    expect(ABI_METHODS.reads).toHaveLength(24);
+    expect(ABI_METHODS.writes).toHaveLength(12);
+    expect(ABI_METHODS.reads).toContain("get_audit_events");
     expect(contractConfig("CONTROLLED_LOCAL").contractAddress).toBeNull();
+    expect(contractConfig("GENLAYER_CANONICAL", "0x984b996079d2591976FcfFb62d0506DF02E0396A")).toMatchObject({ chainId: STUDIONET_CHAIN_ID, rpcUrl: STUDIONET_RPC, contractAddress: "0x984b996079d2591976FcfFb62d0506DF02E0396A" });
+  });
+
+  it("matches the checked client method inventory to the generated V2.4 ABI", () => {
+    const abi = JSON.parse(readFileSync(new URL("../../artifacts/rightsrail-v24.abi.json", import.meta.url), "utf8")) as { methods: Record<string, { readonly: boolean }> };
+    const reads = Object.entries(abi.methods).filter(([, value]) => value.readonly).map(([name]) => name).sort();
+    const writes = Object.entries(abi.methods).filter(([, value]) => !value.readonly).map(([name]) => name).sort();
+    expect([...ABI_METHODS.reads].sort()).toEqual(reads);
+    expect([...ABI_METHODS.writes].sort()).toEqual(writes);
   });
 
   it("prepares a local journal entry without enabling broadcast", () => {

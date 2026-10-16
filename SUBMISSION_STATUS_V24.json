@@ -1,0 +1,130 @@
+﻿{
+    "product":  "RightsRail",
+    "candidate_version":  "2.4.0",
+    "submission_category":  "standalone GenLayer Intelligent Contract",
+    "status":  "NO_GO_STUDIONET_RUNTIME_AND_FEE_ESTIMATE_BLOCKED",
+    "target_network":  {
+                           "alias":  "studionet",
+                           "rpc":  "https://studio.genlayer.com/api",
+                           "chain_id":  61999,
+                           "consensus_main":  "0xb7278A61aa25c888815aFC32Ad3cCC52fF24fE575",
+                           "consensus_data":  "0x88B0F18613Db92Bf970FfE264E02496e20a74D16",
+                           "built_in_configuration":  true,
+                           "custom_rpc_override_used":  false
+                       },
+    "candidate":  {
+                      "source":  "contracts/rightsrail_v24.py",
+                      "source_sha256":  "5C99DEB31EB29B171B94F343950CBFF5204945D02160B2ADA3D742A1FFC6D321",
+                      "abi":  "artifacts/rightsrail-v24.abi.json",
+                      "abi_sha256":  "11548EA63B1C365C7985BE8C748109C4B7F4A33A1A55DE8394EF1CE90E6BE4EA",
+                      "abi_present":  true,
+                      "abi_shape":  {
+                                        "methods":  36,
+                                        "reads":  24,
+                                        "writes":  12
+                                    },
+                      "get_audit_events":  {
+                                               "signature":  "get_audit_events(start, limit)",
+                                               "read_only":  true
+                                           }
+                  },
+    "preflight":  {
+                      "journal":  "docs/provenance/rightsrail-v24-studionet-preflight.json",
+                      "status":  "BLOCKED_BEFORE_BROADCAST",
+                      "fee_estimate":  {
+                                           "command":  "genlayer estimate-fees --json",
+                                           "cli_version":  "0.40.0-rc.3",
+                                           "result":  "FAILED_NO_SAFE_QUOTE",
+                                           "rpc_method":  "sim_getFeeConfig",
+                                           "rpc_error_code":  -32601,
+                                           "error":  "GenLayer CLI 0.40.0-rc.3 called sim_getFeeConfig and received -32601 Method not found; installed genlayer-js 1.1.8 has no estimateTransactionFees method.",
+                                           "quote":  null
+                                       },
+                      "deployer_balance_gen":  "5",
+                      "deployer_nonce_latest":  8,
+                      "deployer_nonce_pending":  8
+                  },
+    "deployment":  {
+                       "journal":  "docs/provenance/live-transactions/rightsrail-v24-studionet-deployment.json",
+                       "status":  "NOT_SUBMITTED_PRECONDITIONS_FAILED",
+                       "broadcast_count":  0,
+                       "transaction_id":  null,
+                       "contract_address":  null,
+                       "final_receipt":  null,
+                       "execution_status":  "NOT_AVAILABLE_NO_TRANSACTION"
+                   },
+    "qualification":  {
+                          "journal":  "docs/provenance/live-transactions/rightsrail-v24-studionet-qualification.json",
+                          "status":  "NOT_RUN_NO_DEPLOYMENT_AND_EVM_GATE_UNSUPPORTED",
+                          "broadcast_count":  0,
+                          "qualification_writes":  0,
+                          "transaction_ids":  [
+
+                                              ],
+                          "consensus":  "NOT_REACHED",
+                          "state_transitions":  "NOT_REACHED",
+                          "settlement":  "NOT_REACHED",
+                          "accounting_and_gen_costs":  "NOT_REACHED",
+                          "delivery":  "UNSUPPORTED_ON_CURRENT_HOSTED_STUDIONET_RUNTIME"
+                      },
+    "qualification_actor_balances_gen":  {
+                                             "issuer":  "5",
+                                             "requester":  "0",
+                                             "operator":  "0"
+                                         },
+    "tests":  {
+                  "python_pytest":  "87 passed, 18 subtests passed",
+                  "python_unittest":  "32 passed",
+                  "ruff":  "PASS",
+                  "mypy":  "PASS",
+                  "python_compile":  "PASS",
+                  "genvm_validate":  "PASS",
+                  "genvm_typecheck":  "PASS",
+                  "genvm_schema":  "PASS_EXACT_MATCH",
+                  "genvm_lint":  "FIVE_E010_REACHABILITY_WARNINGS",
+                  "typescript_api_tests":  "14 passed",
+                  "javascript_deployment_tests":  "21 passed",
+                  "typescript_typecheck":  "PASS",
+                  "production_build":  "PASS",
+                  "browser_e2e":  "28 passed; test-results/.last-run.json status=passed"
+              },
+    "candidate_archive":  {
+                              "path":  "RightsRail_V2.4_STUDIONET_SUBMISSION.zip",
+                              "sha256_record":  "provenance/rightsrail-v24-studionet-archive-manifest.json",
+                              "historical_archive_preserved":  "RightsRail_V2.4_SCHEMA_VERIFIED_CANDIDATE.zip",
+                              "historical_archive_sha256":  "A49AC8CB285B17410E13BF4C6E630B5E93360A7FD753A6F4BD26717714DDF432"
+                          },
+    "historical_studio_dev_deployment":  {
+                                             "chain_id":  61997,
+                                             "transaction_id":  "0x6fc76d39d5869bfc60f19706bef69c734ada994b2e12cf30e2a678456d573960",
+                                             "contract_address":  "0xA6150b95E0464e708834BC8f13DC48De10039550",
+                                             "status":  "FINALIZED",
+                                             "execution_status":  "FINISHED_WITH_RETURN",
+                                             "qualification_writes":  0,
+                                             "kept_separate_from_target_network":  true
+                                         },
+    "historical_bradbury_records":  {
+                                        "deployment_journal":  "docs/provenance/live-transactions/rightsrail-v24-bradbury-deployment.json",
+                                        "qualification_journal":  "docs/provenance/live-transactions/rightsrail-v24-bradbury-qualification.json",
+                                        "current_target":  false
+                                    },
+    "portal_submitted":  false,
+    "delivery_verified":  false,
+    "runtime_compatibility":  {
+                                  "exact_candidate_remote_schema":  "VM_ERROR invalid_contract",
+                                  "diagnostic_result":  "AttributeError: module \u0027genlayer\u0027 has no attribute \u0027evm\u0027 at contracts/rightsrail_v24.py:376 (@gl.evm.contract_interface)",
+                                  "required_delivery_interface":  "@gl.evm.contract_interface",
+                                  "target_studionet_runtime_supports_evm_delivery":  false,
+                                  "contract_file_modified":  false
+                              },
+    "git_release":  {
+                        "branch":  "main",
+                        "remote_configured":  false,
+                        "push_status":  "NOT_POSSIBLE_NO_REMOTE",
+                        "hosted_ci_release_status":  "NOT_AVAILABLE_NO_REMOTE"
+                    },
+    "blockers":  [
+                     "Current hosted Studionet runtime cannot load the required EVM interface for external GEN delivery.",
+                     "No supported fee quote was returned; CLI sim_getFeeConfig failed with -32601 and installed SDK lacks the estimate method."
+                 ]
+}

@@ -1,0 +1,91 @@
+﻿{
+    "schema":  "RIGHTSRAIL_V24_CANDIDATE_MANIFEST_V1",
+    "product":  "RightsRail",
+    "candidate_version":  "2.4.0",
+    "status":  "NO_GO_STUDIONET_RUNTIME_AND_FEE_ESTIMATE_BLOCKED",
+    "target_network":  {
+                           "alias":  "studionet",
+                           "chain_id":  61999,
+                           "rpc":  "https://studio.genlayer.com/api",
+                           "built_in_configuration":  true
+                       },
+    "runner":  "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng",
+    "source":  {
+                   "path":  "contracts/rightsrail_v24.py",
+                   "sha256":  "5C99DEB31EB29B171B94F343950CBFF5204945D02160B2ADA3D742A1FFC6D321",
+                   "derived_from_verified_v23_sha256":  "E22EF2CCF7BFD03C555A13ADD2FADD3C2891C33E34522AB178B7785F9E8571EE",
+                   "change":  "Added read-only get_audit_events(start, limit) over existing audit_records."
+               },
+    "abi":  {
+                "path":  "artifacts/rightsrail-v24.abi.json",
+                "sha256":  "11548EA63B1C365C7985BE8C748109C4B7F4A33A1A55DE8394EF1CE90E6BE4EA",
+                "generated_by":  "genvm-lint 0.11.1rc2",
+                "genvm_version":  "v0.6.0-rc5",
+                "methods":  36,
+                "reads":  24,
+                "writes":  12,
+                "prior_v23_signatures_unchanged":  true,
+                "added_methods":  [
+                                      "get_audit_events"
+                                  ]
+            },
+    "gates":  {
+                  "candidate_verifier":  "PASS: exact pinned source and ABI hashes, 36/24/12",
+                  "genvm_validate":  "PASS: 36 methods, 24 reads, 12 writes",
+                  "genvm_typecheck":  "PASS: zero diagnostics",
+                  "genvm_schema":  "PASS: exact byte hash match to generated schema",
+                  "genvm_lint":  "FIVE_E010_REACHABILITY_WARNINGS; no other warning codes observed",
+                  "python_pytest":  "PASS: 87 passed, 18 subtests passed",
+                  "python_unittest":  "PASS: 32 passed",
+                  "ruff":  "PASS",
+                  "mypy":  "PASS: 13 source files",
+                  "python_compile":  "PASS",
+                  "typescript_api_tests":  "PASS: 14 tests",
+                  "javascript_deployment_tests":  "PASS: 21 tests, including fee-estimate fail-closed guard",
+                  "typescript_typecheck":  "PASS",
+                  "production_build":  "PASS: web and API",
+                  "browser_e2e":  "PASS: 28 tests; last-run status passed",
+                  "studionet_fee_estimate":  "BLOCKED: CLI sim_getFeeConfig returned -32601; installed genlayer-js 1.1.8 has no estimateTransactionFees",
+                  "studionet_deployment":  "NOT_SUBMITTED: no safe fee quote and remote source schema failed",
+                  "studionet_live_qualification":  "NOT_RUN: no verified deployment; runtime lacks EVM interface needed for delivery",
+                  "delivery":  "BLOCKED: @gl.evm.contract_interface unavailable in current hosted Studionet runtime; no external delivery claim"
+              },
+    "current_preflight":  "docs/provenance/rightsrail-v24-studionet-preflight.json",
+    "current_deployment_journal":  "docs/provenance/live-transactions/rightsrail-v24-studionet-deployment.json",
+    "current_qualification_journal":  "docs/provenance/live-transactions/rightsrail-v24-studionet-qualification.json",
+    "historical_records_preserved":  {
+                                         "studio_dev_deployment":  {
+                                                                       "journal":  "docs/provenance/live-transactions/rightsrail-v24-deployment.json",
+                                                                       "chain_id":  61997,
+                                                                       "transaction_id":  "0x6fc76d39d5869bfc60f19706bef69c734ada994b2e12cf30e2a678456d573960",
+                                                                       "contract_address":  "0xA6150b95E0464e708834BC8f13DC48De10039550",
+                                                                       "status":  "FINALIZED",
+                                                                       "execution_status":  "FINISHED_WITH_RETURN"
+                                                                   },
+                                         "bradbury_preflight":  "Historical only; not the target network for this run.",
+                                         "v23_source":  "E22EF2CCF7BFD03C555A13ADD2FADD3C2891C33E34522AB178B7785F9E8571EE",
+                                         "prior_candidate_archive":  {
+                                                                         "path":  "RightsRail_V2.4_SCHEMA_VERIFIED_CANDIDATE.zip",
+                                                                         "sha256":  "A49AC8CB285B17410E13BF4C6E630B5E93360A7FD753A6F4BD26717714DDF432",
+                                                                         "preserved":  true
+                                                                     }
+                                     },
+    "submission":  {
+                       "verdict":  "NO_GO",
+                       "reason":  "The current Studionet runtime cannot load the required EVM delivery interface, and the installed supported fee-estimation paths return no quote. No deployment or qualification transaction was broadcast.",
+                       "archive":  "RightsRail_V2.4_STUDIONET_SUBMISSION.zip",
+                       "archive_member_hashes":  "provenance/rightsrail-v24-studionet-archive-manifest.json"
+                   },
+    "studionet_runtime_probe":  {
+                                    "exact_candidate_result":  "VM_ERROR invalid_contract",
+                                    "in_memory_documented_runner_diagnostic":  "AttributeError: module \u0027genlayer\u0027 has no attribute \u0027evm\u0027 at source line 376",
+                                    "candidate_modified":  false,
+                                    "official_limitation":  "Hosted Studio has no EVM layer or ghost contracts."
+                                },
+    "git_release":  {
+                        "branch":  "main",
+                        "remote_configured":  false,
+                        "push_status":  "NOT_POSSIBLE_NO_REMOTE",
+                        "hosted_ci_release_status":  "NOT_AVAILABLE_NO_REMOTE"
+                    }
+}

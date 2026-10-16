@@ -1,0 +1,69 @@
+﻿{
+    "schema":  "RIGHTSRAIL_V24_STUDIONET_DEPLOYMENT_JOURNAL_V1",
+    "recorded_at_utc":  "2026-10-16T13:44:36Z",
+    "network":  {
+                    "alias":  "studionet",
+                    "rpc":  "https://studio.genlayer.com/api",
+                    "chain_id":  61999,
+                    "consensus_main":  "0xb7278A61aa25c888815aFC32Ad3cCC52fF24fE575",
+                    "consensus_data":  "0x88B0F18613Db92Bf970FfE264E02496e20a74D16",
+                    "built_in_configuration":  true,
+                    "custom_rpc_override_used":  false
+                },
+    "candidate":  {
+                      "source":  "contracts/rightsrail_v24.py",
+                      "source_sha256":  "5C99DEB31EB29B171B94F343950CBFF5204945D02160B2ADA3D742A1FFC6D321",
+                      "abi":  "artifacts/rightsrail-v24.abi.json",
+                      "abi_sha256":  "11548EA63B1C365C7985BE8C748109C4B7F4A33A1A55DE8394EF1CE90E6BE4EA",
+                      "schema_shape":  {
+                                           "methods":  36,
+                                           "reads":  24,
+                                           "writes":  12
+                                       },
+                      "local_genvm_rc5_schema_match":  true
+                  },
+    "signer":  {
+                   "account_name":  "firewall-only",
+                   "address":  "0x33653e6e86807e41682d3346cdf648d6653384b1",
+                   "balance_gen":  "5",
+                   "nonce_latest":  8,
+                   "nonce_pending":  8
+               },
+    "preflight_journal":  "docs/provenance/rightsrail-v24-studionet-preflight.json",
+    "status":  "NOT_SUBMITTED",
+    "phase":  "STOPPED_PREFLIGHT_BLOCKED",
+    "stop_reason":  "STUDIONET_EVM_INTERFACE_UNAVAILABLE_AND_NO_SUPPORTED_FEE_QUOTE",
+    "source_schema":  {
+                          "remote_exact_candidate_result":  "VM_ERROR invalid_contract",
+                          "diagnostic":  "Header-only in-memory runner probe failed at @gl.evm.contract_interface, source line 376, because the Studionet runtime has no genlayer.evm attribute."
+                      },
+    "fee_estimate":  {
+                         "status":  "NO_SAFE_QUOTE",
+                         "sdk":  "genlayer-js 1.1.8",
+                         "sdk_error":  "STUDIONET_FEE_ESTIMATOR_UNAVAILABLE_IN_INSTALLED_SDK",
+                         "cli":  "genlayer CLI 0.40.0-rc.3 estimate-fees --json",
+                         "rpc_method":  "sim_getFeeConfig",
+                         "rpc_error_code":  -32601,
+                         "error":  "Method not found: sim_getFeeConfig",
+                         "quote":  null,
+                         "eth_gas_price_wei":  "0",
+                         "gas_price_not_used_as_protocol_fee_quote":  true
+                     },
+    "existing_deployment_check":  {
+                                      "exact_candidate_found":  false,
+                                      "configured_signer_history_count":  1,
+                                      "other_deployment_tx":  "0xa3f25170cfa592fa5d289c8c9a9f9662b58815150c02190478f39ed5cb084c20",
+                                      "other_deployment_address":  "0x7Ab4Dc9B84f3fDEB90e9795976065F42Ea0b9528",
+                                      "other_source_sha256":  "942980C7BE82BBBC264A3774D0AE130253B6B386E69CF88BD7EF7F752559A114",
+                                      "historical_studio_dev_address":  "0xA6150b95E0464e708834BC8f13DC48De10039550",
+                                      "historical_studio_dev_address_code_on_studionet":  "0x"
+                                  },
+    "transaction_id":  null,
+    "contract_address":  null,
+    "broadcast_count":  0,
+    "signed":  false,
+    "receipt":  null,
+    "execution_status":  "NOT_AVAILABLE_NO_TRANSACTION",
+    "consensus":  "NOT_REACHED",
+    "outcome":  "No Studionet deployment was attempted; both compatibility and fee preconditions failed before signing or broadcast."
+}

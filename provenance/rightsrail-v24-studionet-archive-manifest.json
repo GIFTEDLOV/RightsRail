@@ -1,0 +1,71 @@
+{
+  "schema": "RIGHTSRAIL_V24_STUDIONET_ARCHIVE_MANIFEST_V1",
+  "recorded_at_utc": "2026-10-16T13:47:27.867180Z",
+  "archive": "RightsRail_V2.4_STUDIONET_SUBMISSION.zip",
+  "archive_sha256": "4FEA521315B562605C3E313A72683FEA2993A1605FBFE47A1E96AE853D0C5BD8",
+  "archive_bytes": 29089,
+  "status": "NO_GO_NOT_SUBMISSION_READY",
+  "network": {
+    "alias": "studionet",
+    "rpc": "https://studio.genlayer.com/api",
+    "chain_id": 61999
+  },
+  "candidate_source_sha256": "5C99DEB31EB29B171B94F343950CBFF5204945D02160B2ADA3D742A1FFC6D321",
+  "candidate_abi_sha256": "11548EA63B1C365C7985BE8C748109C4B7F4A33A1A55DE8394EF1CE90E6BE4EA",
+  "member_count": 8,
+  "members": [
+    {
+      "path": "contracts/rightsrail_v24.py",
+      "bytes": 73894,
+      "sha256": "5C99DEB31EB29B171B94F343950CBFF5204945D02160B2ADA3D742A1FFC6D321"
+    },
+    {
+      "path": "artifacts/rightsrail-v24.abi.json",
+      "bytes": 11308,
+      "sha256": "11548EA63B1C365C7985BE8C748109C4B7F4A33A1A55DE8394EF1CE90E6BE4EA"
+    },
+    {
+      "path": "provenance/v24-candidate-manifest.json",
+      "bytes": 6628,
+      "sha256": "791EEF22C470930885BAAFCA722A7925D6C58C83554FAF0469ADB036E020F8D2"
+    },
+    {
+      "path": "docs/provenance/rightsrail-v24-studionet-preflight.json",
+      "bytes": 6119,
+      "sha256": "6A10D59F50E952C73695C799ED206B652829A46CE9A3DE4FFFABE840505E0052"
+    },
+    {
+      "path": "docs/provenance/live-transactions/rightsrail-v24-studionet-deployment.json",
+      "bytes": 4061,
+      "sha256": "F6510899B476F3905E966E4A9CCCEAB311CE5F156D7AC0AAAAB97F46A8D15855"
+    },
+    {
+      "path": "docs/provenance/live-transactions/rightsrail-v24-studionet-qualification.json",
+      "bytes": 3794,
+      "sha256": "9B1ED161D2A8292E6FD9A48162A112042C7DC34D59D57EC766AB55EDD2959380"
+    },
+    {
+      "path": "FINAL_SUBMISSION_REPORT_V24.md",
+      "bytes": 6484,
+      "sha256": "9969729E85BBBE1438EE5680E609DEA4791A75AF26A9902318E871C4A252A1A0"
+    },
+    {
+      "path": "SUBMISSION_STATUS_V24.json",
+      "bytes": 8128,
+      "sha256": "634E2A582AAE2087BFAC86DD07F820412B71263E75182AE1A3EE5AEA4BA0A346"
+    }
+  ],
+  "checks": {
+    "archive_member_set_exact": true,
+    "all_member_bytes_match_workspace": true,
+    "all_member_hashes_verified": true,
+    "secret_assignment_pattern_found": false,
+    "environment_files_included": false,
+    "unrelated_project_files_included": false,
+    "historical_studio_dev_reconciliation_doc_included": false
+  },
+  "historical_archive_preserved": {
+    "path": "RightsRail_V2.4_SCHEMA_VERIFIED_CANDIDATE.zip",
+    "sha256": "A49AC8CB285B17410E13BF4C6E630B5E93360A7FD753A6F4BD26717714DDF432"
+  }
+}

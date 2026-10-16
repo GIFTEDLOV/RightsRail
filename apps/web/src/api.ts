@@ -21,16 +21,18 @@ export interface Provenance {
 export interface Envelope<T> { data: T; provenance: Provenance; }
 export interface StatusData {
   mode: "CONTROLLED_LOCAL" | "GENLAYER_CANONICAL";
-  deployed: false;
+  deployed: boolean;
   chainId: number;
-  contractAddress: null;
+  contractAddress: string | null;
   runner: string;
   contractSha256: string;
   abiSha256: string;
   semanticSchema: "RIGHTSRAIL_USAGE_V1";
-  publicMethodCount: 30;
+  publicMethodCount: number;
+  publicReadMethodCount: number;
+  publicWriteMethodCount: number;
   counts: Record<string, number>;
-  label: "CONTROLLED LOCAL QUALIFICATION";
+  label: string;
 }
 export interface DemoCase {
   case_id: string;

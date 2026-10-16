@@ -28,7 +28,8 @@ ROOT = Path(__file__).resolve().parents[2]
 EXPECTED_SOURCE_SHA = "E22EF2CCF7BFD03C555A13ADD2FADD3C2891C33E34522AB178B7785F9E8571EE"
 LOCAL_KEY = "0x" + "11" * 32
 REFERENCE_SHA = "aa" * 32
-LICENSE_SHA = "bb" * 32
+LICENSE_TEXT = "Controlled local timestamp fixture."
+LICENSE_SHA = hashlib.sha256(LICENSE_TEXT.encode()).hexdigest()
 BASE_TIME = "2026-01-01T00:00:00Z"
 VALID_FROM = 1_767_225_600  # 2026-01-01T00:00:00Z
 VALID_UNTIL = 1_767_312_000  # 2026-01-02T00:00:00Z
@@ -58,16 +59,15 @@ def _sim_config(datetime_value: str) -> dict:
 
 
 def _policy_args(policy_id: str, valid_from: int, valid_until: int, recipient: str) -> list:
-    license_text = "Controlled local timestamp fixture."
     return [
         policy_id,
         REFERENCE_SHA,
         1,
         "image/png",
-        "controlled://rightsrail/reference.png",
+        "https://rightsrail.test/reference.png",
         LICENSE_SHA,
-        len(license_text.encode()),
-        license_text,
+        len(LICENSE_TEXT.encode()),
+        LICENSE_TEXT,
         ["commercial editorial"],
         ["gambling promotion"],
         ["newsletter"],
@@ -148,12 +148,21 @@ def _successful(tx: dict) -> bool:
 @pytest.fixture(scope="module")
 def glsim_url():
     port = _free_port()
-    executable = ROOT / ".venv" / "Scripts" / "glsim.exe"
+    executable = ROOT / ".venv" / "Scripts" / "python.exe"
     if not executable.exists():
-        pytest.skip("GLSim executable is not installed")
+        pytest.skip("Python test runtime is not installed")
+    local_temp_root = ROOT / ".glsim-home" / "Temp"
+    local_temp_root.mkdir(parents=True, exist_ok=True)
+    existing_temp_files = {path.resolve() for path in local_temp_root.iterdir() if path.is_file()}
+    compat_root = ROOT / "tests" / "glsim_windows_compat"
+    inherited_pythonpath = os.environ.get("PYTHONPATH", "")
+    log_path = ROOT / ".glsim-home" / f"glsim-{port}.log"
+    log_handle = log_path.open("w", encoding="utf-8")
     process = subprocess.Popen(
         [
             str(executable),
+            "-m",
+            "glsim",
             "--port",
             str(port),
             "--validators",
@@ -170,16 +179,24 @@ def glsim_url():
         env={
             **os.environ,
             # Keep this probe isolated from the shared user cache.  The
-            # existing RC5 tree remains the input; only extracted/cache
-            # writes are redirected into the project-local test root.
+            # existing RC5 tree remains the input; extracted/cache and
+            # subprocess temporary-file writes stay under the project-local
+            # test root. On Windows, gltest's fd-0 message injection keeps its
+            # temp file open while unlinking it. The child-only sitecustomize
+            # defers that unlink until this simulator process exits.
             "USERPROFILE": str(ROOT / ".glsim-home"),
+            "TEMP": str(local_temp_root),
+            "TMP": str(local_temp_root),
+            "TMPDIR": str(local_temp_root),
+            "PYTHONPATH": os.pathsep.join(
+                part for part in (str(compat_root), inherited_pythonpath) if part
+            ),
             "GENVM_PREBUILT_DIR": str(
                 Path.home() / ".cache" / "gltest-direct" / "trees-v2" / "v0.6.0-rc5"
             ),
         },
-        stdout=subprocess.PIPE,
+        stdout=log_handle,
         stderr=subprocess.STDOUT,
-        text=True,
     )
     url = f"http://127.0.0.1:{port}/api"
     deadline = time.time() + 30
@@ -191,7 +208,8 @@ def glsim_url():
                     return
             except Exception:
                 time.sleep(0.25)
-        output = process.stdout.read() if process.stdout else ""
+            log_handle.flush()
+            output = log_path.read_text(encoding="utf-8")
         pytest.fail("GLSim did not become ready within 30 seconds\n" + output)
     finally:
         process.terminate()
@@ -199,6 +217,22 @@ def glsim_url():
             process.wait(timeout=10)
         except subprocess.TimeoutExpired:
             process.kill()
+            process.wait(timeout=10)
+        log_handle.close()
+        for temp_file in local_temp_root.iterdir():
+            if (
+                temp_file.is_file()
+                and temp_file.name.startswith("tmp")
+                and temp_file.resolve() not in existing_temp_files
+            ):
+                for attempt in range(20):
+                    try:
+                        temp_file.unlink(missing_ok=True)
+                        break
+                    except PermissionError:
+                        if attempt == 19:
+                            raise
+                        time.sleep(0.05)
 
 
 def test_v23_validity_windows_use_documented_genvm_datetime(glsim_url):
@@ -225,7 +259,7 @@ def test_v23_validity_windows_use_documented_genvm_datetime(glsim_url):
     assert address and not address.endswith("0" * 40)
 
     cases = [
-        ("before", VALID_FROM - 1, BASE_TIME, False, "request-before"),
+        ("before", VALID_FROM - 1, "2025-12-31T23:59:59Z", False, "request-before"),
         ("at_start", VALID_FROM, BASE_TIME, True, "request-at-start"),
         ("after_expiry", VALID_UNTIL + 1, "2026-01-02T00:00:01Z", False, "request-after-expiry"),
     ]

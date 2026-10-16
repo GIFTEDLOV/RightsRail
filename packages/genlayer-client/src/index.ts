@@ -1,17 +1,23 @@
 import { RIGHTSRAIL_SCHEMA, type ProviderMode } from "@rightsrail/shared-ts";
 
-export const CONTRACT_SHA256 =
+export const HISTORICAL_V1_CONTRACT_SHA256 =
   "C312E73FA9A01DB54A81FB19CBE82DBD0B73C6F9308D71A181E3E07BD13D548B" as const;
-export const ABI_SHA256 =
+export const HISTORICAL_V1_ABI_SHA256 =
   "E1314699D11B66D903E049F3D4DF558486E93225DFFD861A7A2E7210697969DB" as const;
-export const CANDIDATE_CONTRACT_SHA256 =
+export const HISTORICAL_V23_CONTRACT_SHA256 =
   "E22EF2CCF7BFD03C555A13ADD2FADD3C2891C33E34522AB178B7785F9E8571EE" as const;
-export const CANDIDATE_ABI_SHA256 =
+export const HISTORICAL_V23_ABI_SHA256 =
   "010C074E7FA8892AEFB26C443F62DFAA4E379897DFE950A93927F9E9E081CF3B" as const;
+export const CONTRACT_SHA256 =
+  "5C99DEB31EB29B171B94F343950CBFF5204945D02160B2ADA3D742A1FFC6D321" as const;
+export const ABI_SHA256 =
+  "11548EA63B1C365C7985BE8C748109C4B7F4A33A1A55DE8394EF1CE90E6BE4EA" as const;
+export const CANDIDATE_CONTRACT_SHA256 = CONTRACT_SHA256;
+export const CANDIDATE_ABI_SHA256 = ABI_SHA256;
 export const RUNNER =
   "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng" as const;
-export const STUDIO_DEV_RPC = "https://studio-dev.genlayer.com/api" as const;
-export const STUDIO_DEV_CHAIN_ID = 61997 as const;
+export const STUDIONET_RPC = "https://studio.genlayer.com/api" as const;
+export const STUDIONET_CHAIN_ID = 61999 as const;
 
 export const ABI_METHODS = {
   reads: [
@@ -19,6 +25,7 @@ export const ABI_METHODS = {
     "get_accounting_status",
     "get_adjudication",
     "get_adjudication_ids",
+    "get_audit_events",
     "get_claimable",
     "get_evidence",
     "get_evidence_ids",
@@ -36,6 +43,8 @@ export const ABI_METHODS = {
     "get_settlement",
     "get_settlement_ids",
     "get_status",
+    "get_withdrawal",
+    "get_withdrawal_ids",
   ],
   writes: [
     "adjudicate_usage",
@@ -44,16 +53,16 @@ export const ABI_METHODS = {
     "commit_evidence",
     "create_policy",
     "freeze_policy",
+    "refund_unadjudicated_request",
     "settle_request",
     "submit_usage_request",
     "update_policy_draft",
+    "withdraw_claimable",
+    "withdraw_refund",
   ],
 } as const;
 
-export const CANDIDATE_ABI_METHODS = {
-  reads: [...ABI_METHODS.reads, "get_withdrawal", "get_withdrawal_ids"],
-  writes: [...ABI_METHODS.writes, "withdraw_claimable", "withdraw_refund"],
-} as const;
+export const CANDIDATE_ABI_METHODS = ABI_METHODS;
 
 export type ReadMethod = (typeof ABI_METHODS.reads)[number];
 export type WriteMethod = (typeof ABI_METHODS.writes)[number];
@@ -316,12 +325,15 @@ export class FrozenContractClient implements CanonicalReader, TransactionPrepare
   getAccounting(): Promise<AccountingSnapshot> { return Promise.reject(this.unavailable()); }
 }
 
-export function contractConfig(mode: ProviderMode = "CONTROLLED_LOCAL"): DeploymentConfig {
+export function contractConfig(
+  mode: ProviderMode = "CONTROLLED_LOCAL",
+  contractAddress: string | null = null,
+): DeploymentConfig {
   return {
     mode,
-    chainId: STUDIO_DEV_CHAIN_ID,
-    rpcUrl: mode === "GENLAYER_CANONICAL" ? STUDIO_DEV_RPC : null,
-    contractAddress: null,
+    chainId: STUDIONET_CHAIN_ID,
+    rpcUrl: mode === "GENLAYER_CANONICAL" ? STUDIONET_RPC : null,
+    contractAddress: mode === "GENLAYER_CANONICAL" ? contractAddress : null,
     contractSha256: CONTRACT_SHA256,
     abiSha256: ABI_SHA256,
     runner: RUNNER,

@@ -22,6 +22,7 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = ["--artifacts-dir", ".genlayer-cache/gltest-artifacts"]
 pythonpath = [
   ".",
   "packages/domain",
@@ -37,7 +38,7 @@ pythonpath = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-extend-exclude = ["apps/web/node_modules", "rightsrail_deployed.py"]
+extend-exclude = ["apps/web/node_modules", "rightsrail_deployed.py", ".glsim-home"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
@@ -47,6 +48,7 @@ select = ["E", "F", "I", "B", "UP"]
 # bundle. E010 is a known static reachability false positive for valid
 # gl.nondet calls in RC5 and is recorded in the Phase 2.5 audit.
 "contracts/rightsrail.py" = ["E501", "I001"]
+"contracts/rightsrail_v24.py" = ["E501", "I001"]
 
 [tool.mypy]
 python_version = "3.12"

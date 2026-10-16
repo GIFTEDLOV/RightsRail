@@ -1,0 +1,96 @@
+﻿{
+    "schema":  "RIGHTSRAIL_V24_STUDIONET_PREFLIGHT_V1",
+    "observed_at_utc":  "2026-10-16T13:44:36Z",
+    "status":  "BLOCKED_BEFORE_BROADCAST",
+    "network":  {
+                    "alias":  "studionet",
+                    "chainId":  61999,
+                    "rpc":  "https://studio.genlayer.com/api",
+                    "consensusMain":  "0xb7278A61aa25c888815aFC32Ad3cC52fF24fE575",
+                    "consensusData":  "0x88B0F18613Db92Bf970FfE264E02496e20a74D16",
+                    "built_in_configuration":  true,
+                    "custom_rpc_override_used":  false,
+                    "rpc_chain_id":  61999,
+                    "alias_confirmed_by_cli":  true
+                },
+    "signer":  {
+                   "account_name":  "firewall-only",
+                   "address":  "0x33653E6e86807e41682D3346CDf648D6653384B1",
+                   "balance_wei":  "5000000000000000000",
+                   "balance_gen":  "5",
+                   "latest_nonce":  8,
+                   "pending_nonce":  8
+               },
+    "fee_behavior":  {
+                         "eth_gas_price_wei_observed_but_not_used_as_protocol_fee_quote":  "0",
+                         "fee_estimate_required":  true,
+                         "estimator":  "GenLayerJS estimateTransactionFees",
+                         "status":  "NO_SUPPORTED_FEE_QUOTE",
+                         "quote":  null,
+                         "error":  "STUDIONET_FEE_ESTIMATOR_UNAVAILABLE_IN_INSTALLED_SDK",
+                         "cli_estimate_observed":  {
+                                                       "command":  "genlayer estimate-fees --json",
+                                                       "rpc_method":  "sim_getFeeConfig",
+                                                       "error_code":  -32601,
+                                                       "error":  "Method not found: sim_getFeeConfig",
+                                                       "quote":  null
+                                                   }
+                     },
+    "candidate":  {
+                      "source":  "contracts/rightsrail_v24.py",
+                      "source_bytes":  73894,
+                      "abi":  "artifacts/rightsrail-v24.abi.json",
+                      "abi_bytes":  11308,
+                      "runner":  "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng",
+                      "schema_shape":  {
+                                           "methods":  36,
+                                           "reads":  24,
+                                           "writes":  12
+                                       },
+                      "local_genvm_rc5_schema_match":  true,
+                      "remote_schema_exact_match":  false,
+                      "remote_schema_error":  "gen_getContractSchemaForCode returned VM_ERROR invalid_contract",
+                      "get_audit_events_read_only_in_local_abi":  true
+                  },
+    "existing_state":  {
+                           "repository_studionet_journal_found":  false,
+                           "exact_candidate_in_configured_signer_history":  false,
+                           "exact_candidate_transaction_id":  null,
+                           "exact_candidate_address":  null,
+                           "configured_signer_deployment_history_count":  1,
+                           "deployments":  [
+                                               {
+                                                   "hash":  "0xa3f25170cfa592fa5d289c8c9a9f9662b58815150c02190478f39ed5cb084c20",
+                                                   "status":  "FINALIZED",
+                                                   "address":  "0x7Ab4Dc9B84f3fDEB90e9795976065F42Ea0b9528",
+                                                   "source_sha256":  "942980C7BE82BBBC264A3774D0AE130253B6B386E69CF88BD7EF7F752559A114"
+                                               }
+                                           ]
+                       },
+    "deployment_allowed":  false,
+    "blockers":  [
+                     {
+                         "gate":  "STUDIONET_SOURCE_SCHEMA_COMPATIBILITY",
+                         "result":  "gen_getContractSchemaForCode returned VM_ERROR invalid_contract"
+                     },
+                     {
+                         "gate":  "STUDIONET_FEE_ESTIMATE",
+                         "result":  "STUDIONET_FEE_ESTIMATOR_UNAVAILABLE_IN_INSTALLED_SDK"
+                     },
+                     {
+                         "gate":  "STUDIONET_EVM_DELIVERY_RUNTIME",
+                         "result":  "Current hosted Studionet runtime has no genlayer.evm API; source import fails at @gl.evm.contract_interface (contracts/rightsrail_v24.py:376)."
+                     }
+                 ],
+    "runtime_compatibility_probe":  {
+                                        "status":  "FAILED",
+                                        "exact_candidate_remote_result":  "gen_getContractSchemaForCode returned VM_ERROR invalid_contract",
+                                        "diagnostic":  "A read-only in-memory probe changed only the Depends header to the runner hash shown in current official first-contract documentation. Remote schema execution reached source line 376 and raised AttributeError: module genlayer has no attribute evm.",
+                                        "diagnostic_header_only":  true,
+                                        "candidate_file_modified":  false,
+                                        "source_line":  376,
+                                        "source_declaration":  "@gl.evm.contract_interface",
+                                        "documentation":  "https://docs.genlayer.com/developers/intelligent-contracts/features/value-transfers",
+                                        "interpretation":  "Hosted Studionet runtime cannot load the EVM interface required for the external GEN delivery path."
+                                    }
+}

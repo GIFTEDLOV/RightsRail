@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@rightsrail/genlayer-client": "workspace:*",
-    "@rightsrail/shared-ts": "workspace:*"
+    "@rightsrail/shared-ts": "workspace:*",
+    "genlayer-js": "1.1.8"
   }
 }

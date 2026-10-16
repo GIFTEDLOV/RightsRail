@@ -9,7 +9,7 @@ describe("local API and indexer read model", () => {
     expect(response.provenance).toMatchObject({
       mode: "CONTROLLED_LOCAL",
       canonical: false,
-      chainId: 61997,
+      chainId: 61999,
       contractAddress: null,
       source: "controlled-fixture-store",
     });

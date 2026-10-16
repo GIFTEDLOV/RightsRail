@@ -15,6 +15,8 @@ const NONPAYABLE_METHODS = new Set([
   "authenticate_evidence",
   "adjudicate_usage",
   "settle_request",
+  "withdraw_claimable",
+  "withdraw_refund",
 ]);
 
 export const QUALIFICATION_POLICY_FEE_WEI = 10n;

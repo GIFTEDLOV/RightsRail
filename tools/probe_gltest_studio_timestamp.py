@@ -7,19 +7,17 @@ underlying genlayer-py simulate_write_contract path, both of which use sim_call.
 
 from __future__ import annotations
 
-import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 from eth_account import Account
 from genlayer_py import create_client
 from genlayer_py.chains import studio_devnet
-from gltest.contracts.contract import Contract
 from gltest.contracts import stats_collector as stats_module
+from gltest.contracts.contract import Contract
 from gltest_cli.config.general import get_general_config
-
 
 RPC = "https://studio-dev.genlayer.com/api"
 CONTRACT = "0xfB3335350b0e02ceFb384753990E9B377B4BCB1F"
@@ -50,7 +48,10 @@ def safe(value: Any) -> Any:
     if isinstance(value, dict):
         return {
             str(key): "[REDACTED]"
-            if any(token in str(key).lower() for token in ("private", "secret", "mnemonic", "password"))
+            if any(
+                token in str(key).lower()
+                for token in ("private", "secret", "mnemonic", "password")
+            )
             else safe(item)
             for key, item in value.items()
         }
@@ -111,10 +112,14 @@ def main() -> None:
             item["response_summary"] = {
                 "has_result": "result" in response if isinstance(response, dict) else False,
                 "error": safe(response.get("error")) if isinstance(response, dict) else None,
-                "execution_result": result.get("execution_result") if isinstance(result, dict) else None,
+                "execution_result": (
+                    result.get("execution_result") if isinstance(result, dict) else None
+                ),
                 "result": result.get("result") if isinstance(result, dict) else None,
                 "mode": result.get("mode") if isinstance(result, dict) else None,
-                "contract_state_hash": result.get("contract_state_hash") if isinstance(result, dict) else None,
+                "contract_state_hash": (
+                    result.get("contract_state_hash") if isinstance(result, dict) else None
+                ),
             }
         return response
 
@@ -123,7 +128,7 @@ def main() -> None:
     block = client.provider.make_request("eth_getBlockByNumber", ["latest", False])
     raw_timestamp = block["result"]["timestamp"]
     chain_timestamp = int(raw_timestamp, 16)
-    chain_datetime = datetime.fromtimestamp(chain_timestamp, timezone.utc).strftime(
+    chain_datetime = datetime.fromtimestamp(chain_timestamp, UTC).strftime(
         "%Y-%m-%dT%H:%M:%SZ"
     )
 
