@@ -1,0 +1,16 @@
+[
+  {
+    "variant": "explicit_value",
+    "timestamp": 1792195276,
+    "success": false,
+    "error": "execution failed",
+    "execution_result": "ERROR",
+    "error_result": "\u0001[EXPECTED] policy is outside its validity window"
+  },
+  {
+    "variant": "explicit_value_and_actual_chain_time",
+    "timestamp": 1792195276,
+    "success": true,
+    "result": "00"
+  }
+]

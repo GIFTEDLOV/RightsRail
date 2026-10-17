@@ -335,5 +335,3 @@ export class LocalStore {
     return draft;
   }
 }
-
-export const localStore = new LocalStore();

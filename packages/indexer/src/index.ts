@@ -101,6 +101,9 @@ export class GenLayerCanonicalProvider implements RightsRailProvider {
   readonly config;
   private readonly client = createClient({ chain: studionet });
   private lastSnapshot: { at: number; value: IndexedState } | null = null;
+  private pendingSnapshot: Promise<IndexedState> | null = null;
+
+  invalidate(): void { this.lastSnapshot = null; }
 
   constructor(readonly address: string | null) {
     this.config = contractConfig("GENLAYER_CANONICAL", address);
@@ -111,9 +114,18 @@ export class GenLayerCanonicalProvider implements RightsRailProvider {
     return parse(await this.client.readContract({ address: this.address as `0x${string}`, functionName, args: args as never[] }));
   }
 
+  private async pages(method: string): Promise<unknown[]> {
+    const values: unknown[] = [];
+    for (let start = 0; ; start += 64) {
+      const page = await this.read(method, [BigInt(start), 64n]);
+      if (!Array.isArray(page)) throw new Error(`Canonical page is invalid: ${method}`);
+      values.push(...page);
+      if (page.length < 64) return values;
+    }
+  }
+
   private async records<T>(idsMethod: string, recordMethod: string): Promise<T[]> {
-    const ids = await this.read(idsMethod, [0n, 1000n]);
-    if (!Array.isArray(ids)) throw new Error(`Canonical identifier method returned invalid data: ${idsMethod}`);
+    const ids = await this.pages(idsMethod);
     const values: T[] = [];
     for (const id of ids) {
       const record = await this.read(recordMethod, [String(id)]);
@@ -124,12 +136,17 @@ export class GenLayerCanonicalProvider implements RightsRailProvider {
   }
 
   async snapshot(): Promise<IndexedState> {
+    if (this.lastSnapshot && Date.now() - this.lastSnapshot.at < 60000) return structuredClone(this.lastSnapshot.value);
+    if (!this.pendingSnapshot) this.pendingSnapshot = this.loadSnapshot().finally(() => { this.pendingSnapshot = null; });
+    return structuredClone(await this.pendingSnapshot);
+  }
+
+  private async loadSnapshot(): Promise<IndexedState> {
     if (!this.address) throw new Error("Canonical provider unavailable: contract is not deployed");
     if (!/^0x[\da-fA-F]{40}$/.test(this.address)) throw new Error("Canonical provider contract address is invalid");
     if (CHAIN_ID !== STUDIONET_CHAIN_ID || studionet.id !== STUDIONET_CHAIN_ID || studionet.rpcUrls.default.http[0] !== STUDIONET_RPC) {
       throw new Error("Canonical provider is not configured for built-in Studionet");
     }
-    if (this.lastSnapshot && Date.now() - this.lastSnapshot.at < 3000) return structuredClone(this.lastSnapshot.value);
 
     const [source, schema] = await Promise.all([
       this.client.getContractCode(this.address as `0x${string}`),
@@ -145,7 +162,7 @@ export class GenLayerCanonicalProvider implements RightsRailProvider {
       this.records<PermitRecord>("get_permit_ids", "get_permit"),
       this.records<SettlementRecord>("get_settlement_ids", "get_settlement"),
       this.read("get_accounting_status"),
-      this.read("get_audit_events", [0n, 1000n]),
+      this.pages("get_audit_events"),
     ]);
     if (!accountingRaw || typeof accountingRaw !== "object" || Array.isArray(accountingRaw)) throw new Error("Canonical accounting read is invalid");
     if (!Array.isArray(auditRaw)) throw new Error("Canonical audit page is invalid");

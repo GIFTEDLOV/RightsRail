@@ -28,7 +28,9 @@
     "genlayer:lint": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/genlayer_lint.ps1",
     "genlayer:validate": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/genlayer_validate.ps1",
     "genlayer:typecheck": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/genlayer_typecheck.ps1",
-    "genlayer:schema": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/genlayer_schema.ps1"
+    "genlayer:schema": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/genlayer_schema.ps1",
+    "verify:studionet": "node --test tests/studionet_workflow.test.mjs",
+    "genvm:studionet": "python tools/verify_studionet_genvm.py"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",
@@ -46,5 +48,6 @@
     "typescript": "^5.9.3",
     "vite": "^7.1.9",
     "vitest": "^3.2.4"
-  }
+  },
+  "packageManager": "pnpm@10.17.1"
 }

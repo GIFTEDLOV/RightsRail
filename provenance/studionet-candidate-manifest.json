@@ -1,0 +1,37 @@
+{
+  "product": "RightsRail",
+  "version": "2.4.1",
+  "network": {
+    "alias": "studionet",
+    "chainId": 61999,
+    "rpc": "https://studio.genlayer.com/api",
+    "consensusMain": "0xb7278A61aa25c888815aFC32Ad3cC52fF24fE575",
+    "consensusData": "0x88B0F18613Db92Bf970FfE264E02496e20a74D16"
+  },
+  "source": "contracts/rightsrail_studionet.py",
+  "source_sha256": "DA0828DD579AB0CAA6432AF713559D4E3B5E679444F71E7345C4FF8E0F21EC47",
+  "abi": "artifacts/rightsrail-studionet.abi.json",
+  "abi_sha256": "AB93A76683921294FAC694751CF877E0F195A69DC7659FB5F02D6D34BC099B61",
+  "schema_shape": {
+    "methods": 36,
+    "reads": 24,
+    "writes": 12
+  },
+  "baseline_source_sha256": "5C99DEB31EB29B171B94F343950CBFF5204945D02160B2ADA3D742A1FFC6D321",
+  "runner": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6",
+  "schema_generation": {
+    "tool": "genlayer-js 1.1.8 getContractSchemaForCode",
+    "network_alias": "studionet",
+    "rpc": "https://studio.genlayer.com/api",
+    "generated_at": "2026-10-16T23:42:51.687Z"
+  },
+  "fee_policy": {
+    "gasless": true,
+    "feeValue": "0",
+    "source": "documented built-in Studionet gasless flow",
+    "documentation": "https://github.com/genlayerlabs/skills/blob/main/plugins/genlayer-dev/skills/genlayer-cli/SKILL.md",
+    "rpc_chain_id": 61999,
+    "isStudio": true,
+    "sim_getFeeConfig_used": false
+  }
+}

@@ -2,7 +2,7 @@
 import { createRequire } from "node:module";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { createAccount, createClient } from "genlayer-js";
+import { abi, createAccount, createClient } from "genlayer-js";
 import { studionet } from "genlayer-js/chains";
 
 export const NETWORK = Object.freeze({
@@ -30,19 +30,42 @@ export function readClient(account) {
   return createClient(account ? { chain: studionet, account } : { chain: studionet });
 }
 
-/** Require the documented SDK quote before any contract transaction. */
-export async function requireGaslessFeeEstimate(client) {
-  if (typeof client.estimateTransactionFees !== "function") {
-    throw new Error("STUDIONET_FEE_ESTIMATOR_UNAVAILABLE_IN_INSTALLED_SDK");
+/** Stable Studio uses its documented gasless flow, without the v0.6 fee RPC. */
+export async function verifyStudionetFeePolicy() {
+  assertStudionetConfig();
+  const chainId = Number(BigInt(await rpc("eth_chainId", [])));
+  if (chainId !== NETWORK.chainId || studionet.isStudio !== true) {
+    throw new Error("STUDIONET_GASLESS_NETWORK_NOT_CONFIRMED");
   }
-  const estimate = await client.estimateTransactionFees();
-  if (estimate?.gasless !== true) {
-    throw new Error("STUDIONET_FEE_QUOTE_DID_NOT_CONFIRM_GASLESS_EXECUTION");
-  }
-  if (estimate.feeValue !== undefined && BigInt(estimate.feeValue) !== 0n) {
-    throw new Error("STUDIONET_GASLESS_QUOTE_HAS_NONZERO_FEE_VALUE");
-  }
-  return estimate;
+  return {
+    gasless: true,
+    feeValue: "0",
+    source: "documented built-in Studionet gasless flow",
+    documentation: "https://github.com/genlayerlabs/skills/blob/main/plugins/genlayer-dev/skills/genlayer-cli/SKILL.md",
+    rpc_chain_id: chainId,
+    isStudio: true,
+    sim_getFeeConfig_used: false,
+  };
+}
+
+export const requireGaslessFeeEstimate = verifyStudionetFeePolicy;
+
+/** Stable SDK 1.1.8 omits value and sim_config in simulateWriteContract. */
+export async function simulateStudionetWrite(spec, chainTimestamp) {
+  assertStudionetConfig();
+  if (!Number.isSafeInteger(chainTimestamp) || chainTimestamp <= 0) throw new Error("SIMULATION_CHAIN_TIME_REQUIRED");
+  const data = abi.transactions.serialize([
+    abi.calldata.encode(abi.calldata.makeCalldataObject(spec.functionName, spec.args, spec.kwargs)),
+    false,
+  ]);
+  const request = {
+    type: "write", to: spec.address, from: spec.account.address, data,
+    value: `0x${BigInt(spec.value).toString(16)}`,
+    transaction_hash_variant: "latest-final",
+    sim_config: { genvm_datetime: new Date(chainTimestamp * 1000).toISOString() },
+  };
+  const result = await rpc("gen_call", [request]);
+  return { read_only: true, request, result };
 }
 
 export async function loadConfiguredAccount(name, expectedAddress) {
@@ -81,7 +104,7 @@ export function safeJson(value) {
   if (typeof value === "bigint") return value.toString();
   if (Array.isArray(value)) return value.map(safeJson);
   if (value && typeof value === "object") {
-    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, safeJson(item)]));
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, /^(private_?key|password|api_?key|secret|access_?token|mnemonic)$/i.test(key) ? "[REDACTED]" : safeJson(item)]));
   }
   return value;
 }
@@ -91,7 +114,14 @@ export function statusName(tx) {
 }
 
 export function executionName(tx) {
-  return tx?.txExecutionResultName ?? tx?.executionResultName ?? tx?.execution_result ?? null;
+  const named = tx?.txExecutionResultName ?? tx?.executionResultName;
+  if (named) return named;
+  // Stable Studio returns decoded leader receipts instead of the v0.6 enum.
+  const leaders = tx?.consensus_data?.leader_receipt;
+  const leader = Array.isArray(leaders) ? leaders.find((item) => item.vote == null) ?? leaders[0] : leaders;
+  if (leader?.result?.status === "return" && leader.execution_result === "SUCCESS" && !leader.genvm_result?.raw_error) return "FINISHED_WITH_RETURN";
+  if (["error", "user_error", "contract_error"].includes(leader?.result?.status) && leader.execution_result === "ERROR") return "FINISHED_WITH_ERROR";
+  return null;
 }
 
 /** Poll the same hash until terminal finality. Never submits or rebroadcasts. */

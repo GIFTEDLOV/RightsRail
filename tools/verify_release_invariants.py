@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 from pathlib import Path
 
@@ -31,10 +32,15 @@ def main() -> None:
     client = (ROOT / "packages" / "genlayer-client" / "src" / "index.ts").read_text(
         encoding="utf-8"
     )
-    if constant(client, "CONTRACT_SHA256") != FROZEN_CONTRACT:
-        raise SystemExit("V2.4 contract hash constant changed")
-    if constant(client, "ABI_SHA256") != FROZEN_ABI:
-        raise SystemExit("V2.4 ABI hash constant changed")
+    active = json.loads((ROOT / "provenance/studionet-candidate-manifest.json").read_text())
+    if constant(client, "CONTRACT_SHA256") != active["source_sha256"]:
+        raise SystemExit("Active client source hash differs from the Studionet manifest")
+    if constant(client, "ABI_SHA256") != active["abi_sha256"]:
+        raise SystemExit("Active client ABI hash differs from the Studionet manifest")
+    if sha256(ROOT / active["source"]) != active["source_sha256"]:
+        raise SystemExit("Stable source differs from its recorded candidate")
+    if sha256(ROOT / active["abi"]) != active["abi_sha256"]:
+        raise SystemExit("Stable ABI differs from its recorded candidate")
     candidate_contract = sha256(contract)
     candidate_abi = sha256(abi)
     if candidate_contract != FROZEN_CONTRACT:

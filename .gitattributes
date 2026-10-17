@@ -1,0 +1,4 @@
+contracts/*.py text eol=lf
+artifacts/rightsrail-studionet.abi.json text eol=lf
+apps/web/public/release/rightsrail.abi.json text eol=lf
+provenance/studionet-candidate-manifest.json text eol=lf

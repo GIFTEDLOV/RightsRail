@@ -4,6 +4,7 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .venv/
+.vercel/
 .genlayer-cache/
 venv/
 node_modules/
@@ -20,3 +21,5 @@ build/
 !.env.example
 coverage.xml
 .coverage
+
+.vercel

@@ -6,8 +6,8 @@ import { seedState } from "../../apps/api/src/store.js";
 
 describe("RightsRail frozen client boundary", () => {
   it("keeps the V2.4 candidate metadata and 36-method ABI explicit", () => {
-    expect(CONTRACT_SHA256).toBe("5C99DEB31EB29B171B94F343950CBFF5204945D02160B2ADA3D742A1FFC6D321");
-    expect(ABI_SHA256).toBe("11548EA63B1C365C7985BE8C748109C4B7F4A33A1A55DE8394EF1CE90E6BE4EA");
+    expect(CONTRACT_SHA256).toBe("DA0828DD579AB0CAA6432AF713559D4E3B5E679444F71E7345C4FF8E0F21EC47");
+    expect(ABI_SHA256).toBe("AB93A76683921294FAC694751CF877E0F195A69DC7659FB5F02D6D34BC099B61");
     expect(ABI_METHODS.reads).toHaveLength(24);
     expect(ABI_METHODS.writes).toHaveLength(12);
     expect(ABI_METHODS.reads).toContain("get_audit_events");
@@ -16,7 +16,7 @@ describe("RightsRail frozen client boundary", () => {
   });
 
   it("matches the checked client method inventory to the generated V2.4 ABI", () => {
-    const abi = JSON.parse(readFileSync(new URL("../../artifacts/rightsrail-v24.abi.json", import.meta.url), "utf8")) as { methods: Record<string, { readonly: boolean }> };
+    const abi = JSON.parse(readFileSync(new URL("../../artifacts/rightsrail-studionet.abi.json", import.meta.url), "utf8")) as { methods: Record<string, { readonly: boolean }> };
     const reads = Object.entries(abi.methods).filter(([, value]) => value.readonly).map(([name]) => name).sort();
     const writes = Object.entries(abi.methods).filter(([, value]) => !value.readonly).map(([name]) => name).sort();
     expect([...ABI_METHODS.reads].sort()).toEqual(reads);

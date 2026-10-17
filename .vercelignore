@@ -1,0 +1,14 @@
+.git
+.venv
+.genlayer-cache
+.glsim-home
+.env*
+node_modules
+**/node_modules
+**/dist
+**/*.tsbuildinfo
+test-results
+playwright-report
+screenshots
+*.zip
+rightsrail_deployed.py

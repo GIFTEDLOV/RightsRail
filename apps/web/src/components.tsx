@@ -2,6 +2,7 @@ import { Link, NavLink } from "react-router-dom";
 import type { ReactNode } from "react";
 import { semanticDescriptions, semanticLabels, resultTone } from "./api";
 import type { EvidenceRecord, PolicyRecord, RequestRecord, SemanticKey, SemanticVector, SettlementRecord } from "@rightsrail/genlayer-client";
+import { useLiveStatus } from "./live";
 
 export function Mark({ compact = false }: { compact?: boolean }) {
   return <span className={`brand-mark ${compact ? "brand-mark--compact" : ""}`} aria-hidden="true"><span>R</span><i /></span>;
@@ -17,13 +18,15 @@ const nav = [
   ["/requests", "Usage requests", "U"],
   ["/settlements", "Entitlements", "E"],
   ["/activity", "Activity", "A"],
+  ["/transactions", "Transactions", "T"],
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const live = useLiveStatus();
   return <div className="app-frame">
-    <header className="topbar"><Brand /><div className="topbar-actions"><span className="network-pill"><span className="signal-dot" /> CONTROLLED LOCAL</span><Link className="topbar-link" to="/integrate">Integrate <span>↗</span></Link><Link className="avatar" to="/app" aria-label="Open operator profile">LF</Link></div></header>
+    <header className="topbar"><Brand /><div className="topbar-actions"><span className="network-pill"><span className="signal-dot" /> {live?.deployed ? "STUDIONET 61999" : live ? "CONTROLLED LOCAL" : "CONNECTING"}</span><Link className="topbar-link" to="/integrate">Integrate <span>↗</span></Link><Link className="avatar" to="/app" aria-label="Open operator profile">LF</Link></div></header>
     <div className="app-body">
-      <aside className="sidebar"><div className="sidebar-label">Rights control plane</div><nav aria-label="Application navigation">{nav.map(([href, label, glyph]) => <NavLink key={href} to={href} className={({ isActive }) => `side-link ${isActive ? "active" : ""}`}><span className="side-glyph">{glyph}</span>{label}</NavLink>)}</nav><div className="sidebar-spacer" /><div className="sidebar-foot"><span className="mini-lock">⌁</span><span><b>Local only</b><small>No network writes</small></span></div></aside>
+      <aside className="sidebar"><div className="sidebar-label">Rights control plane</div><nav aria-label="Application navigation">{nav.map(([href, label, glyph]) => <NavLink key={href} to={href} className={({ isActive }) => `side-link ${isActive ? "active" : ""}`}><span className="side-glyph">{glyph}</span>{label}</NavLink>)}</nav><div className="sidebar-spacer" /><div className="sidebar-foot"><span className="mini-lock">⌁</span><span><b>{live?.deployed ? "Studionet" : "Local only"}</b><small>{live?.deployed ? "Wallet transactions available" : "No network writes"}</small></span></div></aside>
       <main className="main-content">{children}</main>
     </div>
   </div>;
@@ -34,7 +37,8 @@ export function PageHeader({ eyebrow, title, description, action }: { eyebrow: s
 }
 
 export function ProvenanceBadge({ compact = false }: { compact?: boolean }) {
-  return <span className={`provenance-badge ${compact ? "compact" : ""}`}><span className="signal-dot" /> CONTROLLED LOCAL <em>·</em> UNDEPLOYED</span>;
+  const status = useLiveStatus();
+  return <span className={`provenance-badge ${compact ? "compact" : ""}`}><span className="signal-dot" /> {status?.deployed ? "CANONICAL STUDIONET" : status ? "CONTROLLED LOCAL" : "CONNECTING"} <em>·</em> {status?.deployed ? "61999" : status ? "UNDEPLOYED" : "UNVERIFIED"}</span>;
 }
 
 export function StatusBadge({ value }: { value: string }) {
@@ -46,7 +50,7 @@ export function LoadingSkeleton({ lines = 4 }: { lines?: number }) {
 }
 
 export function ErrorState({ message }: { message: string }) {
-  return <div className="state-card state-error"><div className="state-icon">!</div><div><strong>Local API unavailable</strong><p>{message}</p><Link className="text-link" to="/app">Return to control plane →</Link></div></div>;
+  return <div className="state-card state-error"><div className="state-icon">!</div><div><strong>RightsRail API unavailable</strong><p>{message}</p><Link className="text-link" to="/app">Return to control plane →</Link></div></div>;
 }
 
 export function EmptyState({ title, message, action }: { title: string; message: string; action?: ReactNode }) {
@@ -74,7 +78,7 @@ export function PolicySummary({ policy }: { policy: PolicyRecord }) {
 }
 
 export function SettlementCard({ settlement }: { settlement: SettlementRecord }) {
-  return <div className="settlement-card"><div className="settlement-icon">{settlement.settlement_type === "PAYOUT_ALLOCATED" ? "↗" : "↩"}</div><div className="settlement-copy"><div className="card-inline"><strong>{settlement.settlement_type.replaceAll("_", " ")}</strong><StatusBadge value={settlement.delivery_status} /></div><p>{settlement.result === "PERMITTED" ? "Frozen recipient entitlement allocated." : "Requester refund entitlement allocated."}</p><Link className="text-link" to={`/settlements/${settlement.settlement_id}`}>View settlement →</Link></div><strong className="settlement-amount">{settlement.amount} <small>GEN</small></strong></div>;
+  return <div className="settlement-card"><div className="settlement-icon">{settlement.settlement_type === "PAYOUT_ALLOCATED" ? "↗" : "↩"}</div><div className="settlement-copy"><div className="card-inline"><strong>{settlement.settlement_type.replaceAll("_", " ")}</strong><StatusBadge value={settlement.delivery_status} /></div><p>{settlement.result === "PERMITTED" ? "Frozen recipient entitlement allocated." : "Requester refund entitlement allocated."}</p><Link className="text-link" to={`/settlements/${settlement.settlement_id}`}>View settlement →</Link></div><strong className="settlement-amount">{settlement.amount} <small>attoGEN</small></strong></div>;
 }
 
 export function AuditTimeline({ items }: { items: Array<{ id: string; action: string; subject_id: string; at: string; description: string; severity: string }> }) {

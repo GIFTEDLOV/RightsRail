@@ -1,3 +1,18 @@
+# RightsRail 2.4.1 ? Stable Studionet
+
+The current compatibility release uses `contracts/rightsrail_studionet.py` and its generated `artifacts/rightsrail-studionet.abi.json`. It is deployed on built-in Studionet (chain 61999) at `0xdDB18c41B3033Ec2daD038F9547baAB913BEA2Aa`.
+
+Deployment transaction: `0x0b85e7aa631ed07223e927b2f9310f67beced18be5265ef247c9a74699463951`, finalized with successful leader execution. Live qualification is in progress; no submission readiness is claimed yet.
+
+- Current candidate: [manifest](provenance/studionet-candidate-manifest.json)
+- Deployment: [verified journal](docs/provenance/live-transactions/rightsrail-studionet-deployment.json)
+- Application: canonical API/indexer and wallet transaction lifecycle, deployed separately on Vercel.
+- Local stable gates: `python tools/verify_studionet_genvm.py`, then the isolated `requirements-studionet.txt` environment with `python -m pytest -c tests_studionet/pytest.ini --confcutdir=tests_studionet tests_studionet -q`.
+
+The V2.3 and V2.4 sources and historical deployment records remain separate. The notes below describe earlier phases.
+
+---
+
 # RightsRail
 
 RightsRail is a GenLayer Intelligent Contract application for semantic usage-rights enforcement for AI and digital media.
