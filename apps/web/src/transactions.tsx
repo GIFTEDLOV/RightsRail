@@ -9,8 +9,10 @@ type Provider = NonNullable<NonNullable<Parameters<typeof CreateClient>[0]>["pro
 type Journal = { method: string; state: string; hash?: `0x${string}`; error?: string; receipt?: unknown };
 
 export function executionResult(tx: unknown): string | null {
-  const value = tx as { txExecutionResultName?: string; consensus_data?: { leader_receipt?: Array<{ vote?: string | null; result?: { status?: string }; execution_result?: string; genvm_result?: { raw_error?: unknown } }> } };
+  const value = tx as { txExecutionResultName?: string; result_name?: string; consensus_data?: { leader_receipt?: Array<{ vote?: string | null; result?: { status?: string }; execution_result?: string; genvm_result?: { raw_error?: unknown } }> } };
   if (value.txExecutionResultName) return value.txExecutionResultName;
+  const status = (value as { statusName?: string }).statusName;
+  if (status === "FINALIZED" && value.result_name && value.result_name !== "MAJORITY_AGREE") return "FINISHED_WITH_CONSENSUS_FAILURE";
   const leaders = value.consensus_data?.leader_receipt;
   const leader = leaders?.find((item) => item.vote == null) ?? leaders?.[0];
   if (leader?.result?.status === "return" && leader.execution_result === "SUCCESS" && !leader.genvm_result?.raw_error) return "FINISHED_WITH_RETURN";
@@ -122,7 +124,7 @@ export function TransactionComposer({ initialMethod = "submit_usage_request" }: 
       {selected?.payable && <div className="field full"><label htmlFor="escrow-value">Escrow (attoGEN)</label><input id="escrow-value" inputMode="numeric" value={value} disabled={!!pending} onChange={(event) => setValue(event.target.value)} /></div>}
     </div>
     <button className="button button-dark" type="button" disabled={!status?.deployed || !!pending || !schema} onClick={() => { void submit(); }}>Review in wallet and sign</button>
-    {journal && <div role="status" aria-live="polite" className="review-box" style={{ marginTop: 20, overflowWrap: "anywhere" }}><strong>{journal.method}: {journal.state}</strong>{journal.hash && <p><a href={`https://explorer-studio.genlayer.com/transactions/${journal.hash}`} target="_blank" rel="noreferrer">{journal.hash}</a></p>}{journal.error && <p role="alert">{journal.error}</p>}{journal.hash && journal.state !== "CANONICAL_READBACK" && <button type="button" onClick={() => setPollVersion((version) => version + 1)}>Resume this receipt</button>}</div>}
+    {journal && <div role="status" aria-live="polite" className="review-box" style={{ marginTop: 20, overflowWrap: "anywhere" }}><strong>{journal.method}: {journal.state}</strong>{journal.hash && <p><a href={`https://explorer-studio.genlayer.com/transactions/${journal.hash}`} target="_blank" rel="noreferrer">{journal.hash}</a></p>}{journal.error && <p role="alert">{journal.error}</p>}{journal.hash && journal.state !== "CANONICAL_READBACK" && <button type="button" onClick={() => { persist({ ...journal, state: "PENDING", error: undefined }); setPollVersion((version) => version + 1); }}>Resume this receipt</button>}</div>}
   </section>;
 }
 

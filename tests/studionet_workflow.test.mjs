@@ -9,6 +9,7 @@ test("stable execution uses the proposing leader, not a canceled validator", () 
     { vote: "agree", execution_result: "ERROR", result: { status: "contract_error", payload: "idle" }, genvm_result: { raw_error: { causes: ["VALIDATOR_QUORUM_REACHED"] } } },
   ] } };
   assert.equal(executionName(tx), "FINISHED_WITH_RETURN");
+  assert.equal(executionName({ ...tx, result_name: "MAJORITY_DISAGREE" }), "FINISHED_WITH_CONSENSUS_FAILURE");
   tx.consensus_data.leader_receipt[0] = { vote: null, execution_result: "ERROR", result: { status: "contract_error", payload: "[EXPECTED] only the frozen entitlement recipient may withdraw" } };
   assert.equal(executionName(tx), "FINISHED_WITH_ERROR");
   assert.equal(executionName({ statusName: "FINALIZED" }), null);

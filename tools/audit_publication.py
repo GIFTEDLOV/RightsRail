@@ -32,7 +32,10 @@ def main() -> None:
             if any(re.search(pattern, data) for pattern in PATTERNS):
                 failures.append(path)
     if failures:
-        raise SystemExit("Credential pattern requires review in: " + ", ".join(sorted(set(failures))))
+        raise SystemExit(
+            "Credential pattern requires review in: "
+            + ", ".join(sorted(set(failures)))
+        )
     print(f"Publication scan: PASS ({len(seen)} unique tracked/staged blobs; values never printed)")
 
 

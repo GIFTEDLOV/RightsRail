@@ -175,6 +175,30 @@ async function reconcile(readClient, txHash, nonce, journal, record) {
   if (status(tx) !== "FINALIZED" || execution(tx) !== "FINISHED_WITH_RETURN") throw new Error("TERMINAL_FAILURE:" + status(tx) + ":" + execution(tx));
   return { tx, waitError: null };
 }
+function prepareConsensusRetry(journal, label) {
+  const previous = journal.transactions.find((item) => item.label === label);
+  if (!previous?.tx_hash || status(previous.receipt) !== "FINALIZED" || previous.receipt?.result_name !== "MAJORITY_DISAGREE") return;
+  const priorRetries = journal.transactions.filter((item) => item.original_label === label).length;
+  if (priorRetries >= 1) throw new Error("CONSENSUS_RETRY_EXHAUSTED:" + label);
+  previous.original_label = label;
+  previous.label = label + ":consensus-failed-1";
+  previous.phase = "TERMINAL_CONSENSUS_FAILURE";
+  previous.status = status(previous.receipt);
+  previous.execution_status = execution(previous.receipt);
+  previous.latest_execution_status = previous.execution_status;
+  previous.failure = "Terminal MAJORITY_DISAGREE; no adjudication state was committed";
+  journal.adjudication_retries = Number(journal.adjudication_retries ?? 0) + 1;
+  journal.failures.push({
+    label: previous.label,
+    tx_hash: previous.tx_hash,
+    failure_stage: "TERMINAL_CONSENSUS_FAILURE",
+    consensus_result: previous.receipt.result_name,
+    error: previous.failure,
+  });
+  journal.stop_reason = null;
+  journal.phase = "QUALIFICATION_IN_PROGRESS";
+  journalWrite(journal);
+}
 async function writeTx({ readClient, writeClient, signer, journal, label, method, args, value, nondeterministic, verify }) {
   const previous = journal.transactions.find((item) => item.label === label);
   if (previous?.phase === "COMPLETE") {
@@ -499,7 +523,9 @@ async function main() {
     journal.cases[caseId].evidence_tx = ev.txHash;
     const au = await writeTx({ readClient, writeClient: operatorClient, signer: operatorAccount, journal, label: "case-" + caseId + ":authenticate_evidence", method: "authenticate_evidence", args: [item.evidence], value: 0n, nondeterministic: true, verify: () => verifyAuth(readClient, item) });
     journal.cases[caseId].authenticate_tx = au.txHash;
-    const ad = await writeTx({ readClient, writeClient: operatorClient, signer: operatorAccount, journal, label: "case-" + caseId + ":adjudicate_usage", method: "adjudicate_usage", args: [item.request], value: 0n, nondeterministic: true, verify: () => verifyAdjudication(readClient, item) });
+    const adjudicationLabel = "case-" + caseId + ":adjudicate_usage";
+    prepareConsensusRetry(journal, adjudicationLabel);
+    const ad = await writeTx({ readClient, writeClient: operatorClient, signer: operatorAccount, journal, label: adjudicationLabel, method: "adjudicate_usage", args: [item.request], value: 0n, nondeterministic: true, verify: () => verifyAdjudication(readClient, item) });
     const adj = ad.readback;
     journal.cases[caseId].adjudicate_tx = ad.txHash;
     journal.cases[caseId].adjudication_id = adj.adjudication_id;

@@ -116,6 +116,12 @@ export function statusName(tx) {
 export function executionName(tx) {
   const named = tx?.txExecutionResultName ?? tx?.executionResultName;
   if (named) return named;
+  // Stable Studio reports the consensus decision separately from the leader
+  // receipt. A successful leader execution is not committed when the network
+  // reaches MAJORITY_DISAGREE.
+  if (statusName(tx) === "FINALIZED" && tx?.result_name && tx.result_name !== "MAJORITY_AGREE") {
+    return "FINISHED_WITH_CONSENSUS_FAILURE";
+  }
   // Stable Studio returns decoded leader receipts instead of the v0.6 enum.
   const leaders = tx?.consensus_data?.leader_receipt;
   const leader = Array.isArray(leaders) ? leaders.find((item) => item.vote == null) ?? leaders[0] : leaders;
