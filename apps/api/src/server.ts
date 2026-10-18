@@ -54,8 +54,17 @@ export async function handler(req: IncomingMessage, res: ServerResponse) {
       return writeJson(res, 200, { refreshed: true });
     }
     if (path === "/api/status" && req.method === "GET") {
-      const state = await snapshot();
-      return writeJson(res, 200, envelope(provider, { mode: configuredMode, deployed: provider.canonical, chainId: CHAIN_ID, contractAddress: appConfig.contractAddress, runner: appConfig.runner, contractSha256: appConfig.contractSha256, abiSha256: appConfig.abiSha256, semanticSchema: "RIGHTSRAIL_USAGE_V1", publicMethodCount: ABI_METHODS.reads.length + ABI_METHODS.writes.length, publicReadMethodCount: ABI_METHODS.reads.length, publicWriteMethodCount: ABI_METHODS.writes.length, counts: { policies: state.policies.length, requests: state.requests.length, evidence: state.evidence.length, adjudications: state.adjudications.length, permits: state.permits.length, settlements: state.settlements.length }, label: provider.canonical ? "CANONICAL STUDIONET V2.4" : "CONTROLLED LOCAL QUALIFICATION" }));
+      const counts = provider instanceof GenLayerCanonicalProvider
+        ? await provider.applicationStatus().then((status) => ({
+          policies: Number(status.policy_count ?? 0),
+          requests: Number(status.request_count ?? 0),
+          evidence: Number(status.evidence_count ?? 0),
+          adjudications: Number(status.adjudication_count ?? 0),
+          permits: Number(status.permit_count ?? 0),
+          settlements: Number(status.settlement_count ?? 0),
+        }))
+        : await snapshot().then((state) => ({ policies: state.policies.length, requests: state.requests.length, evidence: state.evidence.length, adjudications: state.adjudications.length, permits: state.permits.length, settlements: state.settlements.length }));
+      return writeJson(res, 200, envelope(provider, { mode: configuredMode, deployed: provider.canonical, chainId: CHAIN_ID, contractAddress: appConfig.contractAddress, runner: appConfig.runner, contractSha256: appConfig.contractSha256, abiSha256: appConfig.abiSha256, semanticSchema: "RIGHTSRAIL_USAGE_V1", publicMethodCount: ABI_METHODS.reads.length + ABI_METHODS.writes.length, publicReadMethodCount: ABI_METHODS.reads.length, publicWriteMethodCount: ABI_METHODS.writes.length, counts, label: provider.canonical ? "CANONICAL STUDIONET V2.4.1" : "CONTROLLED LOCAL QUALIFICATION" }));
     }
     const state = await snapshot();
     if (path === "/api/policies" && req.method === "GET") return writeJson(res, 200, envelope(provider, state.policies));

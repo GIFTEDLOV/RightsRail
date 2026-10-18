@@ -1,15 +1,18 @@
-# RightsRail 2.4.1 ? Stable Studionet
+# RightsRail 2.4.1 — Studionet
 
-The current compatibility release uses `contracts/rightsrail_studionet.py` and its generated `artifacts/rightsrail-studionet.abi.json`. It is deployed on built-in Studionet (chain 61999) at `0xdDB18c41B3033Ec2daD038F9547baAB913BEA2Aa`.
+**Status: Live qualification and production application verified; repository release checks are being finalized.**
 
-Deployment transaction: `0x0b85e7aa631ed07223e927b2f9310f67beced18be5265ef247c9a74699463951`, finalized with successful leader execution. Live qualification is in progress; no submission readiness is claimed yet.
+RightsRail is live at [rightsrail.vercel.app](https://rightsrail.vercel.app). The public application reads canonical state from built-in GenLayer Studionet (chain 61999) at `0xdDB18c41B3033Ec2daD038F9547baAB913BEA2Aa`.
 
-- Current candidate: [manifest](provenance/studionet-candidate-manifest.json)
-- Deployment: [verified journal](docs/provenance/live-transactions/rightsrail-studionet-deployment.json)
-- Application: canonical API/indexer and wallet transaction lifecycle, deployed separately on Vercel.
-- Local stable gates: `python tools/verify_studionet_genvm.py`, then the isolated `requirements-studionet.txt` environment with `python -m pytest -c tests_studionet/pytest.ini --confcutdir=tests_studionet tests_studionet -q`.
+- Source: `contracts/rightsrail_studionet.py` — SHA-256 `DA0828DD579AB0CAA6432AF713559D4E3B5E679444F71E7345C4FF8E0F21EC47`
+- Generated ABI: `artifacts/rightsrail-studionet.abi.json` — SHA-256 `AB93A76683921294FAC694751CF877E0F195A69DC7659FB5F02D6D34BC099B61`
+- Schema: 36 methods (24 reads, 12 writes), including read-only `get_audit_events(start, limit)`
+- Deployment: `0x0b85e7aa631ed07223e927b2f9310f67beced18be5265ef247c9a74699463951` — `FINALIZED / FINISHED_WITH_RETURN`
+- Live results: A `PERMITTED`, B `DENIED`, C `INCONCLUSIVE`, D `NOT_APPLICABLE`; each settlement and native GEN transfer has a finalized receipt and recipient balance readback.
 
-The V2.3 and V2.4 sources and historical deployment records remain separate. The notes below describe earlier phases.
+Submission evidence: [GitHub repository](https://github.com/GIFTEDLOV/RightsRail), [candidate manifest](provenance/studionet-candidate-manifest.json), [deployment journal](docs/provenance/live-transactions/rightsrail-studionet-deployment.json), [qualification journal](docs/provenance/live-transactions/rightsrail-studionet-qualification.json), [final report](FINAL_SUBMISSION_REPORT_V241.md), [submission status](SUBMISSION_STATUS_V241.json), [submission details](docs/SUBMISSION_DETAILS_V241.md), and [archive manifest](provenance/rightsrail-v241-studionet-archive-manifest.json).
+
+The original V2.4 candidate, V2.3 source, and their historical records remain preserved separately below.
 
 ---
 

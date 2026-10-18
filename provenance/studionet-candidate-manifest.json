@@ -33,5 +33,47 @@
     "rpc_chain_id": 61999,
     "isStudio": true,
     "sim_getFeeConfig_used": false
+  },
+  "deployment": {
+    "journal": "docs/provenance/live-transactions/rightsrail-studionet-deployment.json",
+    "transaction_id": "0x0b85e7aa631ed07223e927b2f9310f67beced18be5265ef247c9a74699463951",
+    "contract_address": "0xdDB18c41B3033Ec2daD038F9547baAB913BEA2Aa",
+    "status": "FINALIZED",
+    "execution_result": "FINISHED_WITH_RETURN",
+    "deployment_count": 1,
+    "source_parity_verified": true,
+    "schema_parity_verified": true,
+    "initial_state_verified": true
+  },
+  "qualification": {
+    "journal": "docs/provenance/live-transactions/rightsrail-studionet-qualification.json",
+    "phase": "QUALIFICATION_AND_DELIVERY_VERIFIED",
+    "verdict": "SUCCESSFUL_CANONICAL_QUALIFICATION_WITH_DELIVERY_READBACK",
+    "broadcast_count": 35,
+    "expected_results_pass": true,
+    "delivery_verification_pass": true,
+    "cases": {
+      "A": {"result": "PERMITTED", "settlement": "PAYOUT_ALLOCATED", "withdrawal_delivery_verified": true},
+      "B": {"result": "DENIED", "settlement": "REFUND_ALLOCATED", "withdrawal_delivery_verified": true},
+      "C": {"result": "INCONCLUSIVE", "settlement": "REFUND_ALLOCATED", "withdrawal_delivery_verified": true},
+      "D": {"result": "NOT_APPLICABLE", "settlement": "REFUND_ALLOCATED", "withdrawal_delivery_verified": true}
+    },
+    "protection_checks_passed": 8,
+    "protection_checks_total": 8,
+    "accounting": {
+      "total_escrow_received_atto_gen": 40,
+      "payout_allocated_atto_gen": 10,
+      "refund_allocated_atto_gen": 30,
+      "withdrawal_emitted_atto_gen": 40,
+      "outstanding_atto_gen": 0,
+      "conservation_rhs_atto_gen": 40
+    }
+  },
+  "application": {
+    "production_url": "https://rightsrail.vercel.app",
+    "vercel_deployment_id": "dpl_AKkJTc1QE7uEstSvckNzX3s1W42Y",
+    "canonical_status_verified": true,
+    "hosted_receipt_and_demo_verification": "PASS",
+    "public_production_access": true
   }
 }

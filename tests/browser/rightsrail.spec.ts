@@ -48,6 +48,44 @@ test.describe("RightsRail local product qualification", () => {
     await expect(page.getByRole("heading", { name: "evidence-case-a" })).toBeVisible();
   });
 
+  test("wallet rejection is explicit and never leaves an uncertain broadcast", async ({ page }) => {
+    await page.route("**/api/status", async (route) => {
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({
+          data: {
+            mode: "GENLAYER_CANONICAL",
+            deployed: true,
+            chainId: 61999,
+            contractAddress: "0xdDB18c41B3033Ec2daD038F9547baAB913BEA2Aa",
+            publicMethodCount: 36,
+          },
+          provenance: { canonical: true, chainId: 61999 },
+        }),
+      });
+    });
+    await page.addInitScript(() => {
+      Object.defineProperty(window, "ethereum", {
+        value: {
+          request: async ({ method }: { method: string }) => {
+            if (method === "eth_requestAccounts") {
+              const error = new Error("User rejected request") as Error & { code: number };
+              error.code = 4001;
+              throw error;
+            }
+            return "0xf22f";
+          },
+        },
+      });
+    });
+    await page.goto("/transactions");
+    await page.getByLabel("Contract method").selectOption("freeze_policy");
+    await page.getByLabel("policy_id (string)").fill("policy-v241-lumen-finch-001");
+    await page.getByRole("button", { name: "Review in wallet and sign" }).click();
+    await expect(page.getByText("freeze_policy: REJECTED")).toBeVisible();
+    await expect(page.getByText("User rejected request", { exact: false })).toBeVisible();
+  });
+
   test("mobile comparison stacks without horizontal overflow", async ({ page }, testInfo) => {
     await page.goto("/demo/case-b");
     await expect(page.getByText("CONTROLLED LOCAL QUALIFICATION").first()).toBeVisible();

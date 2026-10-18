@@ -16,7 +16,7 @@ export function executionResult(tx: unknown): string | null {
   const leaders = value.consensus_data?.leader_receipt;
   const leader = leaders?.find((item) => item.vote == null) ?? leaders?.[0];
   if (leader?.result?.status === "return" && leader.execution_result === "SUCCESS" && !leader.genvm_result?.raw_error) return "FINISHED_WITH_RETURN";
-  if (["error", "user_error", "contract_error"].includes(leader?.result?.status ?? "") && leader?.execution_result === "ERROR") return "FINISHED_WITH_ERROR";
+  if (["error", "user_error", "contract_error", "rollback"].includes(leader?.result?.status ?? "") && leader?.execution_result === "ERROR") return "FINISHED_WITH_ERROR";
   return null;
 }
 

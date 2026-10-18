@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { ABI_METHODS, ABI_SHA256, CONTRACT_SHA256, FrozenContractClient, SEMANTIC_KEYS, STUDIONET_CHAIN_ID, STUDIONET_RPC, assertSemanticVector, contractConfig } from "@rightsrail/genlayer-client";
 import { ControlledFixtureProvider, GenLayerCanonicalProvider, findById, provenance } from "@rightsrail/indexer";
@@ -61,6 +61,21 @@ describe("provider and fixture provenance", () => {
       canonical: true,
       contractAddress: "0x984b996079d2591976FcfFb62d0506DF02E0396A",
     });
+  });
+
+  it("reads and briefly caches only the canonical status view for the status endpoint", async () => {
+    const readContract = vi.fn().mockResolvedValue({ policy_count: 1n, request_count: 4n });
+    const provider = new GenLayerCanonicalProvider(
+      "0x984b996079d2591976FcfFb62d0506DF02E0396A",
+      { readContract } as never,
+    );
+    await expect(provider.applicationStatus()).resolves.toEqual({ policy_count: 1, request_count: 4 });
+    await provider.applicationStatus();
+    expect(readContract).toHaveBeenCalledTimes(1);
+    expect(readContract).toHaveBeenCalledWith(expect.objectContaining({ functionName: "get_status" }));
+    provider.invalidate();
+    await provider.applicationStatus();
+    expect(readContract).toHaveBeenCalledTimes(2);
   });
 
   it("finds typed records by their canonical identifier", () => {

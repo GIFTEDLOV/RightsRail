@@ -12,3 +12,13 @@ playwright-report
 screenshots
 *.zip
 rightsrail_deployed.py
+.github
+contracts
+artifacts
+docs
+provenance
+tests
+tests_studionet
+tools
+requirements*.txt
+*.md

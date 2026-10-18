@@ -126,7 +126,7 @@ export function executionName(tx) {
   const leaders = tx?.consensus_data?.leader_receipt;
   const leader = Array.isArray(leaders) ? leaders.find((item) => item.vote == null) ?? leaders[0] : leaders;
   if (leader?.result?.status === "return" && leader.execution_result === "SUCCESS" && !leader.genvm_result?.raw_error) return "FINISHED_WITH_RETURN";
-  if (["error", "user_error", "contract_error"].includes(leader?.result?.status) && leader.execution_result === "ERROR") return "FINISHED_WITH_ERROR";
+  if (["error", "user_error", "contract_error", "rollback"].includes(leader?.result?.status) && leader.execution_result === "ERROR") return "FINISHED_WITH_ERROR";
   return null;
 }
 

@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { createClient } from "genlayer-js";
 import { studionet } from "genlayer-js/chains";
+import type { GenLayerChain, GenLayerClient } from "genlayer-js/types";
 import {
   ABI_METHODS,
   ABI_SHA256,
@@ -99,19 +100,39 @@ export class GenLayerCanonicalProvider implements RightsRailProvider {
   readonly mode = "GENLAYER_CANONICAL" as const;
   readonly canonical = true as const;
   readonly config;
-  private readonly client = createClient({ chain: studionet });
+  private readonly client: GenLayerClient<GenLayerChain>;
   private lastSnapshot: { at: number; value: IndexedState } | null = null;
   private pendingSnapshot: Promise<IndexedState> | null = null;
+  private lastApplicationStatus: { at: number; value: Record<string, unknown> } | null = null;
+  private pendingApplicationStatus: Promise<Record<string, unknown>> | null = null;
 
-  invalidate(): void { this.lastSnapshot = null; }
+  invalidate(): void { this.lastSnapshot = null; this.lastApplicationStatus = null; }
 
-  constructor(readonly address: string | null) {
+  constructor(readonly address: string | null, client: GenLayerClient<GenLayerChain> = createClient({ chain: studionet })) {
+    this.client = client;
     this.config = contractConfig("GENLAYER_CANONICAL", address);
   }
 
   private async read(functionName: string, args: unknown[] = []): Promise<unknown> {
     if (!this.address) throw new Error("Canonical provider unavailable: contract is not deployed");
     return parse(await this.client.readContract({ address: this.address as `0x${string}`, functionName, args: args as never[] }));
+  }
+
+  async applicationStatus(): Promise<Record<string, unknown>> {
+    if (this.lastApplicationStatus && Date.now() - this.lastApplicationStatus.at < 10000) {
+      return structuredClone(this.lastApplicationStatus.value);
+    }
+    if (!this.pendingApplicationStatus) {
+      this.pendingApplicationStatus = this.read("get_status").then((value) => {
+        if (!value || typeof value !== "object" || Array.isArray(value)) {
+          throw new Error("Canonical application status is invalid");
+        }
+        const normalized = jsonValue(value) as Record<string, unknown>;
+        this.lastApplicationStatus = { at: Date.now(), value: normalized };
+        return normalized;
+      }).finally(() => { this.pendingApplicationStatus = null; });
+    }
+    return structuredClone(await this.pendingApplicationStatus);
   }
 
   private async pages(method: string): Promise<unknown[]> {
