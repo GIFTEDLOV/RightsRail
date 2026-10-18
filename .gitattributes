@@ -1,4 +1,5 @@
 contracts/*.py text eol=lf
+artifacts/rightsrail.abi.json text eol=crlf
 artifacts/rightsrail-v24.abi.json text eol=crlf
 artifacts/rightsrail-studionet.abi.json text eol=lf
 apps/web/public/release/rightsrail.abi.json text eol=lf
