@@ -66,7 +66,7 @@ def main() -> None:
         ARCHIVE, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
     ) as archive:
         for member in MEMBERS:
-            info = zipfile.ZipInfo(member, date_time=(2026, 10, 17, 0, 0, 0))
+            info = zipfile.ZipInfo(member, date_time=(2026, 10, 18, 0, 0, 0))
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = 0o100644 << 16
             archive.writestr(info, payloads[member])
