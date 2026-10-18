@@ -1,0 +1,142 @@
+{
+  "schema": "RIGHTSRAIL_V241_SUBMISSION_STATUS_V1",
+  "product": "RightsRail",
+  "release": "2.4.1",
+  "status": "GO_SUBMISSION_READY",
+  "updated_at": "2026-10-18",
+  "network": {
+    "alias": "studionet",
+    "rpc": "https://studio.genlayer.com/api",
+    "chain_id": 61999,
+    "consensus_main": "0xb7278A61aa25c888815aFC32Ad3cC52fF24fE575",
+    "consensus_data": "0x88B0F18613Db92Bf970FfE264E02496e20a74D16",
+    "fee_profile": "GASLESS_VERIFIED",
+    "fee_value": "0"
+  },
+  "candidate": {
+    "source": "contracts/rightsrail_studionet.py",
+    "source_sha256": "DA0828DD579AB0CAA6432AF713559D4E3B5E679444F71E7345C4FF8E0F21EC47",
+    "abi": "artifacts/rightsrail-studionet.abi.json",
+    "abi_sha256": "AB93A76683921294FAC694751CF877E0F195A69DC7659FB5F02D6D34BC099B61",
+    "schema": {"methods": 36, "reads": 24, "writes": 12, "read_only_get_audit_events": true},
+    "preserved_v24_source_sha256": "5C99DEB31EB29B171B94F343950CBFF5204945D02160B2ADA3D742A1FFC6D321",
+    "preserved_v24_abi_sha256": "11548EA63B1C365C7985BE8C748109C4B7F4A33A1A55DE8394EF1CE90E6BE4EA"
+  },
+  "deployment": {
+    "address": "0xdDB18c41B3033Ec2daD038F9547baAB913BEA2Aa",
+    "transaction_id": "0x0b85e7aa631ed07223e927b2f9310f67beced18be5265ef247c9a74699463951",
+    "status": "FINALIZED",
+    "execution_result": "FINISHED_WITH_RETURN",
+    "count": 1,
+    "source_parity": true,
+    "schema_parity": true,
+    "initial_state_verified": true,
+    "journal": "docs/provenance/live-transactions/rightsrail-studionet-deployment.json"
+  },
+  "qualification": {
+    "phase": "QUALIFICATION_AND_DELIVERY_VERIFIED",
+    "verdict": "SUCCESSFUL_CANONICAL_QUALIFICATION_WITH_DELIVERY_READBACK",
+    "broadcast_count": 35,
+    "actors": {
+      "issuer": "0x33653E6e86807e41682D3346CDf648D6653384B1",
+      "requester": "0x61F10Cc252eD98Ce7596c73fC557cCA4cc600c82",
+      "operator": "0x0291E33706B7CaE6AD332A28f66E7f3E6F634d58",
+      "role_addresses_distinct": true
+    },
+    "funding_transaction_id": "0x7ce1a616add8da991ebf8f20ae0ca2a41ffdd97cbf118cb4c04196df35097245",
+    "funding_atto_gen": 40,
+    "cases": {
+      "A": {
+        "result": "PERMITTED",
+        "settlement": "PAYOUT_ALLOCATED",
+        "adjudication_tx": "0x90c5d7eade35ee07bd74c3c70ad355b85bb21317ee2b4e64640a1f3e943c7afc",
+        "settlement_tx": "0x0f4370ddad5f7b30d19a3132236214bc1301eda3431c900ea74b13b803799dd5",
+        "withdrawal_tx": "0x1ed53154afe02636609329b97e0403955e022531f22962c7c74e53d598420b72",
+        "delivery_child_tx": "0xaec803568440fc693442573de2b4765457bd91a668e118952cacc4e5ff23a873",
+        "recipient_balance_delta_atto_gen": 10
+      },
+      "B": {
+        "result": "DENIED",
+        "settlement": "REFUND_ALLOCATED",
+        "consensus_failed_attempt_tx": "0x88b45ad94f384756e7edb0733c9d70dde04a02b43f773e46f84b5700821e5892",
+        "adjudication_tx": "0xa27db4226d3229b9f6adce4b170076637b406fcfe65e4ddf57d25b7ea88d4528",
+        "settlement_tx": "0x6b3fd04e535ca5822112d4bc32aaa1c0cfea05b9e4d95db5d726e6b9cf155ab8",
+        "withdrawal_tx": "0x574a57db560ec6dc26e3362e6a7a3026d34ad30c5e0b2edf378f849524d88022",
+        "delivery_child_tx": "0xc820edc1dd87d617f814abe82720e84e618faeea63d71fb09aff77b2c8a0de67",
+        "recipient_balance_delta_atto_gen": 10,
+        "same_input_retry": true,
+        "result_shopping": false
+      },
+      "C": {
+        "result": "INCONCLUSIVE",
+        "settlement": "REFUND_ALLOCATED",
+        "adjudication_tx": "0xe71821226c477509c7f7a10678844dc94e5421b8650b46cd3c10f309344e58b7",
+        "settlement_tx": "0x8022ad8f302a7e7be517aac893756d128cbea5e5d8eea8b06bf8a9ee2bf0fe12",
+        "withdrawal_tx": "0x926541d6b322c9380300d4cdd101808b39f25c3d5155bedc953fbf7035503bd3",
+        "delivery_child_tx": "0x38a1d1c73f8e18a10237c726a94907d1c8d8967ad83897bb987d58b39c5a9399",
+        "recipient_balance_delta_atto_gen": 10
+      },
+      "D": {
+        "result": "NOT_APPLICABLE",
+        "settlement": "REFUND_ALLOCATED",
+        "adjudication_tx": "0x2264736592c13de10942fed243ff65447cffe6fafbba55f6d9f5529005588e77",
+        "settlement_tx": "0x1f77a220ad597fe3d6e9dc623d01800e1918ea3440e8ede00a95696595dfd434",
+        "withdrawal_tx": "0x51bb7570c6523333f512d5f4d9140aea0e91af8d49de2cc57f28d22ca6bde4a2",
+        "delivery_child_tx": "0xba90355dc4fafd264e3af1c03b86b45b69c5234c932240c92ff1221751e89c62",
+        "recipient_balance_delta_atto_gen": 10
+      }
+    },
+    "protection_checks": {"passed": 8, "total": 8, "state_unchanged": true},
+    "accounting_atto_gen": {
+      "escrow_received": 40,
+      "payout_allocated": 10,
+      "refund_allocated": 30,
+      "withdrawal_emitted": 40,
+      "outstanding": 0,
+      "conservation_rhs": 40
+    },
+    "evidence_body_verification": true,
+    "journal": "docs/provenance/live-transactions/rightsrail-studionet-qualification.json"
+  },
+  "application": {
+    "production_url": "https://rightsrail.vercel.app",
+    "vercel_deployment_id": "dpl_AKkJTc1QE7uEstSvckNzX3s1W42Y",
+    "public_access": true,
+    "canonical_status_readback": true,
+    "hosted_receipt_and_demo_verification": true,
+    "source_sha256": "DA0828DD579AB0CAA6432AF713559D4E3B5E679444F71E7345C4FF8E0F21EC47",
+    "abi_sha256": "AB93A76683921294FAC694751CF877E0F195A69DC7659FB5F02D6D34BC099B61"
+  },
+  "checks": {
+    "pytest": {"passed": 87, "subtests": 18},
+    "unittest": {"passed": 32},
+    "typescript_api": {"passed": 18},
+    "deployment_policy": {"passed": 21},
+    "stable_workflow": {"passed": 2},
+    "browser_e2e": {"passed": 32},
+    "production_build": "PASS",
+    "typescript_typecheck": "PASS",
+    "ruff": "PASS",
+    "mypy": {"status": "PASS", "files": 13},
+    "python_compile": "PASS",
+    "genvm_rc5": {"validation": "PASS", "typecheck": "PASS", "schema_comparison": "PASS", "lint_notes": "known E010 warnings only"},
+    "stable_genvm": {"validation": "PASS", "typecheck": "PASS", "schema_comparison": "PASS", "diagnostics": 0},
+    "stable_sdk": {"passed": 6},
+    "hosted_production_browser": "PASS",
+    "release_invariants": "PASS"
+  },
+  "github": {
+    "repository": "https://github.com/GIFTEDLOV/RightsRail",
+    "branch": "main",
+    "source_commit": "72aec9b61e9863df21ec34c34d3db712e4729658",
+    "ci_run_id": 39132942743,
+    "ci_status": "PASS",
+    "ci_url": "https://github.com/GIFTEDLOV/RightsRail/actions/runs/39132942743"
+  },
+  "release_artifacts": {
+    "archive": "RightsRail_V2.4.1_STUDIONET_SUBMISSION.zip",
+    "archive_manifest": "provenance/rightsrail-v241-studionet-archive-manifest.json"
+  },
+  "portal_submitted": false,
+  "blockers": []
+}

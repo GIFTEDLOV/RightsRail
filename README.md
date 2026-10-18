@@ -1,6 +1,6 @@
 # RightsRail 2.4.1 — Studionet
 
-**Status: Live qualification and production application verified; repository release checks are being finalized.**
+**Status: GO — live deployment, four-case qualification, production application, repository CI, and release checks passed.**
 
 RightsRail is live at [rightsrail.vercel.app](https://rightsrail.vercel.app). The public application reads canonical state from built-in GenLayer Studionet (chain 61999) at `0xdDB18c41B3033Ec2daD038F9547baAB913BEA2Aa`.
 

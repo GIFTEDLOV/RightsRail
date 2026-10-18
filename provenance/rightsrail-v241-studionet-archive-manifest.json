@@ -1,0 +1,72 @@
+{
+  "schema": "RIGHTSRAIL_V241_STUDIONET_ARCHIVE_MANIFEST_V1",
+  "archive": "RightsRail_V2.4.1_STUDIONET_SUBMISSION.zip",
+  "archive_sha256": "C98458B786005A906C85F3D5D8508328B222C04D744A536F0CDE43BC483DA3C1",
+  "archive_bytes": 440408,
+  "status": "GO_SUBMISSION_READY",
+  "network": {
+    "alias": "studionet",
+    "rpc": "https://studio.genlayer.com/api",
+    "chain_id": 61999
+  },
+  "contract_address": "0xdDB18c41B3033Ec2daD038F9547baAB913BEA2Aa",
+  "candidate_source_sha256": "DA0828DD579AB0CAA6432AF713559D4E3B5E679444F71E7345C4FF8E0F21EC47",
+  "candidate_abi_sha256": "AB93A76683921294FAC694751CF877E0F195A69DC7659FB5F02D6D34BC099B61",
+  "member_count": 9,
+  "members": [
+    {
+      "path": "contracts/rightsrail_studionet.py",
+      "bytes": 73560,
+      "sha256": "DA0828DD579AB0CAA6432AF713559D4E3B5E679444F71E7345C4FF8E0F21EC47"
+    },
+    {
+      "path": "artifacts/rightsrail-studionet.abi.json",
+      "bytes": 10679,
+      "sha256": "AB93A76683921294FAC694751CF877E0F195A69DC7659FB5F02D6D34BC099B61"
+    },
+    {
+      "path": "provenance/studionet-candidate-manifest.json",
+      "bytes": 3261,
+      "sha256": "92E8DCC151748AC79FF865888C3FB2A113801B9ACB94105F5485523B8974118C"
+    },
+    {
+      "path": "docs/provenance/rightsrail-studionet-preflight.json",
+      "bytes": 1856,
+      "sha256": "216A989AAC7D15BDAB4266D53105B1B99C14DCD894D8EB58AA10CF527282400C"
+    },
+    {
+      "path": "docs/provenance/live-transactions/rightsrail-studionet-deployment.json",
+      "bytes": 487619,
+      "sha256": "458535691BF9A59D5EC67C26F183C6F283984B3995AAD28C8543947E2D4B1D05"
+    },
+    {
+      "path": "docs/provenance/live-transactions/rightsrail-studionet-qualification.json",
+      "bytes": 4731138,
+      "sha256": "92DFEF7687537FCC4D38FCE7938D8ACD17C4B49C6D1A4DA6096F0C0D3EBB205A"
+    },
+    {
+      "path": "docs/SUBMISSION_DETAILS_V241.md",
+      "bytes": 4963,
+      "sha256": "3F2065246510592141159D326AF6E05481CFB728EF1F956AB9F576F9E61A6106"
+    },
+    {
+      "path": "FINAL_SUBMISSION_REPORT_V241.md",
+      "bytes": 7493,
+      "sha256": "CF0B3C6C39E7282A625C40502DA5A56A686C54C97B6E763FAB230E6E0EC23943"
+    },
+    {
+      "path": "SUBMISSION_STATUS_V241.json",
+      "bytes": 6540,
+      "sha256": "F93E367AAA6C92A6E2EE2DC04A2E65F96DBC8C755A542332BF1A808B138A3DF9"
+    }
+  ],
+  "checks": {
+    "archive_member_set_exact": true,
+    "all_member_bytes_match_workspace": true,
+    "all_member_hashes_verified": true,
+    "generated_and_published_abi_match": true,
+    "secret_assignment_pattern_found": false,
+    "environment_files_included": false,
+    "unrelated_project_files_included": false
+  }
+}
