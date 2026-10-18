@@ -39,7 +39,7 @@ Reference and proposed evidence for all four cases were served over public HTTPS
 - Hosted browser verification passed against the production URL: canonical demo cards, successful receipt recovery, consensus-failure display, and no browser console errors.
 - Local gates passed: pytest `87 passed, 18 subtests`; unittest `32 passed`; TypeScript/API `18 passed`; deployment policy `21 passed`; stable workflow `2 passed`; browser E2E `32 passed`; Ruff; mypy (13 source files); Python compile; TypeScript typecheck; production build.
 - GenVM RC5 V2.4 validation/typecheck and generated schema comparison passed against the pinned baseline. Lint reported only the known `E010` nondeterministic-reachability warnings. Stable GenVM validation/typecheck/schema comparison passed with zero diagnostics and exact deployed ABI parity. The isolated stable SDK suite passed 6 tests.
-- GitHub Actions passed on source revision `72aec9b61e9863df21ec34c34d3db712e4729658`; see [run 39132942743](https://github.com/GIFTEDLOV/RightsRail/actions/runs/39132942743). The final packaging commit will receive its own CI run before the release is published.
+- GitHub Actions passed on source revision `72aec9b61e9863df21ec34c34d3db712e4729658`; see [run 39132942743](https://github.com/GIFTEDLOV/RightsRail/actions/runs/39132942743). Repository CI gates publication on the full workflow passing for the release package commit; see [current checks](https://github.com/GIFTEDLOV/RightsRail/actions).
 - Build note: Vite reports one 529 KB minified JavaScript chunk; production build and hosted browser checks passed.
 
 ## Submission files
